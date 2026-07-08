@@ -162,3 +162,45 @@ Colabでは [notebooks/student_ai_colab.ipynb](notebooks/student_ai_colab.ipynb)
 ```bash
 python -m pytest
 ```
+
+ただし最初にノートブック内のここだけ変更してください。
+
+REPO_URL = "https://github.com/YOUR_NAME/student-ai.git"
+
+これを自分のGitHub URLにします。
+
+REPO_URL = "https://github.com/あなたのユーザー名/student-ai.git"
+
+Colabでの更新方法は、すでにclone済みなら次を実行します。
+
+%cd /content/student-ai
+!git pull
+
+もしローカル側でコードを変更してGitHubへ上げる場合は、ローカルの
+student-ai フォルダで次を実行します。
+
+git status
+git add .
+git commit -m "Update student AI MVP"
+git push
+
+Colab側でその更新を取り込むには、もう一度:
+
+%cd /content/student-ai
+!git pull
+
+うまくいかない場合の作り直し手順:
+
+%cd /content
+!rm -rf student-ai
+!git clone https://github.com/あなたのユーザー名/student-ai.git
+%cd student-ai
+!pip install -q -r requirements.txt
+
+private repository の場合は、ColabでGitHub認証が必要です。簡単なの
+は、GitHubの Personal Access Token を使って clone する方法です。
+
+!git clone
+https://TOKEN@github.com/あなたのユーザー名/student-ai.git
+
+ただし token をノートブックに残さないようにしてください。
