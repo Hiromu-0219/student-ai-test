@@ -151,9 +151,35 @@ from pathlib import Path
 print(Path("data/logs/human_readable.md").read_text(encoding="utf-8")[-2000:])
 ```
 
+### 8. GitHubの更新をColabへ取り込む
+
+GitHub側のコードを更新したあと、Colabでは次を実行します。
+
+```python
+%cd /content/student-ai
+!git status
+!git pull
+```
+
+依存関係が変わった場合は、pull後に再インストールします。
+
+```python
+!pip install -q -r requirements.txt
+```
+
+pullで衝突したり、Colab上の内容を捨ててGitHubの最新版で作り直す場合は、cloneし直します。
+
+```python
+%cd /content
+!rm -rf student-ai
+!git clone https://github.com/YOUR_NAME/student-ai.git /content/student-ai
+%cd /content/student-ai
+!pip install -q -r requirements.txt
+```
+
 ## Colabノートブック
 
-Colabでは [notebooks/student_ai_colab.ipynb](notebooks/student_ai_colab.ipynb) を使います。ノートブック冒頭でGitHub clone、依存関係インストール、mock確認、4bit LLM実行まで順番に実行できます。
+Colabでは [notebooks/student_ai_colab.ipynb](notebooks/student_ai_colab.ipynb) を使います。ノートブック冒頭でGitHub clone、依存関係インストール、mock確認、4bit LLM実行、GitHubからの更新取り込みまで順番に実行できます。
 
 ## テスト
 
