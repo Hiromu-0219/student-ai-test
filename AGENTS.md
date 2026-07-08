@@ -9,6 +9,7 @@
 ## Runtime
 
 - Google Colab で動くことを優先する。
+- ColabではGitHubから `student-ai` をcloneし、repo rootで実行する前提にする。
 - Colab実行例は `notebooks/student_ai_colab.ipynb` に置く。
 - ローカルLLMは `transformers` で読み込む。
 - 4bit量子化は `bitsandbytes` の `BitsAndBytesConfig` を使う。
