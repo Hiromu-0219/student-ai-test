@@ -1,0 +1,126 @@
+from __future__ import annotations
+
+import argparse
+import re
+from typing import Any
+
+from src.config import (
+    DEFAULT_LOGS_DIR,
+    DEFAULT_MODEL_ID,
+    DEFAULT_STUDENTS_DIR,
+)
+from src.logger import AnswerLogger
+from src.model_loader import LocalLLM
+from src.student_agent import StudentAgent
+from src.state_manager import StateManager
+
+
+class RuleBasedMockLLM:
+    model_id = "rule-based-mock"
+
+    def generate(self, system_prompt: str, user_prompt: str) -> str:
+        problem = _extract_problem(user_prompt)
+        answer = _solve_simple_linear_equation(problem)
+        if answer is None:
+            return "まだ一次方程式として整理できていません。答え: わかりません"
+        return f"両辺を整理して、x は {answer} だと思います。答え: x = {answer}"
+
+
+class StudentAISimulator:
+    def __init__(
+        self,
+        *,
+        model_id: str = DEFAULT_MODEL_ID,
+        load_in_4bit: bool = True,
+        students_dir: str = DEFAULT_STUDENTS_DIR,
+        logs_dir: str = DEFAULT_LOGS_DIR,
+        use_mock_model: bool = False,
+    ) -> None:
+        self.state_manager = StateManager(students_dir)
+        self.logger = AnswerLogger(logs_dir)
+        self.llm = (
+            RuleBasedMockLLM()
+            if use_mock_model
+            else LocalLLM(model_id=model_id, load_in_4bit=load_in_4bit)
+        )
+        self.agent = StudentAgent(self.llm)
+
+    def answer(self, student_id: str, problem: str) -> dict[str, Any]:
+        state = self.state_manager.load_student(student_id)
+        answer = self.agent.answer(state, problem)
+        record = self.logger.log_interaction(
+            student_id=student_id,
+            problem=problem,
+            answer=answer,
+            student_state_snapshot=state,
+            model_id=self.agent.model_id,
+            metadata={"domain": "linear_equation"},
+        )
+        self.state_manager.update_learning_history(
+            student_id,
+            {
+                "problem": problem,
+                "answer": answer,
+                "logged_at": record["timestamp"],
+                "domain": "linear_equation",
+            },
+        )
+        return record
+
+
+def _extract_problem(prompt: str) -> str:
+    marker = "問題:"
+    if marker in prompt:
+        return prompt.split(marker, 1)[1].split("生徒AIとして", 1)[0].strip()
+    return prompt
+
+
+def _solve_simple_linear_equation(text: str) -> str | None:
+    normalized = (
+        text.replace(" ", "")
+        .replace("　", "")
+        .replace("を解いてください。", "")
+        .replace("を解いてください", "")
+        .replace("=", "=")
+    )
+    match = re.search(r"([+-]?\d*)x([+-]\d+)?=([+-]?\d+)", normalized)
+    if not match:
+        return None
+
+    coef_raw, const_raw, rhs_raw = match.groups()
+    if coef_raw in ("", "+"):
+        coef = 1
+    elif coef_raw == "-":
+        coef = -1
+    else:
+        coef = int(coef_raw)
+
+    const = int(const_raw or 0)
+    rhs = int(rhs_raw)
+    if coef == 0:
+        return None
+
+    value = (rhs - const) / coef
+    return str(int(value)) if value.is_integer() else str(value)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Run the student AI simulator.")
+    parser.add_argument("--student-id", default="S001")
+    parser.add_argument("--problem", required=True)
+    parser.add_argument("--model-id", default=DEFAULT_MODEL_ID)
+    parser.add_argument("--no-4bit", action="store_true")
+    parser.add_argument("--mock", action="store_true")
+    args = parser.parse_args()
+
+    sim = StudentAISimulator(
+        model_id=args.model_id,
+        load_in_4bit=not args.no_4bit,
+        use_mock_model=args.mock,
+    )
+    result = sim.answer(args.student_id, args.problem)
+    print(result["answer"])
+
+
+if __name__ == "__main__":
+    main()

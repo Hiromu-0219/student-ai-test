@@ -1,0 +1,19 @@
+{
+  "student_id": "S002",
+  "name": "Mina",
+  "understanding": {
+    "linear_equation": "low",
+    "transposition": "weak",
+    "fraction": "weak"
+  },
+  "error_tendency": [
+    "両辺に同じ操作をする意識が弱い",
+    "x の係数で割る手順を忘れやすい"
+  ],
+  "personality": {
+    "confidence": "low",
+    "style": "迷いながら説明する",
+    "asks_for_help": true
+  },
+  "learning_history": []
+}

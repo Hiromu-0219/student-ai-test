@@ -1,0 +1,19 @@
+{
+  "student_id": "S001",
+  "name": "Aki",
+  "understanding": {
+    "linear_equation": "basic",
+    "transposition": "sometimes_confused",
+    "fraction": "weak"
+  },
+  "error_tendency": [
+    "符号を移項時に間違えやすい",
+    "途中式を省略しがち"
+  ],
+  "personality": {
+    "confidence": "medium",
+    "style": "短く答える",
+    "asks_for_help": false
+  },
+  "learning_history": []
+}

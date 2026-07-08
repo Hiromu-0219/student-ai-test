@@ -1,0 +1,18 @@
+{
+  "student_id": "S003",
+  "name": "Ren",
+  "understanding": {
+    "linear_equation": "high",
+    "transposition": "stable",
+    "fraction": "basic"
+  },
+  "error_tendency": [
+    "暗算で途中式を飛ばす"
+  ],
+  "personality": {
+    "confidence": "high",
+    "style": "はっきり答える",
+    "asks_for_help": false
+  },
+  "learning_history": []
+}
