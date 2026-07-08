@@ -6,13 +6,35 @@
     "transposition": "stable",
     "fraction": "basic"
   },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "high",
+      "can_solve_ax_plus_b_equals_c": true,
+      "can_transpose_terms": true,
+      "can_divide_by_coefficient": true,
+      "can_handle_negative_numbers": true,
+      "can_handle_fractions": "basic"
+    }
+  },
   "error_tendency": [
     "暗算で途中式を飛ばす"
   ],
+  "misconceptions": [],
+  "learning_speed": "fast",
   "personality": {
     "confidence": "high",
     "style": "はっきり答える",
     "asks_for_help": false
   },
+  "big_five": {
+    "openness": "high",
+    "conscientiousness": "high",
+    "extraversion": "medium",
+    "agreeableness": "medium",
+    "neuroticism": "low"
+  },
+  "self_efficacy": "high",
+  "question_tendency": "low",
+  "motivation": "high",
   "learning_history": []
 }

@@ -8,6 +8,8 @@ from src.config import (
     DEFAULT_LOGS_DIR,
     DEFAULT_MODEL_ID,
     DEFAULT_STUDENTS_DIR,
+    GenerationConfig,
+    ModelLoadConfig,
 )
 from src.logger import AnswerLogger
 from src.model_loader import LocalLLM
@@ -35,13 +37,20 @@ class StudentAISimulator:
         students_dir: str = DEFAULT_STUDENTS_DIR,
         logs_dir: str = DEFAULT_LOGS_DIR,
         use_mock_model: bool = False,
+        generation_config: GenerationConfig | None = None,
+        model_load_config: ModelLoadConfig | None = None,
     ) -> None:
         self.state_manager = StateManager(students_dir)
         self.logger = AnswerLogger(logs_dir)
         self.llm = (
             RuleBasedMockLLM()
             if use_mock_model
-            else LocalLLM(model_id=model_id, load_in_4bit=load_in_4bit)
+            else LocalLLM(
+                model_id=model_id,
+                load_in_4bit=load_in_4bit,
+                generation_config=generation_config,
+                model_load_config=model_load_config,
+            )
         )
         self.agent = StudentAgent(self.llm)
 
@@ -111,12 +120,22 @@ def main() -> None:
     parser.add_argument("--model-id", default=DEFAULT_MODEL_ID)
     parser.add_argument("--no-4bit", action="store_true")
     parser.add_argument("--mock", action="store_true")
+    parser.add_argument("--max-new-tokens", type=int, default=256)
+    parser.add_argument("--temperature", type=float, default=0.7)
+    parser.add_argument("--top-p", type=float, default=0.9)
+    parser.add_argument("--repetition-penalty", type=float, default=1.05)
     args = parser.parse_args()
 
     sim = StudentAISimulator(
         model_id=args.model_id,
         load_in_4bit=not args.no_4bit,
         use_mock_model=args.mock,
+        generation_config=GenerationConfig(
+            max_new_tokens=args.max_new_tokens,
+            temperature=args.temperature,
+            top_p=args.top_p,
+            repetition_penalty=args.repetition_penalty,
+        ),
     )
     result = sim.answer(args.student_id, args.problem)
     print(result["answer"])

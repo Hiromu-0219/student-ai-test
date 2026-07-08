@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from src.config import DEFAULT_MODEL_ID, GenerationConfig
+from src.config import DEFAULT_MODEL_ID, GenerationConfig, ModelLoadConfig
 
 
 class LocalLLM:
@@ -10,9 +10,11 @@ class LocalLLM:
         *,
         load_in_4bit: bool = True,
         generation_config: GenerationConfig | None = None,
+        model_load_config: ModelLoadConfig | None = None,
     ) -> None:
         self.model_id = model_id
-        self.load_in_4bit = load_in_4bit
+        self.model_load_config = model_load_config or ModelLoadConfig(load_in_4bit=load_in_4bit)
+        self.load_in_4bit = self.model_load_config.load_in_4bit
         self.generation_config = generation_config or GenerationConfig()
         self.tokenizer = None
         self.model = None
@@ -21,13 +23,14 @@ class LocalLLM:
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
+        compute_dtype = _torch_dtype(self.model_load_config.compute_dtype, torch)
         quantization_config = None
         if self.load_in_4bit:
             quantization_config = BitsAndBytesConfig(
                 load_in_4bit=True,
-                bnb_4bit_compute_dtype=torch.bfloat16,
-                bnb_4bit_quant_type="nf4",
-                bnb_4bit_use_double_quant=True,
+                bnb_4bit_compute_dtype=compute_dtype,
+                bnb_4bit_quant_type=self.model_load_config.bnb_4bit_quant_type,
+                bnb_4bit_use_double_quant=self.model_load_config.bnb_4bit_use_double_quant,
             )
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_id, trust_remote_code=True)
@@ -35,7 +38,7 @@ class LocalLLM:
             self.model_id,
             device_map="auto",
             quantization_config=quantization_config,
-            torch_dtype=torch.bfloat16 if not self.load_in_4bit else None,
+            torch_dtype=compute_dtype if not self.load_in_4bit else None,
             trust_remote_code=True,
         )
 
@@ -69,10 +72,19 @@ class LocalLLM:
         outputs = self.model.generate(
             **inputs,
             max_new_tokens=self.generation_config.max_new_tokens,
-            do_sample=True,
+            do_sample=self.generation_config.do_sample,
             temperature=self.generation_config.temperature,
             top_p=self.generation_config.top_p,
+            repetition_penalty=self.generation_config.repetition_penalty,
             pad_token_id=self.tokenizer.eos_token_id,
         )
         generated = outputs[0][inputs["input_ids"].shape[-1] :]
         return self.tokenizer.decode(generated, skip_special_tokens=True).strip()
+
+
+def _torch_dtype(dtype_name: str, torch_module):
+    if dtype_name == "float16":
+        return torch_module.float16
+    if dtype_name == "float32":
+        return torch_module.float32
+    return torch_module.bfloat16

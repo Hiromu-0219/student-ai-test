@@ -6,14 +6,38 @@
     "transposition": "sometimes_confused",
     "fraction": "weak"
   },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "basic",
+      "can_solve_ax_plus_b_equals_c": true,
+      "can_transpose_terms": "sometimes",
+      "can_divide_by_coefficient": true,
+      "can_handle_negative_numbers": "weak",
+      "can_handle_fractions": false
+    }
+  },
   "error_tendency": [
     "符号を移項時に間違えやすい",
     "途中式を省略しがち"
   ],
+  "misconceptions": [
+    "移項するときに符号を変え忘れることがある"
+  ],
+  "learning_speed": "normal",
   "personality": {
     "confidence": "medium",
     "style": "短く答える",
     "asks_for_help": false
   },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "medium",
+    "extraversion": "low",
+    "agreeableness": "medium",
+    "neuroticism": "medium"
+  },
+  "self_efficacy": "medium",
+  "question_tendency": "low",
+  "motivation": "medium",
   "learning_history": []
 }

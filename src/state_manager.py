@@ -10,8 +10,15 @@ REQUIRED_STUDENT_FIELDS = {
     "student_id",
     "name",
     "understanding",
+    "knowledge_state",
     "error_tendency",
+    "misconceptions",
+    "learning_speed",
     "personality",
+    "big_five",
+    "self_efficacy",
+    "question_tendency",
+    "motivation",
     "learning_history",
 }
 
@@ -71,9 +78,23 @@ class StateManager:
 
         if not isinstance(state["understanding"], dict):
             raise StudentStateError("understanding must be an object")
+        if not isinstance(state["knowledge_state"], dict):
+            raise StudentStateError("knowledge_state must be an object")
         if not isinstance(state["error_tendency"], list):
             raise StudentStateError("error_tendency must be a list")
+        if not isinstance(state["misconceptions"], list):
+            raise StudentStateError("misconceptions must be a list")
+        if not isinstance(state["learning_speed"], str):
+            raise StudentStateError("learning_speed must be a string")
         if not isinstance(state["personality"], dict):
             raise StudentStateError("personality must be an object")
+        if not isinstance(state["big_five"], dict):
+            raise StudentStateError("big_five must be an object")
+        if not isinstance(state["self_efficacy"], str):
+            raise StudentStateError("self_efficacy must be a string")
+        if not isinstance(state["question_tendency"], str):
+            raise StudentStateError("question_tendency must be a string")
+        if not isinstance(state["motivation"], str):
+            raise StudentStateError("motivation must be a string")
         if not isinstance(state["learning_history"], list):
             raise StudentStateError("learning_history must be a list")

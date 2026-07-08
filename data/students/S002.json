@@ -6,14 +6,39 @@
     "transposition": "weak",
     "fraction": "weak"
   },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "low",
+      "can_solve_ax_plus_b_equals_c": false,
+      "can_transpose_terms": false,
+      "can_divide_by_coefficient": "sometimes",
+      "can_handle_negative_numbers": false,
+      "can_handle_fractions": false
+    }
+  },
   "error_tendency": [
     "両辺に同じ操作をする意識が弱い",
     "x の係数で割る手順を忘れやすい"
   ],
+  "misconceptions": [
+    "移項は項を反対側へ動かすだけで符号はそのままだと思っている",
+    "3x = 15 のような式で、3を引けばよいと考えることがある"
+  ],
+  "learning_speed": "slow",
   "personality": {
     "confidence": "low",
     "style": "迷いながら説明する",
     "asks_for_help": true
   },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "low",
+    "extraversion": "medium",
+    "agreeableness": "high",
+    "neuroticism": "high"
+  },
+  "self_efficacy": "low",
+  "question_tendency": "high",
+  "motivation": "medium",
   "learning_history": []
 }
