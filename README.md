@@ -187,7 +187,51 @@ print(result["answer"])
 - `repetition_penalty`: 繰り返し抑制。通常は `1.0` から `1.15`
 - `load_in_4bit`: Colab GPUでメモリを節約するなら `True`
 
-### 7. ログを確認
+### 7. 生徒パラメータを編集する
+
+ノートブックの `Student parameters` セクションで、授業に使う生徒IDと状態を変更できます。
+
+```python
+STUDENT_ID = "S002"
+
+student_state["learning_speed"] = "slow"
+student_state["self_efficacy"] = "low"
+student_state["question_tendency"] = "high"
+student_state["motivation"] = "medium"
+```
+
+主に編集する項目:
+
+- `knowledge_state`: 知識状態
+- `misconceptions`: 誤概念
+- `learning_speed`: 学習速度
+- `big_five`: Big Five
+- `self_efficacy`: 自己効力感
+- `question_tendency`: 質問傾向
+- `motivation`: モチベーション
+
+### 8. 対話授業をする
+
+ノートブックの `Interactive lesson` セクションを実行すると、教師として発話を入力できます。
+
+```python
+while True:
+    teacher_message = input("教師> ").strip()
+    if teacher_message.lower() in {"exit", "quit", "終了"}:
+        break
+
+    result = sim.respond(STUDENT_ID, teacher_message)
+    print("生徒AI>", result["answer"])
+```
+
+例:
+
+```text
+教師> 今日は 2x + 3 = 11 を一緒に解こう。まず何をすればいい？
+生徒AI> えっと、3を右に動かすと思います。でも符号を変えるんでしたっけ？
+```
+
+### 9. ログを確認
 
 ```python
 from pathlib import Path
@@ -195,7 +239,7 @@ from pathlib import Path
 print(Path("data/logs/human_readable.md").read_text(encoding="utf-8")[-2000:])
 ```
 
-### 8. GitHubの更新をColabへ取り込む
+### 10. GitHubの更新をColabへ取り込む
 
 GitHub側のコードを更新したあと、Colabでは次を実行します。
 

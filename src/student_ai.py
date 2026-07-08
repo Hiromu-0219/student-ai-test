@@ -54,30 +54,37 @@ class StudentAISimulator:
         )
         self.agent = StudentAgent(self.llm)
 
-    def answer(self, student_id: str, problem: str) -> dict[str, Any]:
+    def respond(self, student_id: str, teacher_message: str) -> dict[str, Any]:
         state = self.state_manager.load_student(student_id)
-        answer = self.agent.answer(state, problem)
+        answer = self.agent.answer(state, teacher_message)
         record = self.logger.log_interaction(
             student_id=student_id,
-            problem=problem,
+            problem=teacher_message,
             answer=answer,
             student_state_snapshot=state,
             model_id=self.agent.model_id,
-            metadata={"domain": "linear_equation"},
+            metadata={"domain": "linear_equation", "interaction_type": "lesson_dialogue"},
         )
         self.state_manager.update_learning_history(
             student_id,
             {
-                "problem": problem,
+                "teacher_message": teacher_message,
                 "answer": answer,
                 "logged_at": record["timestamp"],
                 "domain": "linear_equation",
+                "interaction_type": "lesson_dialogue",
             },
         )
         return record
 
+    def answer(self, student_id: str, problem: str) -> dict[str, Any]:
+        return self.respond(student_id, problem)
+
 
 def _extract_problem(prompt: str) -> str:
+    marker = "教師の発話:"
+    if marker in prompt:
+        return prompt.split(marker, 1)[1].split("生徒AIとして", 1)[0].strip()
     marker = "問題:"
     if marker in prompt:
         return prompt.split(marker, 1)[1].split("生徒AIとして", 1)[0].strip()

@@ -70,6 +70,20 @@ class StateManager:
             self.save_student(updated)
         return updated
 
+    def update_student_fields(
+        self,
+        student_id: str,
+        fields: dict[str, Any],
+        save: bool = True,
+    ) -> dict[str, Any]:
+        state = self.load_student(student_id)
+        updated = deepcopy(state)
+        updated.update(fields)
+        self.validate_student(updated)
+        if save:
+            self.save_student(updated)
+        return updated
+
     @staticmethod
     def validate_student(state: dict[str, Any]) -> None:
         missing = REQUIRED_STUDENT_FIELDS - set(state)

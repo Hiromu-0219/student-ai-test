@@ -57,3 +57,22 @@ def test_update_learning_history(tmp_path):
     updated = manager.update_learning_history("S999", {"problem": "x+1=2"})
 
     assert updated["learning_history"] == [{"problem": "x+1=2"}]
+
+
+def test_update_student_fields(tmp_path):
+    students_dir = tmp_path / "students"
+    manager = StateManager(students_dir)
+    manager.save_student(sample_student_state())
+
+    updated = manager.update_student_fields(
+        "S999",
+        {
+            "learning_speed": "fast",
+            "self_efficacy": "high",
+            "question_tendency": "low",
+            "motivation": "high",
+        },
+    )
+
+    assert updated["learning_speed"] == "fast"
+    assert updated["self_efficacy"] == "high"
