@@ -11,6 +11,7 @@ from src.config import (
     GenerationConfig,
     ModelLoadConfig,
 )
+from src.learning_updater import LearningUpdater
 from src.logger import AnswerLogger
 from src.model_loader import LocalLLM
 from src.student_agent import StudentAgent
@@ -53,28 +54,39 @@ class StudentAISimulator:
             )
         )
         self.agent = StudentAgent(self.llm)
+        self.learning_updater = LearningUpdater()
 
     def respond(self, student_id: str, teacher_message: str) -> dict[str, Any]:
         state = self.state_manager.load_student(student_id)
         answer = self.agent.answer(state, teacher_message)
+        updated_state, learning_event = self.learning_updater.update_after_interaction(
+            state,
+            teacher_message=teacher_message,
+            student_answer=answer,
+        )
         record = self.logger.log_interaction(
             student_id=student_id,
             problem=teacher_message,
             answer=answer,
             student_state_snapshot=state,
             model_id=self.agent.model_id,
-            metadata={"domain": "linear_equation", "interaction_type": "lesson_dialogue"},
+            metadata={
+                "domain": "linear_equation",
+                "interaction_type": "lesson_dialogue",
+                "learning_event": learning_event,
+            },
         )
-        self.state_manager.update_learning_history(
-            student_id,
+        updated_state["learning_history"].append(
             {
                 "teacher_message": teacher_message,
                 "answer": answer,
                 "logged_at": record["timestamp"],
                 "domain": "linear_equation",
                 "interaction_type": "lesson_dialogue",
-            },
+                "learning_event": learning_event,
+            }
         )
+        self.state_manager.save_student(updated_state)
         return record
 
     def answer(self, student_id: str, problem: str) -> dict[str, Any]:

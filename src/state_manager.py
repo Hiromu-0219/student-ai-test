@@ -109,6 +109,7 @@ class StateManager:
             raise StudentStateError("understanding must be an object")
         if not isinstance(state["knowledge_state"], dict):
             raise StudentStateError("knowledge_state must be an object")
+        StateManager._validate_knowledge_state(state["knowledge_state"])
         if not isinstance(state["error_tendency"], list):
             raise StudentStateError("error_tendency must be a list")
         if not isinstance(state["misconceptions"], list):
@@ -147,3 +148,27 @@ class StateManager:
             raise StudentStateError(
                 f"{field} must be one of {sorted(FIVE_LEVEL_VALUES)}, got {value!r}"
             )
+
+    @staticmethod
+    def _validate_knowledge_state(knowledge_state: dict[str, Any]) -> None:
+        linear_state = knowledge_state.get("linear_equation")
+        if linear_state is None:
+            return
+        if not isinstance(linear_state, dict):
+            raise StudentStateError("knowledge_state.linear_equation must be an object")
+        for field, value in linear_state.items():
+            if field == "level":
+                if value not in FIVE_LEVEL_VALUES:
+                    raise StudentStateError(
+                        f"knowledge_state.linear_equation.level must be one of "
+                        f"{sorted(FIVE_LEVEL_VALUES)}, got {value!r}"
+                    )
+                continue
+            if not isinstance(value, int) or isinstance(value, bool):
+                raise StudentStateError(
+                    f"knowledge_state.linear_equation.{field} must be an integer score"
+                )
+            if not 0 <= value <= 100:
+                raise StudentStateError(
+                    f"knowledge_state.linear_equation.{field} must be between 0 and 100"
+                )

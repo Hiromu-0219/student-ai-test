@@ -9,11 +9,12 @@
   "knowledge_state": {
     "linear_equation": {
       "level": "low",
-      "can_solve_ax_plus_b_equals_c": "low",
-      "can_transpose_terms": "very_low",
-      "can_divide_by_coefficient": "low",
-      "can_handle_negative_numbers": "very_low",
-      "can_handle_fractions": "very_low"
+      "score": 25,
+      "can_solve_ax_plus_b_equals_c": 25,
+      "can_transpose_terms": 5,
+      "can_divide_by_coefficient": 20,
+      "can_handle_negative_numbers": 5,
+      "can_handle_fractions": 5
     }
   },
   "error_tendency": [

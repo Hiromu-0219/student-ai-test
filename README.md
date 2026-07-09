@@ -75,13 +75,13 @@ student-ai/
 
 `data/students/*.json` には主に次のパラメータを持たせます。
 
-段階値は原則として次の5段階で扱います。
+性格・心理系の段階値は原則として次の5段階で扱います。
 
 ```text
 very_low / low / medium / high / very_high
 ```
 
-- `knowledge_state`: 一次方程式に関する知識状態
+- `knowledge_state`: 一次方程式に関する知識状態。知識スコアは0-100で扱い、授業対話により少しずつ更新する
 - `misconceptions`: 誤概念
 - `learning_speed`: 学習速度
 - `big_five`: Big Five性格特性
@@ -216,7 +216,25 @@ student_state["motivation"] = "medium"
 - `question_tendency`: 質問傾向
 - `motivation`: モチベーション
 
-5段階値:
+知識状態は100段階スコアです。
+
+```json
+"knowledge_state": {
+  "linear_equation": {
+    "level": "low",
+    "score": 25,
+    "can_solve_ax_plus_b_equals_c": 25,
+    "can_transpose_terms": 5,
+    "can_divide_by_coefficient": 20,
+    "can_handle_negative_numbers": 5,
+    "can_handle_fractions": 5
+  }
+}
+```
+
+`score` と各スキルは `0` から `100` で、`level` はスコアから `very_low / low / medium / high / very_high` に更新されます。
+
+性格・心理系の5段階値:
 
 ```text
 very_low / low / medium / high / very_high

@@ -11,7 +11,12 @@ def sample_student_state():
         "knowledge_state": {
             "linear_equation": {
                 "level": "medium",
-                "can_solve_ax_plus_b_equals_c": "high",
+                "score": 50,
+                "can_solve_ax_plus_b_equals_c": 70,
+                "can_transpose_terms": 50,
+                "can_divide_by_coefficient": 70,
+                "can_handle_negative_numbers": 25,
+                "can_handle_fractions": 10,
             }
         },
         "error_tendency": [],
@@ -76,3 +81,11 @@ def test_update_student_fields(tmp_path):
 
     assert updated["learning_speed"] == "very_high"
     assert updated["self_efficacy"] == "high"
+
+
+def test_validate_student_rejects_out_of_range_knowledge_score():
+    state = sample_student_state()
+    state["knowledge_state"]["linear_equation"]["score"] = 101
+
+    with pytest.raises(StudentStateError):
+        StateManager.validate_student(state)
