@@ -92,6 +92,52 @@ very_low / low / medium / high / very_high
 
 互換用に `understanding`, `error_tendency`, `personality` も残しています。
 
+### 知識状態 `knowledge_state`
+
+一次方程式をどれくらい理解しているかを `0` から `100` のスコアで管理します。授業対話後に少しずつ更新されます。
+
+| パラメータ | 意味 | 低い場合 | 高い場合 |
+| --- | --- | --- | --- |
+| `score` | 一次方程式全体の総合理解度 | 解き方の方針が立たない | 自力で解ける |
+| `can_solve_ax_plus_b_equals_c` | `ax + b = c` 型を解く力 | 何から始めるか迷う | 標準問題を解ける |
+| `can_transpose_terms` | 移項の理解 | 符号を変え忘れる | 移項を安定して使える |
+| `can_divide_by_coefficient` | 係数で割る理解 | `3x = 15` で3を引くなどの誤り | 係数で割って `x` を求められる |
+| `can_handle_negative_numbers` | 負の数を含む式への対応 | マイナスで混乱する | 符号を正しく扱える |
+| `can_handle_fractions` | 分数を含む式への対応 | 分数係数で止まる | 分数でも整理できる |
+
+`level` は `score` から自動的に更新される表示用ラベルです。
+
+| score範囲 | level |
+| --- | --- |
+| `0-19` | `very_low` |
+| `20-39` | `low` |
+| `40-59` | `medium` |
+| `60-79` | `high` |
+| `80-100` | `very_high` |
+
+### 誤概念・学習特性
+
+| パラメータ | 意味 | 反応への影響 |
+| --- | --- | --- |
+| `misconceptions` | 生徒が持っている誤った考え方 | 誤答や迷いの原因として発話に反映される |
+| `learning_speed` | 授業による知識スコアの伸びやすさ | 高いほど1回の対話で知識スコアが上がりやすい |
+| `learning_history` | 過去の教師発話、生徒回答、知識更新記録 | 直近履歴がプロンプトに入り、継続授業らしさが出る |
+
+### 心理・性格パラメータ
+
+心理・性格系は5段階です。
+
+| パラメータ | 意味 | 低い場合 | 高い場合 |
+| --- | --- | --- | --- |
+| `self_efficacy` | 自己効力感。「自分は解ける」と思える度合い | 自信なさげ、確認が多い | 自信を持って答える |
+| `question_tendency` | 質問傾向 | わからなくても黙りやすい | つまずきを質問しやすい |
+| `motivation` | 学習意欲 | 粘りにくい、短い返答 | 前向きに取り組む |
+| `big_five.openness` | 開放性。新しい解き方への受け入れやすさ | 慣れた手順に固執 | 別解や説明を受け入れやすい |
+| `big_five.conscientiousness` | 誠実性。丁寧さ、手順を守る傾向 | 途中式を飛ばす | 丁寧に式を書く |
+| `big_five.extraversion` | 外向性。発話量や反応の積極性 | 返答が短い | よく話す |
+| `big_five.agreeableness` | 協調性。教師への合わせやすさ | そっけない | 素直に反応する |
+| `big_five.neuroticism` | 神経症傾向。不安や焦りやすさ | 落ち着いている | 不安、迷いが出やすい |
+
 ## ColabでGitHubから動かす手順
 
 ### 1. GPUランタイムを選ぶ
@@ -187,11 +233,16 @@ print(result["answer"])
 
 パラメータの目安:
 
+- `MODEL_ID`: 使用するHugging FaceモデルID。例: `Qwen/Qwen3-4B`
 - `max_new_tokens`: 回答の最大長。短い生徒回答なら `128` から `256`
 - `temperature`: 高いほど揺れが大きい。安定させるなら `0.3` から `0.7`
 - `top_p`: 低いほど候補を絞る。通常は `0.8` から `0.95`
+- `do_sample`: `True` なら毎回少し揺れる。`False` なら安定寄り
 - `repetition_penalty`: 繰り返し抑制。通常は `1.0` から `1.15`
 - `load_in_4bit`: Colab GPUでメモリを節約するなら `True`
+- `bnb_4bit_quant_type`: 4bit量子化方式。通常は `nf4`
+- `bnb_4bit_use_double_quant`: さらにメモリを節約する設定。通常は `True`
+- `compute_dtype`: 計算精度。Colabではまず `bfloat16`、動かない場合は `float16`
 
 ### 7. 生徒パラメータを編集する
 
