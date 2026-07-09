@@ -361,7 +361,19 @@ from pathlib import Path
 print(Path("data/assessments/human_readable.md").read_text(encoding="utf-8")[-2000:])
 ```
 
-### 10. 授業ログを確認
+### 10. パラメータによる誤答傾向を確認する
+
+ノートブックの `Parameter error tendency check` セクションで、同じ問題を複数の検証用プロファイルに解かせ、回答と正誤を比較できます。
+
+検証用プロファイル例:
+
+- `PARAM_LOW_KNOWLEDGE`: 知識が低く、移項の誤概念が強い
+- `PARAM_HIGH_ANXIETY`: 知識は中程度だが不安が強い
+- `PARAM_HIGH_KNOWLEDGE`: 知識が高く、誤概念がほぼない
+
+この検証では `update_knowledge=False` にしているため、知識スコアは更新されません。
+
+### 11. 授業ログを確認
 
 ```python
 from pathlib import Path
@@ -369,7 +381,7 @@ from pathlib import Path
 print(Path("data/logs/human_readable.md").read_text(encoding="utf-8")[-2000:])
 ```
 
-### 11. GitHubの更新をColabへ取り込む
+### 12. GitHubの更新をColabへ取り込む
 
 GitHub側のコードを更新したあと、Colabでは次を実行します。
 
