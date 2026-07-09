@@ -326,9 +326,13 @@ while True:
 生徒AI> えっと、3を右に動かすと思います。でも符号を変えるんでしたっけ？
 ```
 
-### 9. 学力テストを受けさせる
+### 9. LLMで学力テストを受けさせる
 
-ノートブックの `Assessment test` セクションで、生徒AIにテストを受けさせられます。テストは測定用なので、`knowledge_state` は更新しません。
+ノートブックの `Assessment test` セクションで、生徒AIにテストを受けさせられます。`Create simulator` セクションで `USE_MOCK_MODEL=False` にしていれば、QwenなどのLLMが生徒として解答します。テストは測定用なので、`knowledge_state` は更新しません。
+
+```python
+USE_MOCK_MODEL = False  # LLMで受験させる
+```
 
 ```python
 from src.test_runner import TestRunner
