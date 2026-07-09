@@ -9,18 +9,18 @@
   "knowledge_state": {
     "linear_equation": {
       "level": "high",
-      "can_solve_ax_plus_b_equals_c": true,
-      "can_transpose_terms": true,
-      "can_divide_by_coefficient": true,
-      "can_handle_negative_numbers": true,
-      "can_handle_fractions": "basic"
+      "can_solve_ax_plus_b_equals_c": "very_high",
+      "can_transpose_terms": "very_high",
+      "can_divide_by_coefficient": "high",
+      "can_handle_negative_numbers": "high",
+      "can_handle_fractions": "medium"
     }
   },
   "error_tendency": [
     "暗算で途中式を飛ばす"
   ],
   "misconceptions": [],
-  "learning_speed": "fast",
+  "learning_speed": "high",
   "personality": {
     "confidence": "high",
     "style": "はっきり答える",

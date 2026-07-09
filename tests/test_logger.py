@@ -16,7 +16,7 @@ def test_log_interaction_writes_jsonl_and_markdown(tmp_path):
             "knowledge_state": {},
             "error_tendency": [],
             "misconceptions": [],
-            "learning_speed": "normal",
+            "learning_speed": "medium",
             "personality": {},
             "big_five": {},
             "self_efficacy": "medium",

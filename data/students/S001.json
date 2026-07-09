@@ -8,12 +8,12 @@
   },
   "knowledge_state": {
     "linear_equation": {
-      "level": "basic",
-      "can_solve_ax_plus_b_equals_c": true,
-      "can_transpose_terms": "sometimes",
-      "can_divide_by_coefficient": true,
-      "can_handle_negative_numbers": "weak",
-      "can_handle_fractions": false
+      "level": "medium",
+      "can_solve_ax_plus_b_equals_c": "high",
+      "can_transpose_terms": "medium",
+      "can_divide_by_coefficient": "high",
+      "can_handle_negative_numbers": "low",
+      "can_handle_fractions": "very_low"
     }
   },
   "error_tendency": [
@@ -23,7 +23,7 @@
   "misconceptions": [
     "移項するときに符号を変え忘れることがある"
   ],
-  "learning_speed": "normal",
+  "learning_speed": "medium",
   "personality": {
     "confidence": "medium",
     "style": "短く答える",

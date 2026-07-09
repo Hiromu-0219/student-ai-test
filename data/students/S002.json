@@ -9,11 +9,11 @@
   "knowledge_state": {
     "linear_equation": {
       "level": "low",
-      "can_solve_ax_plus_b_equals_c": false,
-      "can_transpose_terms": false,
-      "can_divide_by_coefficient": "sometimes",
-      "can_handle_negative_numbers": false,
-      "can_handle_fractions": false
+      "can_solve_ax_plus_b_equals_c": "low",
+      "can_transpose_terms": "very_low",
+      "can_divide_by_coefficient": "low",
+      "can_handle_negative_numbers": "very_low",
+      "can_handle_fractions": "very_low"
     }
   },
   "error_tendency": [
@@ -24,7 +24,7 @@
     "移項は項を反対側へ動かすだけで符号はそのままだと思っている",
     "3x = 15 のような式で、3を引けばよいと考えることがある"
   ],
-  "learning_speed": "slow",
+  "learning_speed": "low",
   "personality": {
     "confidence": "low",
     "style": "迷いながら説明する",

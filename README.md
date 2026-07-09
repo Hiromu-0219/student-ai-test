@@ -75,6 +75,12 @@ student-ai/
 
 `data/students/*.json` には主に次のパラメータを持たせます。
 
+段階値は原則として次の5段階で扱います。
+
+```text
+very_low / low / medium / high / very_high
+```
+
 - `knowledge_state`: 一次方程式に関する知識状態
 - `misconceptions`: 誤概念
 - `learning_speed`: 学習速度
@@ -194,7 +200,7 @@ print(result["answer"])
 ```python
 STUDENT_ID = "S002"
 
-student_state["learning_speed"] = "slow"
+student_state["learning_speed"] = "low"
 student_state["self_efficacy"] = "low"
 student_state["question_tendency"] = "high"
 student_state["motivation"] = "medium"
@@ -209,6 +215,12 @@ student_state["motivation"] = "medium"
 - `self_efficacy`: 自己効力感
 - `question_tendency`: 質問傾向
 - `motivation`: モチベーション
+
+5段階値:
+
+```text
+very_low / low / medium / high / very_high
+```
 
 ### 8. 対話授業をする
 

@@ -10,13 +10,13 @@ def sample_student_state():
         "understanding": {"linear_equation": "basic"},
         "knowledge_state": {
             "linear_equation": {
-                "level": "basic",
-                "can_solve_ax_plus_b_equals_c": True,
+                "level": "medium",
+                "can_solve_ax_plus_b_equals_c": "high",
             }
         },
         "error_tendency": [],
         "misconceptions": [],
-        "learning_speed": "normal",
+        "learning_speed": "medium",
         "personality": {"confidence": "medium"},
         "big_five": {
             "openness": "medium",
@@ -67,12 +67,12 @@ def test_update_student_fields(tmp_path):
     updated = manager.update_student_fields(
         "S999",
         {
-            "learning_speed": "fast",
+            "learning_speed": "very_high",
             "self_efficacy": "high",
             "question_tendency": "low",
             "motivation": "high",
         },
     )
 
-    assert updated["learning_speed"] == "fast"
+    assert updated["learning_speed"] == "very_high"
     assert updated["self_efficacy"] == "high"

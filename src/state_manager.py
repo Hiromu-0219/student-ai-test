@@ -22,6 +22,21 @@ REQUIRED_STUDENT_FIELDS = {
     "learning_history",
 }
 
+FIVE_LEVEL_VALUES = {"very_low", "low", "medium", "high", "very_high"}
+FIVE_LEVEL_FIELDS = {
+    "learning_speed",
+    "self_efficacy",
+    "question_tendency",
+    "motivation",
+}
+BIG_FIVE_FIELDS = {
+    "openness",
+    "conscientiousness",
+    "extraversion",
+    "agreeableness",
+    "neuroticism",
+}
+
 
 class StudentStateError(ValueError):
     """Raised when a student state file is missing required data."""
@@ -100,15 +115,35 @@ class StateManager:
             raise StudentStateError("misconceptions must be a list")
         if not isinstance(state["learning_speed"], str):
             raise StudentStateError("learning_speed must be a string")
+        StateManager._validate_five_level_field(state, "learning_speed")
         if not isinstance(state["personality"], dict):
             raise StudentStateError("personality must be an object")
         if not isinstance(state["big_five"], dict):
             raise StudentStateError("big_five must be an object")
+        missing_big_five = BIG_FIVE_FIELDS - set(state["big_five"])
+        if missing_big_five:
+            raise StudentStateError(f"Missing big_five fields: {sorted(missing_big_five)}")
+        for field in BIG_FIVE_FIELDS:
+            StateManager._validate_five_level_value(f"big_five.{field}", state["big_five"][field])
         if not isinstance(state["self_efficacy"], str):
             raise StudentStateError("self_efficacy must be a string")
+        StateManager._validate_five_level_field(state, "self_efficacy")
         if not isinstance(state["question_tendency"], str):
             raise StudentStateError("question_tendency must be a string")
+        StateManager._validate_five_level_field(state, "question_tendency")
         if not isinstance(state["motivation"], str):
             raise StudentStateError("motivation must be a string")
+        StateManager._validate_five_level_field(state, "motivation")
         if not isinstance(state["learning_history"], list):
             raise StudentStateError("learning_history must be a list")
+
+    @staticmethod
+    def _validate_five_level_field(state: dict[str, Any], field: str) -> None:
+        StateManager._validate_five_level_value(field, state[field])
+
+    @staticmethod
+    def _validate_five_level_value(field: str, value: Any) -> None:
+        if value not in FIVE_LEVEL_VALUES:
+            raise StudentStateError(
+                f"{field} must be one of {sorted(FIVE_LEVEL_VALUES)}, got {value!r}"
+            )

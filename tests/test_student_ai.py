@@ -13,13 +13,13 @@ def test_simulator_mock_answer_logs_and_updates_history(tmp_path):
   "understanding": {"linear_equation": "basic"},
   "knowledge_state": {
     "linear_equation": {
-      "level": "basic",
-      "can_solve_ax_plus_b_equals_c": true
+      "level": "medium",
+      "can_solve_ax_plus_b_equals_c": "high"
     }
   },
   "error_tendency": [],
   "misconceptions": [],
-  "learning_speed": "normal",
+  "learning_speed": "medium",
   "personality": {"confidence": "medium"},
   "big_five": {
     "openness": "medium",
@@ -62,13 +62,13 @@ def test_simulator_mock_respond_accepts_teacher_message(tmp_path):
   "understanding": {"linear_equation": "basic"},
   "knowledge_state": {
     "linear_equation": {
-      "level": "basic",
-      "can_solve_ax_plus_b_equals_c": true
+      "level": "medium",
+      "can_solve_ax_plus_b_equals_c": "high"
     }
   },
   "error_tendency": [],
   "misconceptions": [],
-  "learning_speed": "normal",
+  "learning_speed": "medium",
   "personality": {"confidence": "medium"},
   "big_five": {
     "openness": "medium",
