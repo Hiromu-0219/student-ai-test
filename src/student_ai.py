@@ -56,14 +56,34 @@ class StudentAISimulator:
         self.agent = StudentAgent(self.llm)
         self.learning_updater = LearningUpdater()
 
-    def respond(self, student_id: str, teacher_message: str) -> dict[str, Any]:
+    def respond(
+        self,
+        student_id: str,
+        teacher_message: str,
+        *,
+        update_knowledge: bool = True,
+    ) -> dict[str, Any]:
         state = self.state_manager.load_student(student_id)
         answer = self.agent.answer(state, teacher_message)
-        updated_state, learning_event = self.learning_updater.update_after_interaction(
-            state,
-            teacher_message=teacher_message,
-            student_answer=answer,
-        )
+        updated_state = state
+        learning_event = {
+            "knowledge_delta": 0,
+            "updated_score": state.get("knowledge_state", {})
+            .get("linear_equation", {})
+            .get("score"),
+            "updated_level": state.get("knowledge_state", {})
+            .get("linear_equation", {})
+            .get("level"),
+            "touched_skills": [],
+            "update_enabled": False,
+        }
+        if update_knowledge:
+            updated_state, learning_event = self.learning_updater.update_after_interaction(
+                state,
+                teacher_message=teacher_message,
+                student_answer=answer,
+            )
+            learning_event["update_enabled"] = True
         record = self.logger.log_interaction(
             student_id=student_id,
             problem=teacher_message,
@@ -76,17 +96,18 @@ class StudentAISimulator:
                 "learning_event": learning_event,
             },
         )
-        updated_state["learning_history"].append(
-            {
-                "teacher_message": teacher_message,
-                "answer": answer,
-                "logged_at": record["timestamp"],
-                "domain": "linear_equation",
-                "interaction_type": "lesson_dialogue",
-                "learning_event": learning_event,
-            }
-        )
-        self.state_manager.save_student(updated_state)
+        if update_knowledge:
+            updated_state["learning_history"].append(
+                {
+                    "teacher_message": teacher_message,
+                    "answer": answer,
+                    "logged_at": record["timestamp"],
+                    "domain": "linear_equation",
+                    "interaction_type": "lesson_dialogue",
+                    "learning_event": learning_event,
+                }
+            )
+            self.state_manager.save_student(updated_state)
         return record
 
     def answer(self, student_id: str, problem: str) -> dict[str, Any]:

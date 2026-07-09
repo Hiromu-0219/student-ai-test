@@ -1,0 +1,42 @@
+{
+  "test_id": "linear_equation_basic_001",
+  "title": "一次方程式 基礎テスト",
+  "domain": "linear_equation",
+  "questions": [
+    {
+      "question_id": "Q001",
+      "problem": "2x + 3 = 11 を解きなさい。",
+      "answer": "x = 4",
+      "skill": "can_solve_ax_plus_b_equals_c",
+      "difficulty": 1
+    },
+    {
+      "question_id": "Q002",
+      "problem": "3x - 5 = 10 を解きなさい。",
+      "answer": "x = 5",
+      "skill": "can_transpose_terms",
+      "difficulty": 2
+    },
+    {
+      "question_id": "Q003",
+      "problem": "-2x + 4 = 10 を解きなさい。",
+      "answer": "x = -3",
+      "skill": "can_handle_negative_numbers",
+      "difficulty": 3
+    },
+    {
+      "question_id": "Q004",
+      "problem": "5x = 20 を解きなさい。",
+      "answer": "x = 4",
+      "skill": "can_divide_by_coefficient",
+      "difficulty": 1
+    },
+    {
+      "question_id": "Q005",
+      "problem": "x/2 + 1 = 5 を解きなさい。",
+      "answer": "x = 8",
+      "skill": "can_handle_fractions",
+      "difficulty": 3
+    }
+  ]
+}

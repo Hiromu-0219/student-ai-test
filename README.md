@@ -27,13 +27,20 @@ student-ai/
 │  │  ├─ S001.json
 │  │  ├─ S002.json
 │  │  └─ S003.json
-│  └─ logs/
+│  ├─ logs/
+│  │  ├─ machine_readable.jsonl
+│  │  └─ human_readable.md
+│  ├─ tests/
+│  │  └─ linear_equation_basic_001.json
+│  └─ assessments/
 │     ├─ machine_readable.jsonl
 │     └─ human_readable.md
 └─ tests/
    ├─ test_state_manager.py
    ├─ test_logger.py
-   └─ test_student_ai.py
+   ├─ test_student_ai.py
+   ├─ test_grader.py
+   └─ test_test_runner.py
 ```
 
 ## 各ファイルの役割
@@ -49,8 +56,14 @@ student-ai/
 - `src/state_manager.py`: 生徒状態JSONの読み込み、検証、保存
 - `src/logger.py`: `machine_readable.jsonl` と `human_readable.md` へのログ保存
 - `src/prompts.py`: 一次方程式用プロンプト
+- `src/test_bank.py`: 学力テスト問題セットの読み込み
+- `src/grader.py`: `x = 数値` 形式の採点
+- `src/test_runner.py`: 生徒AIにテストを受けさせる実行器
+- `src/assessment_logger.py`: 学力テスト結果ログの保存
 - `data/students/*.json`: 生徒ごとの状態データ
 - `data/logs/`: 回答ログの保存先
+- `data/tests/`: 学力テスト問題セット
+- `data/assessments/`: 学力テスト結果ログの保存先
 - `tests/`: mock modelを使う最小テスト
 
 ## 実装範囲
@@ -62,6 +75,7 @@ student-ai/
 - TransformersでローカルLLMを読み込み
 - bitsandbytesによる4bit量子化に対応
 - 回答ログをJSONLとMarkdownに保存
+- 学力テストを受けさせ、得点とスキル別正答率を保存
 - ファインチューニングなし
 
 ## 想定モデル
@@ -312,7 +326,38 @@ while True:
 生徒AI> えっと、3を右に動かすと思います。でも符号を変えるんでしたっけ？
 ```
 
-### 9. ログを確認
+### 9. 学力テストを受けさせる
+
+ノートブックの `Assessment test` セクションで、生徒AIにテストを受けさせられます。テストは測定用なので、`knowledge_state` は更新しません。
+
+```python
+from src.test_runner import TestRunner
+
+TEST_ID = "linear_equation_basic_001"
+
+runner = TestRunner(simulator=sim)
+assessment_result = runner.run_test(
+    student_id=STUDENT_ID,
+    test_id=TEST_ID,
+)
+
+print("テスト:", assessment_result["title"])
+print("得点:", assessment_result["score_percentage"], "%")
+print("正答数:", assessment_result["correct_count"], "/", assessment_result["total_count"])
+print("スキル別スコア:")
+for skill, score in assessment_result["skill_scores"].items():
+    print("-", skill, score, "%")
+```
+
+評価ログはここに保存されます。
+
+```python
+from pathlib import Path
+
+print(Path("data/assessments/human_readable.md").read_text(encoding="utf-8")[-2000:])
+```
+
+### 10. 授業ログを確認
 
 ```python
 from pathlib import Path
@@ -320,7 +365,7 @@ from pathlib import Path
 print(Path("data/logs/human_readable.md").read_text(encoding="utf-8")[-2000:])
 ```
 
-### 10. GitHubの更新をColabへ取り込む
+### 11. GitHubの更新をColabへ取り込む
 
 GitHub側のコードを更新したあと、Colabでは次を実行します。
 
