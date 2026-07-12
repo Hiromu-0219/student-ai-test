@@ -393,10 +393,20 @@ linear_equation_20q_001
 - 正答率を計算する
 - 理解度スコアと正答率の散布図を描く
 - 相関係数 `r` をグラフタイトルに表示する
+- 問題ごとの正誤表を表示する
+- 正誤表をCSV保存する
 
 テスト時は `src/cognitive_model.py` が知識スコアから正答/誤答方針を決め、その方針をLLMに渡します。これにより、LLM本体の計算能力だけに引っ張られず、パラメータ差が正答率に出やすくなります。
 
 この検証でも `update_knowledge=False` なので、テスト中に知識スコアは更新されません。講義前に実行し、`Interactive lesson` で授業をした後にもう一度実行すると、授業前後の正答率変化を比較できます。
+
+保存されるCSV:
+
+```text
+data/assessments/understanding_accuracy_summary.csv
+data/assessments/understanding_accuracy_detail.csv
+data/assessments/understanding_accuracy_correctness_table.csv
+```
 
 ### 12. 授業ログを確認
 
