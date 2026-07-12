@@ -3,3 +3,4 @@ accelerate
 bitsandbytes
 torch
 pytest
+matplotlib

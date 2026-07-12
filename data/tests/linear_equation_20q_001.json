@@ -1,0 +1,147 @@
+{
+  "test_id": "linear_equation_20q_001",
+  "title": "一次方程式 20問テスト",
+  "domain": "linear_equation",
+  "questions": [
+    {
+      "question_id": "Q001",
+      "problem": "2x + 3 = 11 を解きなさい。",
+      "answer": "x = 4",
+      "skill": "can_solve_ax_plus_b_equals_c",
+      "difficulty": 1
+    },
+    {
+      "question_id": "Q002",
+      "problem": "3x - 5 = 10 を解きなさい。",
+      "answer": "x = 5",
+      "skill": "can_transpose_terms",
+      "difficulty": 2
+    },
+    {
+      "question_id": "Q003",
+      "problem": "-2x + 4 = 10 を解きなさい。",
+      "answer": "x = -3",
+      "skill": "can_handle_negative_numbers",
+      "difficulty": 3
+    },
+    {
+      "question_id": "Q004",
+      "problem": "5x = 20 を解きなさい。",
+      "answer": "x = 4",
+      "skill": "can_divide_by_coefficient",
+      "difficulty": 1
+    },
+    {
+      "question_id": "Q005",
+      "problem": "x/2 + 1 = 5 を解きなさい。",
+      "answer": "x = 8",
+      "skill": "can_handle_fractions",
+      "difficulty": 3
+    },
+    {
+      "question_id": "Q006",
+      "problem": "x + 7 = 12 を解きなさい。",
+      "answer": "x = 5",
+      "skill": "can_transpose_terms",
+      "difficulty": 1
+    },
+    {
+      "question_id": "Q007",
+      "problem": "4x - 8 = 0 を解きなさい。",
+      "answer": "x = 2",
+      "skill": "can_divide_by_coefficient",
+      "difficulty": 1
+    },
+    {
+      "question_id": "Q008",
+      "problem": "-3x - 6 = 12 を解きなさい。",
+      "answer": "x = -6",
+      "skill": "can_handle_negative_numbers",
+      "difficulty": 3
+    },
+    {
+      "question_id": "Q009",
+      "problem": "6x + 2 = 20 を解きなさい。",
+      "answer": "x = 3",
+      "skill": "can_solve_ax_plus_b_equals_c",
+      "difficulty": 2
+    },
+    {
+      "question_id": "Q010",
+      "problem": "x/3 - 2 = 4 を解きなさい。",
+      "answer": "x = 18",
+      "skill": "can_handle_fractions",
+      "difficulty": 3
+    },
+    {
+      "question_id": "Q011",
+      "problem": "7x - 14 = 21 を解きなさい。",
+      "answer": "x = 5",
+      "skill": "can_divide_by_coefficient",
+      "difficulty": 2
+    },
+    {
+      "question_id": "Q012",
+      "problem": "2x - 9 = -1 を解きなさい。",
+      "answer": "x = 4",
+      "skill": "can_handle_negative_numbers",
+      "difficulty": 3
+    },
+    {
+      "question_id": "Q013",
+      "problem": "-x + 5 = 9 を解きなさい。",
+      "answer": "x = -4",
+      "skill": "can_handle_negative_numbers",
+      "difficulty": 3
+    },
+    {
+      "question_id": "Q014",
+      "problem": "3x + 1 = 1 を解きなさい。",
+      "answer": "x = 0",
+      "skill": "can_solve_ax_plus_b_equals_c",
+      "difficulty": 2
+    },
+    {
+      "question_id": "Q015",
+      "problem": "10x = -30 を解きなさい。",
+      "answer": "x = -3",
+      "skill": "can_handle_negative_numbers",
+      "difficulty": 2
+    },
+    {
+      "question_id": "Q016",
+      "problem": "x/4 + 2 = 7 を解きなさい。",
+      "answer": "x = 20",
+      "skill": "can_handle_fractions",
+      "difficulty": 3
+    },
+    {
+      "question_id": "Q017",
+      "problem": "8x + 16 = 0 を解きなさい。",
+      "answer": "x = -2",
+      "skill": "can_handle_negative_numbers",
+      "difficulty": 2
+    },
+    {
+      "question_id": "Q018",
+      "problem": "9x - 3 = 24 を解きなさい。",
+      "answer": "x = 3",
+      "skill": "can_solve_ax_plus_b_equals_c",
+      "difficulty": 2
+    },
+    {
+      "question_id": "Q019",
+      "problem": "x - 15 = 0 を解きなさい。",
+      "answer": "x = 15",
+      "skill": "can_transpose_terms",
+      "difficulty": 1
+    },
+    {
+      "question_id": "Q020",
+      "problem": "2x + 5 = -7 を解きなさい。",
+      "answer": "x = -6",
+      "skill": "can_handle_negative_numbers",
+      "difficulty": 3
+    }
+  ]
+}

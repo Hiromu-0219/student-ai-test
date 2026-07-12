@@ -31,7 +31,8 @@ student-ai/
 │  │  ├─ machine_readable.jsonl
 │  │  └─ human_readable.md
 │  ├─ tests/
-│  │  └─ linear_equation_basic_001.json
+│  │  ├─ linear_equation_basic_001.json
+│  │  └─ linear_equation_20q_001.json
 │  └─ assessments/
 │     ├─ machine_readable.jsonl
 │     └─ human_readable.md
@@ -373,7 +374,27 @@ print(Path("data/assessments/human_readable.md").read_text(encoding="utf-8")[-20
 
 この検証では `update_knowledge=False` にしているため、知識スコアは更新されません。
 
-### 11. 授業ログを確認
+### 11. 理解度と正答率の相関グラフを作る
+
+ノートブックの `Understanding score vs accuracy graph` セクションで、理解度スコアと20問テストの正答率の相関を確認できます。
+
+使うテスト:
+
+```text
+linear_equation_20q_001
+```
+
+検証内容:
+
+- 理解度 `0,20,40,60,80,100` の検証用生徒を作る
+- 20問テストを受けさせる
+- 正答率を計算する
+- 理解度スコアと正答率の散布図を描く
+- 相関係数 `r` をグラフタイトルに表示する
+
+この検証でも `update_knowledge=False` なので、テスト中に知識スコアは更新されません。
+
+### 12. 授業ログを確認
 
 ```python
 from pathlib import Path
@@ -381,7 +402,7 @@ from pathlib import Path
 print(Path("data/logs/human_readable.md").read_text(encoding="utf-8")[-2000:])
 ```
 
-### 12. GitHubの更新をColabへ取り込む
+### 13. GitHubの更新をColabへ取り込む
 
 GitHub側のコードを更新したあと、Colabでは次を実行します。
 
