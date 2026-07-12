@@ -2,7 +2,7 @@
 
 一次方程式を学習する生徒AIのMVPです。Google Colabで実行することを前提に、GitHubからcloneしてそのまま動かせる構成にしています。
 
-LLMは「発話生成器」としてのみ使います。生徒の理解度・誤答傾向・性格・学習履歴は、LLM内部ではなく `data/students/*.json` で管理します。
+現在の主目的は、授業対話ではなく「生徒状態パラメータ、特に理解度スコアとテスト正答率の関係」を検証することです。LLMは「発話生成器」として使い、生徒の理解度・誤答傾向・性格・学習履歴は、LLM内部ではなく `data/students/*.json` で管理します。
 
 ## Colab前提のディレクトリ構造
 
@@ -79,6 +79,8 @@ student-ai/
 - bitsandbytesによる4bit量子化に対応
 - 回答ログをJSONLとMarkdownに保存
 - 学力テストを受けさせ、得点とスキル別正答率を保存
+- 現在の検証フローでは授業による状態更新は実行しない
+- 将来的に授業と生徒状態変化を扱えるよう、学習更新・誤概念解消の拡張点は残す
 - ファインチューニングなし
 
 ## 想定モデル
@@ -98,7 +100,7 @@ student-ai/
 very_low / low / medium / high / very_high
 ```
 
-- `knowledge_state`: 一次方程式に関する知識状態。知識スコアは0-100で扱い、授業対話により少しずつ更新する
+- `knowledge_state`: 一次方程式に関する知識状態。知識スコアは0-100で扱う
 - `misconceptions`: 誤概念
 - `learning_speed`: 学習速度
 - `big_five`: Big Five性格特性
@@ -111,7 +113,7 @@ very_low / low / medium / high / very_high
 
 ### 知識状態 `knowledge_state`
 
-一次方程式をどれくらい理解しているかを `0` から `100` のスコアで管理します。授業対話後に少しずつ更新されます。
+一次方程式をどれくらい理解しているかを `0` から `100` のスコアで管理します。現在の検証ではテスト中に更新せず、初期パラメータとして正答率との関係を見ます。将来的には授業対話後に少しずつ更新する設計へ拡張できます。
 
 | パラメータ | 意味 | 低い場合 | 高い場合 |
 | --- | --- | --- | --- |
@@ -308,30 +310,19 @@ student_state["motivation"] = "medium"
 very_low / low / medium / high / very_high
 ```
 
-### 8. 対話授業をする
+### 8. 現在の検証では授業対話は使わない
 
-ノートブックの `Interactive lesson` セクションを実行すると、教師として発話を入力できます。
+授業対話機能は将来拡張用に残していますが、現在の妥当性検証では使いません。中心に見るのは、`knowledge_state` と学力テスト正答率の関係です。
+
+将来有効化する場合は、内部的には次のAPIを使います。
 
 ```python
-while True:
-    teacher_message = input("教師> ").strip()
-    if teacher_message.lower() in {"exit", "quit", "終了"}:
-        break
-
-    result = sim.respond(STUDENT_ID, teacher_message)
-    print("生徒AI>", result["answer"])
+result = sim.respond(STUDENT_ID, teacher_message)
 ```
 
-例:
+### 9. 現在の検証では学習介入は使わない
 
-```text
-教師> 今日は 2x + 3 = 11 を一緒に解こう。まず何をすればいい？
-生徒AI> えっと、3を右に動かすと思います。でも符号を変えるんでしたっけ？
-```
-
-### 9. 講義後の学習を明示的に反映する
-
-ノートブックの `Controlled learning intervention` セクションで、「この講義で学習できた」と制御できます。
+講義後に状態変化を反映する設計は残していますが、現在の妥当性検証では使いません。将来的に授業後の状態変化を扱う場合は、次のAPIで知識スコアや誤概念解消を制御できます。
 
 ```python
 learning_event = sim.apply_learning_intervention(
@@ -347,20 +338,6 @@ learning_event = sim.apply_learning_intervention(
     resolve_misconceptions=True,
 )
 ```
-
-効果:
-
-- 指定した知識スコアを加算する
-- 関連スキルが一定以上になると、対応する誤概念を `misconceptions` から削除する
-- `learning_history` に `controlled_learning_intervention` として記録する
-
-補足:
-
-- 誤概念が残っていると、該当スキルのテストで正答確率が下がります
-- たとえば「移項しても符号は変えなくてよい」という誤概念が残ると、移項問題を間違えやすい状態が続きます
-- `resolve_misconceptions=True` にすると、対応スキルが十分に伸びたときに誤概念を解消できます
-
-これにより、講義前テスト、講義、学習介入、講義後テストの順で変化を比較できます。
 
 ### 10. LLMで学力テストを受けさせる
 
@@ -431,7 +408,7 @@ linear_equation_20q_001
 
 テスト時は `src/cognitive_model.py` が知識スコアから正答/誤答方針を決め、その方針をLLMに渡します。これにより、LLM本体の計算能力だけに引っ張られず、パラメータ差が正答率に出やすくなります。
 
-この検証でも `update_knowledge=False` なので、テスト中に知識スコアは更新されません。講義前に実行し、`Interactive lesson` で授業をした後にもう一度実行すると、授業前後の正答率変化を比較できます。
+この検証では `update_knowledge=False` なので、テスト中に知識スコアは更新されません。理解度スコアを変えた検証用生徒を複数作り、正答率の差を見る目的です。
 
 保存されるCSV:
 
