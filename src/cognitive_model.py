@@ -27,7 +27,7 @@ class CognitiveModel:
         skill = question["skill"]
         skill_score = _score(linear_state.get(skill, linear_state.get("score", 0)))
         overall_score = _score(linear_state.get("score", skill_score))
-        probability = self._correct_probability(student_state, skill_score, overall_score)
+        probability = self._correct_probability(student_state, skill, skill_score, overall_score)
         roll = _deterministic_roll(student_state["student_id"], question["question_id"])
         target_correct = roll < probability
         expected_value = extract_x_value(question["answer"])
@@ -49,14 +49,15 @@ class CognitiveModel:
     def _correct_probability(
         self,
         student_state: dict[str, Any],
+        skill: str,
         skill_score: int,
         overall_score: int,
     ) -> int:
         probability = round(skill_score * 0.75 + overall_score * 0.25)
         probability += LEVEL_ADJUSTMENT.get(student_state.get("self_efficacy", "medium"), 0)
         probability += round(LEVEL_ADJUSTMENT.get(student_state.get("motivation", "medium"), 0) / 2)
-        if student_state.get("misconceptions"):
-            probability -= 10
+        if _has_skill_related_misconception(student_state.get("misconceptions", []), skill):
+            probability -= 15
         return max(5, min(95, probability))
 
     def _rationale(self, target_correct: bool, skill: str, skill_score: int) -> str:
@@ -96,3 +97,13 @@ def _format_fraction(value: Fraction) -> str:
     if value.denominator == 1:
         return str(value.numerator)
     return f"{value.numerator}/{value.denominator}"
+
+
+def _has_skill_related_misconception(misconceptions: list[str], skill: str) -> bool:
+    keywords = {
+        "can_transpose_terms": ["移項", "符号", "反対側"],
+        "can_divide_by_coefficient": ["係数", "割", "引けば"],
+        "can_handle_negative_numbers": ["マイナス", "負", "-"],
+        "can_handle_fractions": ["分数", "/"],
+    }.get(skill, [])
+    return any(any(keyword in misconception for keyword in keywords) for misconception in misconceptions)

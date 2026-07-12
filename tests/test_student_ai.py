@@ -158,3 +158,68 @@ def test_simulator_updates_knowledge_state_after_interaction(tmp_path):
 
     assert updated["knowledge_state"]["linear_equation"]["score"] > 50
     assert updated["learning_history"][-1]["learning_event"]["knowledge_delta"] > 0
+
+
+def test_simulator_apply_learning_intervention_resolves_misconceptions(tmp_path):
+    students_dir = tmp_path / "students"
+    logs_dir = tmp_path / "logs"
+    students_dir.mkdir()
+    (students_dir / "S999.json").write_text(
+        """
+{
+  "student_id": "S999",
+  "name": "Test",
+  "understanding": {"linear_equation": "basic"},
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "low",
+      "score": 30,
+      "can_solve_ax_plus_b_equals_c": 30,
+      "can_transpose_terms": 30,
+      "can_divide_by_coefficient": 30,
+      "can_handle_negative_numbers": 20,
+      "can_handle_fractions": 10
+    }
+  },
+  "error_tendency": [],
+  "misconceptions": [
+    "移項しても符号は変えなくてよいと思っている",
+    "係数で割る代わりに係数を引くことがある"
+  ],
+  "learning_speed": "medium",
+  "personality": {"confidence": "medium"},
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "medium",
+    "extraversion": "medium",
+    "agreeableness": "medium",
+    "neuroticism": "medium"
+  },
+  "self_efficacy": "medium",
+  "question_tendency": "medium",
+  "motivation": "medium",
+  "learning_history": []
+}
+""".strip(),
+        encoding="utf-8",
+    )
+
+    sim = StudentAISimulator(
+        students_dir=str(students_dir),
+        logs_dir=str(logs_dir),
+        use_mock_model=True,
+    )
+    event = sim.apply_learning_intervention(
+        "S999",
+        skill_deltas={
+            "score": 20,
+            "can_transpose_terms": 30,
+            "can_divide_by_coefficient": 30,
+        },
+    )
+    updated = sim.state_manager.load_student("S999")
+
+    assert updated["knowledge_state"]["linear_equation"]["score"] == 50
+    assert updated["knowledge_state"]["linear_equation"]["can_transpose_terms"] == 60
+    assert updated["misconceptions"] == []
+    assert len(event["resolved_misconceptions"]) == 2

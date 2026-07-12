@@ -329,7 +329,40 @@ while True:
 生徒AI> えっと、3を右に動かすと思います。でも符号を変えるんでしたっけ？
 ```
 
-### 9. LLMで学力テストを受けさせる
+### 9. 講義後の学習を明示的に反映する
+
+ノートブックの `Controlled learning intervention` セクションで、「この講義で学習できた」と制御できます。
+
+```python
+learning_event = sim.apply_learning_intervention(
+    STUDENT_ID,
+    skill_deltas={
+        "score": 15,
+        "can_solve_ax_plus_b_equals_c": 15,
+        "can_transpose_terms": 30,
+        "can_divide_by_coefficient": 25,
+        "can_handle_negative_numbers": 5,
+        "can_handle_fractions": 0,
+    },
+    resolve_misconceptions=True,
+)
+```
+
+効果:
+
+- 指定した知識スコアを加算する
+- 関連スキルが一定以上になると、対応する誤概念を `misconceptions` から削除する
+- `learning_history` に `controlled_learning_intervention` として記録する
+
+補足:
+
+- 誤概念が残っていると、該当スキルのテストで正答確率が下がります
+- たとえば「移項しても符号は変えなくてよい」という誤概念が残ると、移項問題を間違えやすい状態が続きます
+- `resolve_misconceptions=True` にすると、対応スキルが十分に伸びたときに誤概念を解消できます
+
+これにより、講義前テスト、講義、学習介入、講義後テストの順で変化を比較できます。
+
+### 10. LLMで学力テストを受けさせる
 
 ノートブックの `Assessment test` セクションで、生徒AIにテストを受けさせられます。`Create simulator` セクションで `USE_MOCK_MODEL=False` にしていれば、QwenなどのLLMが生徒として解答します。テストは測定用なので、`knowledge_state` は更新しません。
 
@@ -364,7 +397,7 @@ from pathlib import Path
 print(Path("data/assessments/human_readable.md").read_text(encoding="utf-8")[-2000:])
 ```
 
-### 10. パラメータによる誤答傾向を確認する
+### 11. パラメータによる誤答傾向を確認する
 
 ノートブックの `Parameter error tendency check` セクションで、同じ問題を複数の検証用プロファイルに解かせ、回答と正誤を比較できます。
 
@@ -376,7 +409,7 @@ print(Path("data/assessments/human_readable.md").read_text(encoding="utf-8")[-20
 
 この検証では `update_knowledge=False` にしているため、知識スコアは更新されません。
 
-### 11. 理解度と正答率の相関グラフを作る
+### 12. 理解度と正答率の相関グラフを作る
 
 ノートブックの `Understanding score vs accuracy graph` セクションで、理解度スコアと20問テストの正答率の相関を確認できます。
 
@@ -408,7 +441,7 @@ data/assessments/understanding_accuracy_detail.csv
 data/assessments/understanding_accuracy_correctness_table.csv
 ```
 
-### 12. 授業ログを確認
+### 13. 授業ログを確認
 
 ```python
 from pathlib import Path
@@ -416,7 +449,7 @@ from pathlib import Path
 print(Path("data/logs/human_readable.md").read_text(encoding="utf-8")[-2000:])
 ```
 
-### 13. GitHubの更新をColabへ取り込む
+### 14. GitHubの更新をColabへ取り込む
 
 GitHub側のコードを更新したあと、Colabでは次を実行します。
 

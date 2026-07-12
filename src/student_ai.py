@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import re
+from datetime import datetime, timezone
 from typing import Any
 
 from src.config import (
@@ -117,6 +118,25 @@ class StudentAISimulator:
 
     def answer(self, student_id: str, problem: str) -> dict[str, Any]:
         return self.respond(student_id, problem)
+
+    def apply_learning_intervention(
+        self,
+        student_id: str,
+        *,
+        skill_deltas: dict[str, int],
+        resolve_misconceptions: bool = True,
+    ) -> dict[str, Any]:
+        state = self.state_manager.load_student(student_id)
+        updated_state, event = self.learning_updater.apply_controlled_learning(
+            state,
+            skill_deltas=skill_deltas,
+            resolve_misconceptions=resolve_misconceptions,
+        )
+        event["logged_at"] = datetime.now(timezone.utc).isoformat()
+        event["interaction_type"] = "controlled_learning_intervention"
+        updated_state["learning_history"].append(event)
+        self.state_manager.save_student(updated_state)
+        return event
 
 
 def _extract_problem(prompt: str) -> str:

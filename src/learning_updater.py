@@ -13,6 +13,13 @@ SKILL_KEYS = {
     "can_handle_fractions",
 }
 
+MISCONCEPTION_KEYWORDS = {
+    "can_transpose_terms": ["移項", "符号", "反対側"],
+    "can_divide_by_coefficient": ["係数", "割", "引けば"],
+    "can_handle_negative_numbers": ["マイナス", "負", "-"],
+    "can_handle_fractions": ["分数", "/"],
+}
+
 LEARNING_SPEED_MULTIPLIER = {
     "very_low": 0.25,
     "low": 0.5,
@@ -39,17 +46,56 @@ class LearningUpdater:
         delta = max(0, min(8, round(base_delta * multiplier)))
 
         touched_skills = self._touched_skills(teacher_message)
+        resolved_misconceptions: list[str] = []
         if delta > 0:
             linear_state["score"] = _clamp_score(linear_state.get("score", 0) + delta)
             for skill in touched_skills:
                 linear_state[skill] = _clamp_score(linear_state.get(skill, 0) + delta)
             linear_state["level"] = _score_to_level(linear_state["score"])
+            resolved_misconceptions = self._resolve_misconceptions(
+                updated,
+                touched_skills=touched_skills,
+            )
 
         event = {
             "knowledge_delta": delta,
             "updated_score": linear_state.get("score", 0),
             "updated_level": linear_state.get("level", "very_low"),
             "touched_skills": sorted(touched_skills),
+            "resolved_misconceptions": resolved_misconceptions,
+        }
+        return updated, event
+
+    def apply_controlled_learning(
+        self,
+        student_state: dict[str, Any],
+        *,
+        skill_deltas: dict[str, int],
+        resolve_misconceptions: bool = True,
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
+        updated = deepcopy(student_state)
+        linear_state = updated.setdefault("knowledge_state", {}).setdefault("linear_equation", {})
+        self._ensure_numeric_knowledge_state(linear_state)
+
+        touched_skills = set()
+        for skill, delta in skill_deltas.items():
+            if skill == "score" or skill in SKILL_KEYS:
+                linear_state[skill] = _clamp_score(linear_state.get(skill, 0) + delta)
+                if skill != "score":
+                    touched_skills.add(skill)
+        linear_state["level"] = _score_to_level(linear_state["score"])
+
+        resolved = []
+        if resolve_misconceptions:
+            resolved = self._resolve_misconceptions(updated, touched_skills=touched_skills)
+
+        event = {
+            "controlled_learning": True,
+            "skill_deltas": skill_deltas,
+            "updated_score": linear_state.get("score", 0),
+            "updated_level": linear_state.get("level", "very_low"),
+            "touched_skills": sorted(touched_skills),
+            "resolved_misconceptions": resolved,
         }
         return updated, event
 
@@ -81,6 +127,29 @@ class LearningUpdater:
         if "/" in normalized or "分数" in teacher_message:
             skills.add("can_handle_fractions")
         return skills
+
+    def _resolve_misconceptions(
+        self,
+        student_state: dict[str, Any],
+        *,
+        touched_skills: set[str],
+        threshold: int = 55,
+    ) -> list[str]:
+        misconceptions = student_state.get("misconceptions", [])
+        if not misconceptions:
+            return []
+
+        linear_state = student_state.get("knowledge_state", {}).get("linear_equation", {})
+        resolved = []
+        remaining = []
+        for misconception in misconceptions:
+            related_skill = _related_skill_for_misconception(misconception, touched_skills)
+            if related_skill and linear_state.get(related_skill, 0) >= threshold:
+                resolved.append(misconception)
+            else:
+                remaining.append(misconception)
+        student_state["misconceptions"] = remaining
+        return resolved
 
 
 def _looks_like_linear_equation_lesson(text: str) -> bool:
@@ -122,3 +191,14 @@ def _score_to_level(score: int) -> str:
 
 def _clamp_score(value: Any) -> int:
     return max(0, min(100, int(round(value))))
+
+
+def _related_skill_for_misconception(
+    misconception: str,
+    touched_skills: set[str],
+) -> str | None:
+    for skill in touched_skills:
+        keywords = MISCONCEPTION_KEYWORDS.get(skill, [])
+        if any(keyword in misconception for keyword in keywords):
+            return skill
+    return None
