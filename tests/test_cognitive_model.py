@@ -1,0 +1,54 @@
+from src.cognitive_model import CognitiveModel
+
+
+def student_state(score):
+    return {
+        "student_id": f"S{score}",
+        "knowledge_state": {
+            "linear_equation": {
+                "level": "medium",
+                "score": score,
+                "can_solve_ax_plus_b_equals_c": score,
+            }
+        },
+        "misconceptions": [] if score >= 60 else ["移項しても符号は変えなくてよい"],
+        "self_efficacy": "medium",
+        "motivation": "medium",
+    }
+
+
+def test_cognitive_model_probability_increases_with_knowledge_score():
+    model = CognitiveModel()
+    question = {
+        "question_id": "Q001",
+        "answer": "x = 4",
+        "skill": "can_solve_ax_plus_b_equals_c",
+    }
+
+    low = model.build_assessment_directive(student_state=student_state(0), question=question)
+    high = model.build_assessment_directive(student_state=student_state(100), question=question)
+
+    assert low["correct_probability"] < high["correct_probability"]
+    assert low["target_answer"] != high["target_answer"]
+
+
+def test_cognitive_model_uses_wrong_answer_when_target_incorrect():
+    model = CognitiveModel()
+    question = {
+        "question_id": "Q001",
+        "answer": "x = 4",
+        "skill": "can_solve_ax_plus_b_equals_c",
+    }
+
+    directive = None
+    for index in range(100):
+        state = student_state(0)
+        state["student_id"] = f"LOW_{index}"
+        candidate = model.build_assessment_directive(student_state=state, question=question)
+        if not candidate["target_correct"]:
+            directive = candidate
+            break
+
+    assert directive is not None
+    assert directive["target_correct"] is False
+    assert directive["target_answer"] != "x = 4"

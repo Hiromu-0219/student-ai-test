@@ -1,0 +1,98 @@
+from __future__ import annotations
+
+import hashlib
+from fractions import Fraction
+from typing import Any
+
+from src.grader import extract_x_value
+
+
+LEVEL_ADJUSTMENT = {
+    "very_low": -10,
+    "low": -5,
+    "medium": 0,
+    "high": 5,
+    "very_high": 10,
+}
+
+
+class CognitiveModel:
+    def build_assessment_directive(
+        self,
+        *,
+        student_state: dict[str, Any],
+        question: dict[str, Any],
+    ) -> dict[str, Any]:
+        linear_state = student_state.get("knowledge_state", {}).get("linear_equation", {})
+        skill = question["skill"]
+        skill_score = _score(linear_state.get(skill, linear_state.get("score", 0)))
+        overall_score = _score(linear_state.get("score", skill_score))
+        probability = self._correct_probability(student_state, skill_score, overall_score)
+        roll = _deterministic_roll(student_state["student_id"], question["question_id"])
+        target_correct = roll < probability
+        expected_value = extract_x_value(question["answer"])
+        target_value = expected_value if target_correct else _wrong_value(expected_value, question["skill"])
+
+        return {
+            "mode": "assessment",
+            "target_correct": target_correct,
+            "correct_probability": probability,
+            "roll": roll,
+            "skill": skill,
+            "skill_score": skill_score,
+            "overall_score": overall_score,
+            "expected_answer": question["answer"],
+            "target_answer": f"x = {_format_fraction(target_value)}",
+            "rationale": self._rationale(target_correct, skill, skill_score),
+        }
+
+    def _correct_probability(
+        self,
+        student_state: dict[str, Any],
+        skill_score: int,
+        overall_score: int,
+    ) -> int:
+        probability = round(skill_score * 0.75 + overall_score * 0.25)
+        probability += LEVEL_ADJUSTMENT.get(student_state.get("self_efficacy", "medium"), 0)
+        probability += round(LEVEL_ADJUSTMENT.get(student_state.get("motivation", "medium"), 0) / 2)
+        if student_state.get("misconceptions"):
+            probability -= 10
+        return max(5, min(95, probability))
+
+    def _rationale(self, target_correct: bool, skill: str, skill_score: int) -> str:
+        if target_correct:
+            return f"{skill} のスコアが {skill_score} なので、この問題は正答できる想定。"
+        return f"{skill} のスコアが {skill_score} なので、この問題では誤答する想定。"
+
+
+def _score(value: Any) -> int:
+    if isinstance(value, bool):
+        return 100 if value else 0
+    if isinstance(value, (int, float)):
+        return max(0, min(100, int(round(value))))
+    return 0
+
+
+def _deterministic_roll(student_id: str, question_id: str) -> int:
+    digest = hashlib.sha256(f"{student_id}:{question_id}".encode("utf-8")).hexdigest()
+    return int(digest[:8], 16) % 100
+
+
+def _wrong_value(expected_value: Fraction | None, skill: str) -> Fraction:
+    if expected_value is None:
+        return Fraction(0)
+    if skill == "can_transpose_terms":
+        return expected_value - 1
+    if skill == "can_divide_by_coefficient":
+        return expected_value + 2
+    if skill == "can_handle_negative_numbers":
+        return -expected_value
+    if skill == "can_handle_fractions":
+        return expected_value / 2
+    return expected_value + 1
+
+
+def _format_fraction(value: Fraction) -> str:
+    if value.denominator == 1:
+        return str(value.numerator)
+    return f"{value.numerator}/{value.denominator}"

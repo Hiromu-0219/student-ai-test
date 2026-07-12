@@ -20,6 +20,11 @@ class StudentAgent:
     def model_id(self) -> str:
         return self.speech_generator.model_id
 
-    def answer(self, student_state: dict[str, Any], problem: str) -> str:
-        prompt = build_student_prompt(student_state, problem)
+    def answer(
+        self,
+        student_state: dict[str, Any],
+        problem: str,
+        assessment_directive: dict[str, Any] | None = None,
+    ) -> str:
+        prompt = build_student_prompt(student_state, problem, assessment_directive)
         return self.speech_generator.generate(SYSTEM_PROMPT, prompt)

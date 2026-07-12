@@ -4,6 +4,7 @@ from collections import defaultdict
 from typing import Any
 
 from src.assessment_logger import AssessmentLogger
+from src.cognitive_model import CognitiveModel
 from src.grader import LinearEquationGrader
 from src.student_ai import StudentAISimulator
 from src.test_bank import TestBank
@@ -19,11 +20,13 @@ class TestRunner:
         test_bank: TestBank | None = None,
         grader: LinearEquationGrader | None = None,
         assessment_logger: AssessmentLogger | None = None,
+        cognitive_model: CognitiveModel | None = None,
     ) -> None:
         self.simulator = simulator
         self.test_bank = test_bank or TestBank()
         self.grader = grader or LinearEquationGrader()
         self.assessment_logger = assessment_logger or AssessmentLogger()
+        self.cognitive_model = cognitive_model or CognitiveModel()
 
     def run_test(
         self,
@@ -41,10 +44,16 @@ class TestRunner:
         skill_correct: dict[str, int] = defaultdict(int)
 
         for question in test_data["questions"]:
+            student_state = self.simulator.state_manager.load_student(student_id)
+            assessment_directive = self.cognitive_model.build_assessment_directive(
+                student_state=student_state,
+                question=question,
+            )
             response = self.simulator.respond(
                 student_id,
                 question["problem"],
                 update_knowledge=False,
+                assessment_directive=assessment_directive,
             )
             grading = self.grader.grade(question["answer"], response["answer"])
             skill = question["skill"]
@@ -59,6 +68,7 @@ class TestRunner:
                     "difficulty": question["difficulty"],
                     "student_answer": response["answer"],
                     "grading": grading,
+                    "assessment_directive": assessment_directive,
                 }
             )
 

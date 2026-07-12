@@ -22,6 +22,9 @@ class RuleBasedMockLLM:
     model_id = "rule-based-mock"
 
     def generate(self, system_prompt: str, user_prompt: str) -> str:
+        target_answer = _extract_target_answer(user_prompt)
+        if target_answer:
+            return f"考えてみると、{target_answer} だと思います。答え: {target_answer}"
         problem = _extract_problem(user_prompt)
         answer = _solve_simple_linear_equation(problem)
         if answer is None:
@@ -62,9 +65,10 @@ class StudentAISimulator:
         teacher_message: str,
         *,
         update_knowledge: bool = True,
+        assessment_directive: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         state = self.state_manager.load_student(student_id)
-        answer = self.agent.answer(state, teacher_message)
+        answer = self.agent.answer(state, teacher_message, assessment_directive)
         updated_state = state
         learning_event = {
             "knowledge_delta": 0,
@@ -94,6 +98,7 @@ class StudentAISimulator:
                 "domain": "linear_equation",
                 "interaction_type": "lesson_dialogue",
                 "learning_event": learning_event,
+                "assessment_directive": assessment_directive,
             },
         )
         if update_knowledge:
@@ -122,6 +127,19 @@ def _extract_problem(prompt: str) -> str:
     if marker in prompt:
         return prompt.split(marker, 1)[1].split("生徒AIとして", 1)[0].strip()
     return prompt
+
+
+def _extract_target_answer(prompt: str) -> str | None:
+    match = re.search(r"target_answer:\s*(x\s*=\s*[+-]?\d+(?:/\d+)?)", prompt)
+    if match:
+        return match.group(1).replace(" ", "")
+    match = re.search(r"'target_answer': '([^']+)'", prompt)
+    if match:
+        return match.group(1)
+    match = re.search(r'"target_answer": "([^"]+)"', prompt)
+    if match:
+        return match.group(1)
+    return None
 
 
 def _solve_simple_linear_equation(text: str) -> str | None:

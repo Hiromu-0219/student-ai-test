@@ -21,7 +21,8 @@ student-ai/
 │  ├─ student_ai.py
 │  ├─ state_manager.py
 │  ├─ logger.py
-│  └─ prompts.py
+│  ├─ prompts.py
+│  └─ cognitive_model.py
 ├─ data/
 │  ├─ students/
 │  │  ├─ S001.json
@@ -60,6 +61,7 @@ student-ai/
 - `src/test_bank.py`: 学力テスト問題セットの読み込み
 - `src/grader.py`: `x = 数値` 形式の採点
 - `src/test_runner.py`: 生徒AIにテストを受けさせる実行器
+- `src/cognitive_model.py`: テスト時に知識状態から正答/誤答方針を決める認知モデル
 - `src/assessment_logger.py`: 学力テスト結果ログの保存
 - `data/students/*.json`: 生徒ごとの状態データ
 - `data/logs/`: 回答ログの保存先
@@ -392,7 +394,9 @@ linear_equation_20q_001
 - 理解度スコアと正答率の散布図を描く
 - 相関係数 `r` をグラフタイトルに表示する
 
-この検証でも `update_knowledge=False` なので、テスト中に知識スコアは更新されません。
+テスト時は `src/cognitive_model.py` が知識スコアから正答/誤答方針を決め、その方針をLLMに渡します。これにより、LLM本体の計算能力だけに引っ張られず、パラメータ差が正答率に出やすくなります。
+
+この検証でも `update_knowledge=False` なので、テスト中に知識スコアは更新されません。講義前に実行し、`Interactive lesson` で授業をした後にもう一度実行すると、授業前後の正答率変化を比較できます。
 
 ### 12. 授業ログを確認
 
