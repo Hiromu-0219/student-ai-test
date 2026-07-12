@@ -27,8 +27,18 @@ class CognitiveModel:
         skill = question["skill"]
         skill_score = _score(linear_state.get(skill, linear_state.get("score", 0)))
         overall_score = _score(linear_state.get("score", skill_score))
-        probability = self._correct_probability(student_state, skill, skill_score, overall_score)
-        roll = _deterministic_roll(student_state["student_id"], question["question_id"])
+        misconception_penalty = _misconception_penalty(
+            student_state.get("misconceptions", []),
+            skill,
+            skill_score,
+        )
+        probability = self._correct_probability(
+            student_state,
+            skill_score,
+            overall_score,
+            misconception_penalty,
+        )
+        roll = _deterministic_roll(question["question_id"])
         target_correct = roll < probability
         expected_value = extract_x_value(question["answer"])
         target_value = expected_value if target_correct else _wrong_value(expected_value, question["skill"])
@@ -41,6 +51,7 @@ class CognitiveModel:
             "skill": skill,
             "skill_score": skill_score,
             "overall_score": overall_score,
+            "misconception_penalty": misconception_penalty,
             "expected_answer": question["answer"],
             "target_answer": f"x = {_format_fraction(target_value)}",
             "rationale": self._rationale(target_correct, skill, skill_score),
@@ -49,15 +60,14 @@ class CognitiveModel:
     def _correct_probability(
         self,
         student_state: dict[str, Any],
-        skill: str,
         skill_score: int,
         overall_score: int,
+        misconception_penalty: int,
     ) -> int:
         probability = round(skill_score * 0.75 + overall_score * 0.25)
         probability += LEVEL_ADJUSTMENT.get(student_state.get("self_efficacy", "medium"), 0)
         probability += round(LEVEL_ADJUSTMENT.get(student_state.get("motivation", "medium"), 0) / 2)
-        if _has_skill_related_misconception(student_state.get("misconceptions", []), skill):
-            probability -= 15
+        probability -= misconception_penalty
         return max(5, min(95, probability))
 
     def _rationale(self, target_correct: bool, skill: str, skill_score: int) -> str:
@@ -74,8 +84,8 @@ def _score(value: Any) -> int:
     return 0
 
 
-def _deterministic_roll(student_id: str, question_id: str) -> int:
-    digest = hashlib.sha256(f"{student_id}:{question_id}".encode("utf-8")).hexdigest()
+def _deterministic_roll(question_id: str) -> int:
+    digest = hashlib.sha256(question_id.encode("utf-8")).hexdigest()
     return int(digest[:8], 16) % 100
 
 
@@ -99,11 +109,14 @@ def _format_fraction(value: Fraction) -> str:
     return f"{value.numerator}/{value.denominator}"
 
 
-def _has_skill_related_misconception(misconceptions: list[str], skill: str) -> bool:
+def _misconception_penalty(misconceptions: list[str], skill: str, skill_score: int) -> int:
     keywords = {
         "can_transpose_terms": ["移項", "符号", "反対側"],
         "can_divide_by_coefficient": ["係数", "割", "引けば"],
         "can_handle_negative_numbers": ["マイナス", "負", "-"],
         "can_handle_fractions": ["分数", "/"],
     }.get(skill, [])
-    return any(any(keyword in misconception for keyword in keywords) for misconception in misconceptions)
+    has_related = any(any(keyword in misconception for keyword in keywords) for misconception in misconceptions)
+    if not has_related:
+        return 0
+    return max(0, round((100 - skill_score) * 0.25))

@@ -52,3 +52,41 @@ def test_cognitive_model_uses_wrong_answer_when_target_incorrect():
     assert directive is not None
     assert directive["target_correct"] is False
     assert directive["target_answer"] != "x = 4"
+
+
+def test_cognitive_model_correctness_is_monotonic_for_same_question():
+    model = CognitiveModel()
+    question = {
+        "question_id": "Q001",
+        "answer": "x = 4",
+        "skill": "can_solve_ax_plus_b_equals_c",
+    }
+    directives = [
+        model.build_assessment_directive(student_state=student_state(score), question=question)
+        for score in [0, 20, 40, 60, 80, 100]
+    ]
+    probabilities = [directive["correct_probability"] for directive in directives]
+    correctness = [directive["target_correct"] for directive in directives]
+
+    assert probabilities == sorted(probabilities)
+    assert correctness == sorted(correctness)
+
+
+def test_misconception_penalty_fades_as_skill_increases():
+    model = CognitiveModel()
+    question = {
+        "question_id": "Q001",
+        "answer": "x = 4",
+        "skill": "can_transpose_terms",
+    }
+    low = student_state(20)
+    high = student_state(80)
+    low["knowledge_state"]["linear_equation"]["can_transpose_terms"] = 20
+    high["knowledge_state"]["linear_equation"]["can_transpose_terms"] = 80
+    low["misconceptions"] = ["移項しても符号は変えなくてよい"]
+    high["misconceptions"] = ["移項しても符号は変えなくてよい"]
+
+    low_directive = model.build_assessment_directive(student_state=low, question=question)
+    high_directive = model.build_assessment_directive(student_state=high, question=question)
+
+    assert low_directive["misconception_penalty"] > high_directive["misconception_penalty"]
