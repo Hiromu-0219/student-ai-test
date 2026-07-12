@@ -420,7 +420,28 @@ data/assessments/understanding_accuracy_detail.csv
 data/assessments/understanding_accuracy_correctness_table.csv
 ```
 
-### 13. 授業ログを確認
+### 13. 5刻み・大量問題で相関を見る
+
+ノートブックの `Dense understanding sweep, 5-point intervals` セクションで、理解度 `0,5,10,...,100` の21段階をまとめて検証できます。
+
+このセルはLLM発話を生成せず、`src/cognitive_model.py` だけで正答/誤答を決めます。そのため、Colabでも問題数を多めにできます。標準では500問です。
+
+```python
+UNDERSTANDING_SCORES_DENSE = list(range(0, 101, 5))
+GENERATED_QUESTION_COUNT = 500
+```
+
+重い場合は `GENERATED_QUESTION_COUNT = 200` に下げます。余裕があれば `1000` 以上に増やせます。
+
+保存されるCSV:
+
+```text
+data/assessments/dense_understanding_accuracy_summary.csv
+data/assessments/dense_understanding_accuracy_detail.csv
+data/assessments/dense_understanding_accuracy_correctness_table.csv
+```
+
+### 14. 授業ログを確認
 
 ```python
 from pathlib import Path
@@ -428,7 +449,7 @@ from pathlib import Path
 print(Path("data/logs/human_readable.md").read_text(encoding="utf-8")[-2000:])
 ```
 
-### 14. GitHubの更新をColabへ取り込む
+### 15. GitHubの更新をColabへ取り込む
 
 ノートブック上部の `Pull latest code from GitHub` セルを実行します。clone直後に置いてあるので、基本的には上から順番に実行すれば最新版のコードを取り込めます。
 
