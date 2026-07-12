@@ -90,3 +90,21 @@ def test_misconception_penalty_fades_as_skill_increases():
     high_directive = model.build_assessment_directive(student_state=high, question=question)
 
     assert low_directive["misconception_penalty"] > high_directive["misconception_penalty"]
+
+
+def test_misconception_strength_disappears_at_high_understanding_even_if_text_remains():
+    model = CognitiveModel()
+    question = {
+        "question_id": "Q001",
+        "answer": "x = 4",
+        "skill": "can_transpose_terms",
+    }
+    state = student_state(95)
+    state["knowledge_state"]["linear_equation"]["can_transpose_terms"] = 95
+    state["misconceptions"] = ["移項は項を反対側へ動かすだけで符号はそのままだと思っている"]
+
+    directive = model.build_assessment_directive(student_state=state, question=question)
+
+    assert directive["misconception_strength"] == "none"
+    assert directive["misconception_penalty"] == 0
+    assert directive["active_misconceptions"] == []

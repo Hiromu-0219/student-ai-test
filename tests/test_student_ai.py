@@ -223,3 +223,64 @@ def test_simulator_apply_learning_intervention_resolves_misconceptions(tmp_path)
     assert updated["knowledge_state"]["linear_equation"]["can_transpose_terms"] == 60
     assert updated["misconceptions"] == []
     assert len(event["resolved_misconceptions"]) == 2
+
+
+def test_assessment_response_uses_answer_only_format(tmp_path):
+    students_dir = tmp_path / "students"
+    logs_dir = tmp_path / "logs"
+    students_dir.mkdir()
+    (students_dir / "S999.json").write_text(
+        """
+{
+  "student_id": "S999",
+  "name": "Test",
+  "understanding": {"linear_equation": "basic"},
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "medium",
+      "score": 50,
+      "can_solve_ax_plus_b_equals_c": 50,
+      "can_transpose_terms": 50,
+      "can_divide_by_coefficient": 50,
+      "can_handle_negative_numbers": 50,
+      "can_handle_fractions": 50
+    }
+  },
+  "error_tendency": [],
+  "misconceptions": [],
+  "learning_speed": "medium",
+  "personality": {"confidence": "medium"},
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "medium",
+    "extraversion": "medium",
+    "agreeableness": "medium",
+    "neuroticism": "medium"
+  },
+  "self_efficacy": "medium",
+  "question_tendency": "medium",
+  "motivation": "medium",
+  "learning_history": []
+}
+""".strip(),
+        encoding="utf-8",
+    )
+    sim = StudentAISimulator(
+        students_dir=str(students_dir),
+        logs_dir=str(logs_dir),
+        use_mock_model=True,
+    )
+    result = sim.respond(
+        "S999",
+        "2x+3=11",
+        update_knowledge=False,
+        assessment_directive={
+            "mode": "assessment",
+            "target_correct": True,
+            "target_answer": "x = 4",
+            "correct_probability": 100,
+            "rationale": "test",
+        },
+    )
+
+    assert result["answer"] == "答え: x = 4"

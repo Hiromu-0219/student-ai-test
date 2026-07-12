@@ -27,10 +27,19 @@ class CognitiveModel:
         skill = question["skill"]
         skill_score = _score(linear_state.get(skill, linear_state.get("score", 0)))
         overall_score = _score(linear_state.get("score", skill_score))
-        misconception_penalty = _misconception_penalty(
+        related_misconceptions = _related_misconceptions(
             student_state.get("misconceptions", []),
             skill,
+        )
+        misconception_strength = _misconception_strength(
             skill_score,
+            overall_score,
+            bool(related_misconceptions),
+        )
+        misconception_penalty = _misconception_penalty(
+            misconception_strength,
+            skill_score,
+            overall_score,
         )
         probability = self._correct_probability(
             student_state,
@@ -52,6 +61,11 @@ class CognitiveModel:
             "skill_score": skill_score,
             "overall_score": overall_score,
             "misconception_penalty": misconception_penalty,
+            "misconception_strength": misconception_strength,
+            "active_misconceptions": _active_misconceptions(
+                related_misconceptions,
+                misconception_strength,
+            ),
             "expected_answer": question["answer"],
             "target_answer": f"x = {_format_fraction(target_value)}",
             "rationale": self._rationale(target_correct, skill, skill_score),
@@ -109,14 +123,46 @@ def _format_fraction(value: Fraction) -> str:
     return f"{value.numerator}/{value.denominator}"
 
 
-def _misconception_penalty(misconceptions: list[str], skill: str, skill_score: int) -> int:
+def _related_misconceptions(misconceptions: list[str], skill: str) -> list[str]:
     keywords = {
         "can_transpose_terms": ["移項", "符号", "反対側"],
         "can_divide_by_coefficient": ["係数", "割", "引けば"],
         "can_handle_negative_numbers": ["マイナス", "負", "-"],
         "can_handle_fractions": ["分数", "/"],
     }.get(skill, [])
-    has_related = any(any(keyword in misconception for keyword in keywords) for misconception in misconceptions)
-    if not has_related:
+    return [
+        misconception
+        for misconception in misconceptions
+        if any(keyword in misconception for keyword in keywords)
+    ]
+
+
+def _misconception_strength(skill_score: int, overall_score: int, has_related_misconception: bool) -> str:
+    if not has_related_misconception:
+        return "none"
+    effective_score = max(skill_score, overall_score)
+    if effective_score >= 90:
+        return "none"
+    if effective_score >= 70:
+        return "weak"
+    if effective_score >= 40:
+        return "medium"
+    return "strong"
+
+
+def _active_misconceptions(misconceptions: list[str], strength: str) -> list[dict[str, str]]:
+    if strength == "none":
+        return []
+    return [{"text": misconception, "strength": strength} for misconception in misconceptions]
+
+
+def _misconception_penalty(strength: str, skill_score: int, overall_score: int) -> int:
+    if strength == "none":
         return 0
-    return max(0, round((100 - skill_score) * 0.25))
+    effective_score = max(skill_score, overall_score)
+    multiplier = {
+        "weak": 0.10,
+        "medium": 0.18,
+        "strong": 0.30,
+    }[strength]
+    return max(0, round((100 - effective_score) * multiplier))

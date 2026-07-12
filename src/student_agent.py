@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Protocol
 
-from src.prompts import SYSTEM_PROMPT, build_student_prompt
+from src.prompts import ASSESSMENT_SYSTEM_PROMPT, SYSTEM_PROMPT, build_student_prompt
 
 
 class SpeechGenerator(Protocol):
@@ -27,4 +27,5 @@ class StudentAgent:
         assessment_directive: dict[str, Any] | None = None,
     ) -> str:
         prompt = build_student_prompt(student_state, problem, assessment_directive)
-        return self.speech_generator.generate(SYSTEM_PROMPT, prompt)
+        system_prompt = ASSESSMENT_SYSTEM_PROMPT if assessment_directive else SYSTEM_PROMPT
+        return self.speech_generator.generate(system_prompt, prompt)

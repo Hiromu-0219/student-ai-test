@@ -25,6 +25,8 @@ class RuleBasedMockLLM:
     def generate(self, system_prompt: str, user_prompt: str) -> str:
         target_answer = _extract_target_answer(user_prompt)
         if target_answer:
+            if "学力テスト" in system_prompt:
+                return f"答え: {target_answer}"
             return f"考えてみると、{target_answer} だと思います。答え: {target_answer}"
         problem = _extract_problem(user_prompt)
         answer = _solve_simple_linear_equation(problem)
@@ -152,7 +154,7 @@ def _extract_problem(prompt: str) -> str:
 def _extract_target_answer(prompt: str) -> str | None:
     match = re.search(r"target_answer:\s*(x\s*=\s*[+-]?\d+(?:/\d+)?)", prompt)
     if match:
-        return match.group(1).replace(" ", "")
+        return match.group(1)
     match = re.search(r"'target_answer': '([^']+)'", prompt)
     if match:
         return match.group(1)
