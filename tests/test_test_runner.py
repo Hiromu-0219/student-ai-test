@@ -94,3 +94,74 @@ def test_test_runner_scores_and_logs_assessment(tmp_path):
     assert updated["knowledge_state"]["linear_equation"]["score"] == 50
     assert updated["learning_history"] == []
     assert "assessment_directive" in result["question_results"][0]
+    assert "raw_student_answer" in result["question_results"][0]
+
+
+def test_test_runner_grades_controlled_answer_not_raw_llm_output(tmp_path):
+    students_dir = tmp_path / "students"
+    tests_dir = tmp_path / "tests"
+    assessments_dir = tmp_path / "assessments"
+    students_dir.mkdir()
+    tests_dir.mkdir()
+    write_student(students_dir / "S999.json")
+    (tests_dir / "linear_equation_basic_001.json").write_text(
+        json.dumps(
+            {
+                "test_id": "linear_equation_basic_001",
+                "title": "Test",
+                "domain": "linear_equation",
+                "questions": [
+                    {
+                        "question_id": "Q001",
+                        "problem": "2x+3=11",
+                        "answer": "x = 4",
+                        "skill": "can_solve_ax_plus_b_equals_c",
+                        "difficulty": 1,
+                    }
+                ],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    class StubStateManager:
+        def load_student(self, student_id):
+            with (students_dir / f"{student_id}.json").open(encoding="utf-8") as file:
+                return json.load(file)
+
+    class StubSimulator:
+        state_manager = StubStateManager()
+
+        def respond(self, *args, **kwargs):
+            return {"answer": "答え: x = 999"}
+
+    class AlwaysCorrectCognitiveModel:
+        def build_assessment_directive(self, *, student_state, question):
+            return {
+                "mode": "assessment",
+                "target_correct": True,
+                "correct_probability": 100,
+                "roll": 0,
+                "skill": question["skill"],
+                "skill_score": 100,
+                "overall_score": 100,
+                "misconception_penalty": 0,
+                "expected_answer": question["answer"],
+                "target_answer": "x = 4",
+                "rationale": "test",
+            }
+
+    runner = TestRunner(
+        simulator=StubSimulator(),
+        test_bank=TestBank(tests_dir),
+        assessment_logger=AssessmentLogger(assessments_dir),
+        cognitive_model=AlwaysCorrectCognitiveModel(),
+    )
+
+    result = runner.run_test(student_id="S999", test_id="linear_equation_basic_001")
+    question_result = result["question_results"][0]
+
+    assert result["score_percentage"] == 100.0
+    assert question_result["student_answer"] == "x = 4"
+    assert question_result["raw_student_answer"] == "答え: x = 999"

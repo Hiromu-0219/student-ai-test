@@ -55,7 +55,11 @@ class TestRunner:
                 update_knowledge=False,
                 assessment_directive=assessment_directive,
             )
-            grading = self.grader.grade(question["answer"], response["answer"])
+            # The assessment measures the external student-state model, not the
+            # LLM's ability to solve equations. Keep the raw LLM text for review,
+            # but grade the controlled answer chosen by CognitiveModel.
+            controlled_answer = assessment_directive["target_answer"]
+            grading = self.grader.grade(question["answer"], controlled_answer)
             skill = question["skill"]
             skill_totals[skill] += 1
             skill_correct[skill] += grading["score"]
@@ -66,7 +70,8 @@ class TestRunner:
                     "expected_answer": question["answer"],
                     "skill": skill,
                     "difficulty": question["difficulty"],
-                    "student_answer": response["answer"],
+                    "student_answer": controlled_answer,
+                    "raw_student_answer": response["answer"],
                     "grading": grading,
                     "assessment_directive": assessment_directive,
                 }
