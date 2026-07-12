@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from src.personality_model import build_personality_profile
+
 
 SYSTEM_PROMPT = """あなたは教育シミュレーション用の「生徒AI」です。
 教師の発話に、生徒状態に合わせて回答してください。
@@ -52,6 +54,10 @@ def build_student_prompt(
     motivation = student_state.get("motivation", "medium")
     recent_history = student_state.get("learning_history", [])[-3:]
     directive_text = _format_assessment_directive(assessment_directive)
+    personality_profile = build_personality_profile(student_state)
+    personality_instructions = "\n".join(
+        f"- {instruction}" for instruction in personality_profile["prompt_instructions"]
+    )
 
     return f"""生徒状態:
 - student_id: {student_state.get("student_id")}
@@ -67,6 +73,10 @@ def build_student_prompt(
 - question_tendency: {question_tendency}
 - motivation: {motivation}
 - recent_learning_history: {recent_history}
+
+発話スタイル:
+- personality_profile: {personality_profile}
+{personality_instructions}
 
 {directive_text}
 

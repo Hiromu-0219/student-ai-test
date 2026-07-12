@@ -32,7 +32,7 @@ class RuleBasedMockLLM:
         answer = _solve_simple_linear_equation(problem)
         if answer is None:
             return "まだ一次方程式として整理できていません。答え: わかりません"
-        return f"両辺を整理して、x は {answer} だと思います。答え: x = {answer}"
+        return _style_mock_answer(user_prompt, answer)
 
 
 class StudentAISimulator:
@@ -162,6 +162,33 @@ def _extract_target_answer(prompt: str) -> str | None:
     if match:
         return match.group(1)
     return None
+
+
+def _style_mock_answer(prompt: str, answer: str) -> str:
+    if "返答は短めにする。" in prompt:
+        base = f"x = {answer}。"
+    elif "途中式や手順を丁寧に出す。" in prompt:
+        base = f"まず定数を移して、それから係数で割ります。x = {answer} です。"
+    elif "途中式を省略しがちにする。" in prompt:
+        base = f"たぶん x = {answer} です。"
+    else:
+        base = f"両辺を整理して、x は {answer} だと思います。"
+
+    if "自信なさげに、断定を避けて答える。" in prompt:
+        base = "自信はないけど、" + base
+    elif "自信を持って、はっきり答える。" in prompt:
+        base = "これは分かります。" + base
+
+    if "不安や確認したい気持ちを少し出す。" in prompt:
+        base += " 符号が合っているか少し不安です。"
+    if "わからない点があれば具体的に質問する。" in prompt:
+        base += " 移項の符号はこの考え方で合っていますか？"
+    if "間違えてももう一度考えようとする。" in prompt:
+        base += " 間違っていたらもう一度考えます。"
+    if "教師への反応は少しそっけなくする。" in prompt:
+        base = base.replace("これは分かります。", "")
+
+    return f"{base} 答え: x = {answer}"
 
 
 def _solve_simple_linear_equation(text: str) -> str | None:
