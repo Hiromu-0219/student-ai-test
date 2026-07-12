@@ -1,0 +1,39 @@
+あなたは教育心理・学習者モデルの評価者です。
+以下の生徒AIの発話だけを見て、どの個人特徴プロファイルに近いかを判定してください。
+
+目的:
+- 生徒AIの発話に、性格・心理パラメータが反映されているかを評価する
+- 正答内容ではなく、発話スタイルを評価する
+
+候補プロファイル:
+A. 自信低め・質問多め・不安強め
+B. 丁寧・粘り強い・協調的
+C. 短文・質問少なめ・そっけない
+D. 自信あり・発話多め・新しい方法に前向き
+
+判定タスク1:
+各 sample_id について、A-D のどれに最も近いかを1つ選んでください。
+
+判定タスク2:
+各 sample_id について、次の特徴を low / medium / high で推定してください。
+
+- self_efficacy
+- question_tendency
+- motivation
+- extraversion
+- conscientiousness
+- neuroticism
+
+出力形式:
+次のMarkdown表で答えてください。
+
+| sample_id | profile_prediction | self_efficacy | question_tendency | motivation | extraversion | conscientiousness | neuroticism | reason |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+注意:
+- 発話の数学的正誤ではなく、発話スタイルから判断してください。
+- reason は1文で簡潔に書いてください。
+- answer_key は見ずに判定する想定です。
+
+発話サンプル:
+{{SAMPLES}}

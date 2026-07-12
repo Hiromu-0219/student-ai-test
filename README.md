@@ -499,6 +499,14 @@ Colabでは [notebooks/student_ai_colab.ipynb](notebooks/student_ai_colab.ipynb)
 
 個人特徴による発話差を試す場合は [notebooks/personality_experiment.ipynb](notebooks/personality_experiment.ipynb) を使います。同じ知識状態で性格・心理パラメータだけを変え、発話から個人特徴を推定できるかを確認できます。
 
+このノートブックは、別AIに評価させるためのプロンプトも生成します。
+
+```text
+data/assessments/personality_judge_prompt.txt
+```
+
+この `.txt` の中身をChatGPTなどに貼ると、発話だけからプロファイル分類と特徴推定を行わせることができます。テンプレートは `data/prompts/personality_judge_prompt_template.txt` にあります。
+
 ## テスト
 
 標準テストではモデルをダウンロードしません。`use_mock_model=True` で実行経路を確認します。
