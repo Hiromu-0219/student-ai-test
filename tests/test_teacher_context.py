@@ -59,3 +59,21 @@ def test_context_builder_accepts_explicit_target_skill():
 
     assert context["target_skill"] == "can_divide_by_coefficient"
     assert context["constraints"]["max_teacher_utterance_chars"] == 80
+
+
+def test_context_builder_accepts_classroom_observation():
+    classroom_observation = {
+        "student_count": 3,
+        "classroom_summary": "3 students observed.",
+        "recommended_teacher_actions": ["Check priority students individually."],
+    }
+
+    context = build_teacher_context(
+        student_state=_student_state(),
+        recent_student_utterance="符号が変わるか自信がありません。",
+        communication_observation={"trait_estimates": {"self_efficacy": "low"}},
+        classroom_observation=classroom_observation,
+    )
+
+    assert context["classroom_observation"]["student_count"] == 3
+    assert context["classroom_observation"]["recommended_teacher_actions"]

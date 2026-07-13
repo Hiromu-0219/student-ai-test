@@ -48,6 +48,28 @@ class TraitClassification:
         }
 
 
+@dataclass(frozen=True)
+class ClassroomCommunicationSummary:
+    student_count: int
+    individual_results: list[dict[str, Any]]
+    profile_counts: dict[str, int]
+    trait_level_counts: dict[str, dict[str, int]]
+    priority_students: list[dict[str, Any]]
+    classroom_summary: str
+    recommended_teacher_actions: list[str]
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "student_count": self.student_count,
+            "individual_results": self.individual_results,
+            "profile_counts": self.profile_counts,
+            "trait_level_counts": self.trait_level_counts,
+            "priority_students": self.priority_students,
+            "classroom_summary": self.classroom_summary,
+            "recommended_teacher_actions": self.recommended_teacher_actions,
+        }
+
+
 class CommunicationAI:
     """Observer/communication layer between student AI and teacher AI.
 
@@ -86,6 +108,39 @@ class CommunicationAI:
             )
             results.append({**row, **classification.to_dict()})
         return results
+
+    def summarize_classroom(
+        self,
+        rows: list[dict[str, Any]],
+        *,
+        min_students: int = 3,
+        max_students: int = 20,
+    ) -> ClassroomCommunicationSummary:
+        _validate_classroom_size(rows, min_students, max_students)
+        individual_results = self.classify_many(rows)
+        profile_counts = _count_profiles(individual_results)
+        trait_level_counts = _count_trait_levels(individual_results)
+        priority_students = _select_priority_students(individual_results)
+        actions = _classroom_actions(
+            profile_counts=profile_counts,
+            trait_level_counts=trait_level_counts,
+            priority_students=priority_students,
+        )
+        summary = _classroom_summary_text(
+            student_count=len(individual_results),
+            profile_counts=profile_counts,
+            trait_level_counts=trait_level_counts,
+            priority_students=priority_students,
+        )
+        return ClassroomCommunicationSummary(
+            student_count=len(individual_results),
+            individual_results=individual_results,
+            profile_counts=profile_counts,
+            trait_level_counts=trait_level_counts,
+            priority_students=priority_students,
+            classroom_summary=summary,
+            recommended_teacher_actions=actions,
+        )
 
 
 class LLMCommunicationAI:
@@ -154,6 +209,46 @@ class LLMCommunicationAI:
             )
             results.append({**row, **classification.to_dict()})
         return results
+
+    def summarize_classroom(
+        self,
+        rows: list[dict[str, Any]],
+        *,
+        min_students: int = 3,
+        max_students: int = 20,
+    ) -> ClassroomCommunicationSummary:
+        _validate_classroom_size(rows, min_students, max_students)
+        fallback_summary = self.fallback.summarize_classroom(
+            rows,
+            min_students=min_students,
+            max_students=max_students,
+        )
+        individual_results = self.classify_many(rows)
+        profile_counts = _count_profiles(individual_results)
+        trait_level_counts = _count_trait_levels(individual_results)
+        priority_students = _select_priority_students(individual_results)
+        actions = _classroom_actions(
+            profile_counts=profile_counts,
+            trait_level_counts=trait_level_counts,
+            priority_students=priority_students,
+        )
+        summary = _classroom_summary_text(
+            student_count=len(individual_results),
+            profile_counts=profile_counts,
+            trait_level_counts=trait_level_counts,
+            priority_students=priority_students,
+        )
+        if not summary:
+            summary = fallback_summary.classroom_summary
+        return ClassroomCommunicationSummary(
+            student_count=len(individual_results),
+            individual_results=individual_results,
+            profile_counts=profile_counts,
+            trait_level_counts=trait_level_counts,
+            priority_students=priority_students,
+            classroom_summary=summary,
+            recommended_teacher_actions=actions or fallback_summary.recommended_teacher_actions,
+        )
 
 
 def _extract_features(utterance: str) -> dict[str, bool | int]:
@@ -263,6 +358,129 @@ def _normalize_confidence(value: Any, fallback: float) -> float:
     except (TypeError, ValueError):
         return fallback
     return round(max(0.0, min(1.0, confidence)), 2)
+
+
+def _validate_classroom_size(
+    rows: list[dict[str, Any]],
+    min_students: int,
+    max_students: int,
+) -> None:
+    if not min_students <= len(rows) <= max_students:
+        raise ValueError(
+            f"classroom summary expects {min_students}-{max_students} students, "
+            f"got {len(rows)}"
+        )
+
+
+def _count_profiles(results: list[dict[str, Any]]) -> dict[str, int]:
+    counts = {"A": 0, "B": 0, "C": 0, "D": 0}
+    for result in results:
+        profile = result.get("profile_prediction")
+        if profile in counts:
+            counts[profile] += 1
+    return counts
+
+
+def _count_trait_levels(results: list[dict[str, Any]]) -> dict[str, dict[str, int]]:
+    trait_keys = [
+        "self_efficacy",
+        "question_tendency",
+        "motivation",
+        "extraversion",
+        "conscientiousness",
+        "neuroticism",
+    ]
+    counts = {key: {"low": 0, "medium": 0, "high": 0} for key in trait_keys}
+    for result in results:
+        traits = result.get("trait_estimates", {})
+        for key in trait_keys:
+            level = traits.get(key)
+            if level in counts[key]:
+                counts[key][level] += 1
+    return counts
+
+
+def _select_priority_students(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    scored = []
+    for result in results:
+        traits = result.get("trait_estimates", {})
+        score = 0
+        if traits.get("self_efficacy") == "low":
+            score += 3
+        if traits.get("neuroticism") == "high":
+            score += 3
+        if traits.get("motivation") == "low":
+            score += 2
+        if traits.get("question_tendency") == "low":
+            score += 1
+        if result.get("profile_prediction") in {"A", "C"}:
+            score += 1
+        if score <= 0:
+            continue
+        scored.append(
+            {
+                "student_id": result.get("student_id"),
+                "priority_score": score,
+                "profile_prediction": result.get("profile_prediction"),
+                "trait_estimates": traits,
+                "teacher_summary": result.get("teacher_summary"),
+                "recommended_teacher_attention": result.get(
+                    "recommended_teacher_attention",
+                    [],
+                ),
+            }
+        )
+    return sorted(scored, key=lambda row: row["priority_score"], reverse=True)[:5]
+
+
+def _classroom_actions(
+    *,
+    profile_counts: dict[str, int],
+    trait_level_counts: dict[str, dict[str, int]],
+    priority_students: list[dict[str, Any]],
+) -> list[str]:
+    actions = []
+    low_self = trait_level_counts["self_efficacy"]["low"]
+    high_anxiety = trait_level_counts["neuroticism"]["high"]
+    low_questions = trait_level_counts["question_tendency"]["low"]
+    low_motivation = trait_level_counts["motivation"]["low"]
+
+    if low_self + high_anxiety >= 2:
+        actions.append("Start with a short confidence-building recap before asking for answers.")
+    if low_questions >= 2:
+        actions.append("Use teacher-initiated checks because several students may not ask questions.")
+    if low_motivation >= 2:
+        actions.append("Use one small problem at a time and keep the task goal visible.")
+    if profile_counts.get("B", 0) + profile_counts.get("D", 0) >= 2:
+        actions.append("Let confident or diligent students explain one step after individual thinking time.")
+    if priority_students:
+        actions.append("Check priority students individually before moving to a harder problem.")
+    if not actions:
+        actions.append("Continue the current explanation and verify understanding with one quick problem.")
+    return actions
+
+
+def _classroom_summary_text(
+    *,
+    student_count: int,
+    profile_counts: dict[str, int],
+    trait_level_counts: dict[str, dict[str, int]],
+    priority_students: list[dict[str, Any]],
+) -> str:
+    priority_ids = [
+        str(student["student_id"])
+        for student in priority_students
+        if student.get("student_id") is not None
+    ]
+    return (
+        f"{student_count} students observed. "
+        f"Profiles: A={profile_counts['A']}, B={profile_counts['B']}, "
+        f"C={profile_counts['C']}, D={profile_counts['D']}. "
+        f"Low self-efficacy={trait_level_counts['self_efficacy']['low']}, "
+        f"high anxiety={trait_level_counts['neuroticism']['high']}, "
+        f"low motivation={trait_level_counts['motivation']['low']}. "
+        f"Priority students: {', '.join(priority_ids) if priority_ids else 'none'}."
+    )
 
 
 def _estimate_traits(features: dict[str, bool | int]) -> dict[str, str]:

@@ -74,7 +74,7 @@ student-ai/
 - `src/logger.py`: `machine_readable.jsonl` と `human_readable.md` へのログ保存
 - `src/prompts.py`: 一次方程式用プロンプト
 - `src/personality_model.py`: 個人特徴を発話スタイル指示へ変換
-- `src/observer/trait_classifier.py`: 伝達AI。生徒発話から個人特徴を分類し、先生AIへ渡す要約を作る
+- `src/observer/trait_classifier.py`: 伝達AI。生徒発話から個人特徴を分類し、1人または3〜20人のクラス全体要約を作る
 - `src/teacher/context_builder.py`: 教師AIが判断に使う生徒状態、単元目標、発話観察を1つのコンテキストにまとめる
 - `src/teacher/strategy_selector.py`: 教師AIの授業手法をルールベースで選ぶMVP
 - `src/teacher/prompts.py`: 将来LLM教師に同じコンテキストを渡すためのプロンプト
@@ -516,7 +516,7 @@ Colabでは [notebooks/student_ai_colab.ipynb](notebooks/student_ai_colab.ipynb)
 
 個人特徴による発話差を試す場合は [notebooks/personality_experiment.ipynb](notebooks/personality_experiment.ipynb) を使います。同じ知識状態で性格・心理パラメータだけを変え、発話から個人特徴を推定できるかを確認できます。
 
-このノートブックでは標準で実LLMによる生徒発話を生成し、`src/observer/trait_classifier.py` の伝達AIも実行します。伝達AIは生徒発話を読み、プロファイル分類、特徴推定、先生AIに渡す要約、授業上の注意点を作ります。
+このノートブックでは標準で実LLMによる生徒発話を生成し、`src/observer/trait_classifier.py` の伝達AIも実行します。伝達AIは生徒発話を読み、プロファイル分類、特徴推定、先生AIに渡す要約、授業上の注意点を作ります。複数生徒を扱う場合は `summarize_classroom()` で3〜20人分の発話を集約し、クラス全体の傾向、優先対応が必要な生徒、教師への推奨行動を出します。
 
 ```text
 data/assessments/communication_ai_trait_classification.csv
@@ -537,7 +537,7 @@ data/assessments/personality_judge_prompt.txt
 
 この `.txt` の中身をChatGPTなどに貼ると、発話だけからプロファイル分類と特徴推定を行わせることができます。テンプレートは `data/prompts/personality_judge_prompt_template.txt` にあります。
 
-授業手法を考える実験は [notebooks/teaching_strategy_experiment.ipynb](notebooks/teaching_strategy_experiment.ipynb) を使います。上から順番に実行すると、GitHubから最新版を取り込み、生徒AIの発話を作り、伝達AIで観察し、`src/teacher/` のルールベース教師が次の授業方略を選びます。
+授業手法を考える実験は [notebooks/teaching_strategy_experiment.ipynb](notebooks/teaching_strategy_experiment.ipynb) を使います。上から順番に実行すると、GitHubから最新版を取り込み、生徒AIの発話を作り、伝達AIで個別観察とクラス全体要約を行い、`src/teacher/` のルールベース教師が次の授業方略を選びます。
 
 この段階では、教師AIの判断はLLMに任せず、まず判断理由を追跡しやすいルールで実装しています。将来的にLLM教師へ置き換える場合は、`src/teacher/prompts.py` のプロンプトに `teacher_context` を渡します。
 

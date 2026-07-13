@@ -35,6 +35,7 @@ class TeacherContextBuilder:
         student_state: dict[str, Any],
         recent_student_utterance: str,
         communication_observation: Any,
+        classroom_observation: Any | None = None,
         target_skill: str | None = None,
         constraints: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
@@ -66,6 +67,11 @@ class TeacherContextBuilder:
             },
             "recent_student_utterance": recent_student_utterance,
             "communication_ai_observation": observation,
+            "classroom_observation": (
+                _observation_to_dict(classroom_observation)
+                if classroom_observation is not None
+                else None
+            ),
             "available_strategies": self.curriculum.get("strategy_definitions", []),
             "misconception_map": self.curriculum.get("misconception_map", {}),
             "next_problem_bank": self.curriculum.get("next_problem_bank", {}),
@@ -95,6 +101,7 @@ def build_teacher_context(
     student_state: dict[str, Any],
     recent_student_utterance: str,
     communication_observation: Any,
+    classroom_observation: Any | None = None,
     target_skill: str | None = None,
     constraints: dict[str, Any] | None = None,
     curriculum_path: str | Path = DEFAULT_CURRICULUM_PATH,
@@ -103,6 +110,7 @@ def build_teacher_context(
         student_state=student_state,
         recent_student_utterance=recent_student_utterance,
         communication_observation=communication_observation,
+        classroom_observation=classroom_observation,
         target_skill=target_skill,
         constraints=constraints,
     )
