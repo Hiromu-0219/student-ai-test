@@ -1,4 +1,4 @@
-from src.observer import CommunicationAI
+from src.observer import CommunicationAI, LLMCommunicationAI
 
 
 def test_communication_ai_classifies_anxious_questioning_student():
@@ -38,3 +38,52 @@ def test_communication_ai_classifies_many_rows():
     assert len(results) == 2
     assert results[0]["profile_prediction"] == "A"
     assert results[1]["profile_prediction"] == "C"
+
+
+class FakeClassifierLLM:
+    model_id = "fake-classifier"
+
+    def __init__(self, output: str) -> None:
+        self.output = output
+
+    def generate(self, system_prompt: str, user_prompt: str) -> str:
+        return self.output
+
+
+def test_llm_communication_ai_uses_json_classification():
+    llm_output = """
+{
+  "profile_prediction": "D",
+  "trait_estimates": {
+    "self_efficacy": "high",
+    "question_tendency": "high",
+    "motivation": "high",
+    "extraversion": "high",
+    "conscientiousness": "medium",
+    "neuroticism": "low"
+  },
+  "evidence": ["自信を示す表現がある"],
+  "confidence": 0.91,
+  "teacher_summary": "自信が高く発話量も多い生徒です。",
+  "recommended_teacher_attention": ["発展的な問いを出す"]
+}
+""".strip()
+
+    result = LLMCommunicationAI(FakeClassifierLLM(llm_output)).classify_utterance(
+        utterance="これは分かります。x = 4 です。もっと別の解き方も試したいです。",
+        student_id="S_TEST",
+    )
+
+    assert result.profile_prediction == "D"
+    assert result.trait_estimates["self_efficacy"] == "high"
+    assert result.confidence == 0.91
+    assert result.recommended_teacher_attention == ["発展的な問いを出す"]
+
+
+def test_llm_communication_ai_falls_back_on_invalid_json():
+    result = LLMCommunicationAI(FakeClassifierLLM("not json")).classify_utterance(
+        utterance="x = 4。 答え: x = 4",
+        student_id="S_TEST",
+    )
+
+    assert result.profile_prediction == "C"

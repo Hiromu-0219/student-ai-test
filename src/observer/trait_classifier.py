@@ -1,10 +1,31 @@
 from __future__ import annotations
 
+import json
+import re
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Protocol
 
 
 LEVELS = ("low", "medium", "high")
+
+
+COMMUNICATION_AI_SYSTEM_PROMPT = """あなたは教育シミュレーションの伝達AIです。
+生徒AIの発話を観察し、先生AIに渡すために個人特徴を分類してください。
+
+制約:
+- 数学の正誤ではなく、発話スタイルから判断してください。
+- 必ずJSONだけを返してください。
+- Markdownや説明文をJSONの外に書かないでください。
+- profile_prediction は A, B, C, D のいずれかです。
+- trait_estimates の各値は low, medium, high のいずれかです。
+"""
+
+
+class TextGenerator(Protocol):
+    model_id: str
+
+    def generate(self, system_prompt: str, user_prompt: str) -> str:
+        pass
 
 
 @dataclass(frozen=True)
@@ -67,6 +88,74 @@ class CommunicationAI:
         return results
 
 
+class LLMCommunicationAI:
+    """LLM-based communication AI with rule-based fallback."""
+
+    def __init__(
+        self,
+        text_generator: TextGenerator,
+        *,
+        fallback: CommunicationAI | None = None,
+    ) -> None:
+        self.text_generator = text_generator
+        self.fallback = fallback or CommunicationAI()
+
+    def classify_utterance(
+        self,
+        *,
+        utterance: str,
+        student_id: str | None = None,
+    ) -> TraitClassification:
+        fallback_result = self.fallback.classify_utterance(
+            utterance=utterance,
+            student_id=student_id,
+        )
+        prompt = _build_llm_classification_prompt(
+            utterance=utterance,
+            student_id=student_id,
+            fallback_result=fallback_result,
+        )
+        raw_output = self.text_generator.generate(
+            COMMUNICATION_AI_SYSTEM_PROMPT,
+            prompt,
+        )
+        parsed = _parse_llm_classification(raw_output)
+        if parsed is None:
+            return fallback_result
+
+        traits = _normalize_traits(parsed.get("trait_estimates", {}), fallback_result.trait_estimates)
+        profile = _normalize_profile(
+            parsed.get("profile_prediction"),
+            fallback_result.profile_prediction,
+        )
+        evidence = _normalize_string_list(parsed.get("evidence"), fallback_result.evidence)
+        attention = _normalize_string_list(
+            parsed.get("recommended_teacher_attention"),
+            fallback_result.recommended_teacher_attention,
+        )
+        teacher_summary = str(parsed.get("teacher_summary") or fallback_result.teacher_summary)
+        confidence = _normalize_confidence(parsed.get("confidence"), fallback_result.confidence)
+
+        return TraitClassification(
+            profile_prediction=profile,
+            trait_estimates=traits,
+            evidence=evidence,
+            confidence=confidence,
+            teacher_summary=teacher_summary,
+            recommended_teacher_attention=attention,
+        )
+
+    def classify_many(self, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        results = []
+        for row in rows:
+            classification = self.classify_utterance(
+                utterance=row["answer"],
+                student_id=row.get("student_id"),
+            )
+            results.append({**row, **classification.to_dict()})
+        return results
+
+
 def _extract_features(utterance: str) -> dict[str, bool | int]:
     text = utterance
     return {
@@ -82,6 +171,98 @@ def _extract_features(utterance: str) -> dict[str, bool | int]:
         "prefers_checking_sign": any(token in text for token in ["符号", "移項"]),
         "length": len(text),
     }
+
+
+def _build_llm_classification_prompt(
+    *,
+    utterance: str,
+    student_id: str | None,
+    fallback_result: TraitClassification,
+) -> str:
+    return f"""分類対象:
+- student_id: {student_id}
+- utterance: {utterance}
+
+候補プロファイル:
+A. 自信低め・質問多め・不安強め
+B. 丁寧・粘り強い・協調的
+C. 短文・質問少なめ・そっけない
+D. 自信あり・発話多め・新しい方法に前向き
+
+推定する特徴:
+- self_efficacy: low / medium / high
+- question_tendency: low / medium / high
+- motivation: low / medium / high
+- extraversion: low / medium / high
+- conscientiousness: low / medium / high
+- neuroticism: low / medium / high
+
+参考用のルールベース推定:
+{json.dumps(fallback_result.to_dict(), ensure_ascii=False)}
+
+次のJSON形式だけで返してください。
+{{
+  "profile_prediction": "A",
+  "trait_estimates": {{
+    "self_efficacy": "low",
+    "question_tendency": "high",
+    "motivation": "medium",
+    "extraversion": "medium",
+    "conscientiousness": "medium",
+    "neuroticism": "high"
+  }},
+  "evidence": ["根拠1", "根拠2"],
+  "confidence": 0.8,
+  "teacher_summary": "先生AIに渡す短い要約",
+  "recommended_teacher_attention": ["授業上の注意1", "授業上の注意2"]
+}}"""
+
+
+def _parse_llm_classification(raw_output: str) -> dict[str, Any] | None:
+    text = raw_output.strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json)?", "", text).strip()
+        text = re.sub(r"```$", "", text).strip()
+    match = re.search(r"\{.*\}", text, flags=re.DOTALL)
+    if match:
+        text = match.group(0)
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError:
+        return None
+    return parsed if isinstance(parsed, dict) else None
+
+
+def _normalize_profile(value: Any, fallback: str) -> str:
+    value = str(value).strip().upper()
+    return value if value in {"A", "B", "C", "D"} else fallback
+
+
+def _normalize_traits(values: Any, fallback: dict[str, str]) -> dict[str, str]:
+    if not isinstance(values, dict):
+        return fallback
+    normalized = {}
+    for key, fallback_value in fallback.items():
+        value = str(values.get(key, fallback_value)).strip().lower()
+        normalized[key] = value if value in LEVELS else fallback_value
+    return normalized
+
+
+def _normalize_string_list(value: Any, fallback: list[str]) -> list[str]:
+    if isinstance(value, list):
+        strings = [str(item) for item in value if str(item).strip()]
+        return strings or fallback
+    if isinstance(value, str) and value.strip():
+        return [value.strip()]
+    return fallback
+
+
+def _normalize_confidence(value: Any, fallback: float) -> float:
+    try:
+        confidence = float(value)
+    except (TypeError, ValueError):
+        return fallback
+    return round(max(0.0, min(1.0, confidence)), 2)
 
 
 def _estimate_traits(features: dict[str, bool | int]) -> dict[str, str]:

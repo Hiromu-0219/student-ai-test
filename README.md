@@ -509,6 +509,12 @@ Colabでは [notebooks/student_ai_colab.ipynb](notebooks/student_ai_colab.ipynb)
 data/assessments/communication_ai_trait_classification.csv
 ```
 
+伝達AIは標準ではルールベース分類です。実LLMで分類させる場合は、`personality_experiment.ipynb` で `USE_MOCK_MODEL=False` にしてから、伝達AIセルの次の値を変更します。
+
+```python
+USE_LLM_COMMUNICATION_AI = True
+```
+
 このノートブックは、別AIに評価させるためのプロンプトも生成します。
 
 ```text

@@ -1,3 +1,3 @@
-from src.observer.trait_classifier import CommunicationAI, TraitClassification
+from src.observer.trait_classifier import CommunicationAI, LLMCommunicationAI, TraitClassification
 
-__all__ = ["CommunicationAI", "TraitClassification"]
+__all__ = ["CommunicationAI", "LLMCommunicationAI", "TraitClassification"]
