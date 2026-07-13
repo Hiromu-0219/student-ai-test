@@ -77,3 +77,24 @@ def test_context_builder_accepts_classroom_observation():
 
     assert context["classroom_observation"]["student_count"] == 3
     assert context["classroom_observation"]["recommended_teacher_actions"]
+
+
+def test_context_builder_accepts_teacher_belief():
+    belief = {
+        "teacher_id": "T001",
+        "student_id": "S_TEST",
+        "estimated_knowledge": {"linear_equation": {"score": 38, "confidence": 0.4}},
+        "estimated_traits": {
+            "self_efficacy": {"level": "low", "confidence": 0.6},
+        },
+    }
+
+    context = build_teacher_context(
+        student_state=_student_state(),
+        recent_student_utterance="符号が変わるか自信がありません。",
+        communication_observation={"trait_estimates": {"self_efficacy": "low"}},
+        teacher_belief=belief,
+    )
+
+    assert context["teacher_belief"]["teacher_id"] == "T001"
+    assert context["teacher_belief"]["estimated_knowledge"]["linear_equation"]["score"] == 38

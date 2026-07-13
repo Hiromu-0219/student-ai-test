@@ -1,0 +1,35 @@
+{
+  "teacher_id": "T001",
+  "student_id": "S002",
+  "estimated_knowledge": {
+    "linear_equation": {
+      "score": 50,
+      "confidence": 0.0
+    }
+  },
+  "estimated_traits": {
+    "self_efficacy": {
+      "level": "medium",
+      "confidence": 0.0
+    },
+    "question_tendency": {
+      "level": "medium",
+      "confidence": 0.0
+    },
+    "motivation": {
+      "level": "medium",
+      "confidence": 0.0
+    },
+    "conscientiousness": {
+      "level": "medium",
+      "confidence": 0.0
+    },
+    "neuroticism": {
+      "level": "medium",
+      "confidence": 0.0
+    }
+  },
+  "estimated_misconceptions": [],
+  "evidence_history": [],
+  "last_updated": null
+}

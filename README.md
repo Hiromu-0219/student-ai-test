@@ -27,9 +27,12 @@ student-ai/
 │  ├─ personality_model.py
 │  ├─ observer/
 │  │  ├─ __init__.py
+│  │  ├─ observation_filter.py
+│  │  ├─ observation_logger.py
 │  │  └─ trait_classifier.py
 │  ├─ teacher/
 │  │  ├─ __init__.py
+│  │  ├─ belief_manager.py
 │  │  ├─ context_builder.py
 │  │  ├─ prompts.py
 │  │  └─ strategy_selector.py
@@ -37,10 +40,14 @@ student-ai/
 ├─ data/
 │  ├─ curriculum/
 │  │  └─ linear_equation.json
+│  ├─ observations/
+│  │  └─ classroom_events.jsonl
 │  ├─ students/
 │  │  ├─ S001.json
 │  │  ├─ S002.json
 │  │  └─ S003.json
+│  ├─ teacher_beliefs/
+│  │  └─ T001/
 │  ├─ logs/
 │  │  ├─ machine_readable.jsonl
 │  │  └─ human_readable.md
@@ -75,7 +82,10 @@ student-ai/
 - `src/prompts.py`: 一次方程式用プロンプト
 - `src/personality_model.py`: 個人特徴を発話スタイル指示へ変換
 - `src/observer/trait_classifier.py`: 伝達AI。生徒発話から個人特徴を分類し、1人または3〜20人のクラス全体要約を作る
+- `src/observer/observation_filter.py`: 生徒AIの内部状態を隠し、授業中に観察できる情報だけをイベント化する
+- `src/observer/observation_logger.py`: 授業中の観察イベントをJSONLに保存する
 - `src/teacher/context_builder.py`: 教師AIが判断に使う生徒状態、単元目標、発話観察を1つのコンテキストにまとめる
+- `src/teacher/belief_manager.py`: 観察イベントから教師側の生徒推定 `teacher_belief` を更新する
 - `src/teacher/strategy_selector.py`: 教師AIの授業手法をルールベースで選ぶMVP
 - `src/teacher/prompts.py`: 将来LLM教師に同じコンテキストを渡すためのプロンプト
 - `data/curriculum/linear_equation.json`: 一次方程式の単元目標、スキル優先度、誤概念対応、次に出す問題
@@ -85,6 +95,8 @@ student-ai/
 - `src/cognitive_model.py`: テスト時に知識状態から正答/誤答方針を決める認知モデル
 - `src/assessment_logger.py`: 学力テスト結果ログの保存
 - `data/students/*.json`: 生徒ごとの状態データ
+- `data/observations/`: 授業中に観察できたイベントログ
+- `data/teacher_beliefs/`: 教師ごとに管理する生徒への推定状態
 - `data/logs/`: 回答ログの保存先
 - `data/tests/`: 学力テスト問題セット
 - `data/assessments/`: 学力テスト結果ログの保存先
@@ -103,6 +115,24 @@ student-ai/
 - 現在の検証フローでは授業による状態更新は実行しない
 - 将来的に授業と生徒状態変化を扱えるよう、学習更新・誤概念解消の拡張点は残す
 - ファインチューニングなし
+
+## 内部状態と教師側推定の分離
+
+生徒AIの真の内部状態は `data/students/*.json` に保存します。ただし、教師AIや伝達AIが授業中にこの真値を直接見る設計にはしません。
+
+授業中に実環境で拾える情報だけを `observable_event` として作り、そこから教師側の推定値 `teacher_belief` を更新します。
+
+```text
+true student state
+  ↓ 生徒AIの反応生成に使う。教師AIには直接見せない
+observable_event
+  ↓ 発話、回答、正誤、反応時間、質問有無、途中式有無など
+teacher_belief
+  ↓ 教師が日々の観察から徐々に持つ生徒理解
+teacher AI context
+```
+
+`teacher_belief` は `data/teacher_beliefs/{teacher_id}/{student_id}.json` に保存します。初対面ではconfidenceが低く、観察が増えるほど推定のconfidenceが上がります。
 
 ## 想定モデル
 
