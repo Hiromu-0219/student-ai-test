@@ -79,3 +79,58 @@ def test_teacher_belief_update_many_matches_by_student_id(tmp_path):
     assert set(updated) == {"S001", "S002"}
     assert updated["S001"]["estimated_knowledge"]["linear_equation"]["score"] > 50
     assert updated["S002"]["estimated_knowledge"]["linear_equation"]["score"] < 50
+
+
+def test_teacher_belief_accumulates_confidence_across_lessons(tmp_path):
+    manager = TeacherBeliefManager(tmp_path)
+    communication_result = {
+        "student_id": "S001",
+        "profile_prediction": "C",
+        "trait_estimates": {
+            "self_efficacy": "medium",
+            "question_tendency": "low",
+            "motivation": "low",
+            "conscientiousness": "low",
+            "neuroticism": "medium",
+        },
+        "confidence": 0.7,
+        "evidence": ["返答が短い"],
+    }
+
+    first_event = build_observable_event(
+        lesson_id="L001",
+        teacher_id="T001",
+        student_id="S001",
+        teacher_prompt="x + 3 = 8",
+        utterance="x = 5",
+        answer="x = 5",
+        is_correct=True,
+    ).to_dict()
+    second_event = build_observable_event(
+        lesson_id="L002",
+        teacher_id="T001",
+        student_id="S001",
+        teacher_prompt="2x + 3 = 11",
+        utterance="x = 4",
+        answer="x = 4",
+        is_correct=True,
+    ).to_dict()
+
+    first_belief = manager.update_from_observation(
+        teacher_id="T001",
+        student_id="S001",
+        observable_event=first_event,
+        communication_result=communication_result,
+    )
+    second_belief = manager.update_from_observation(
+        teacher_id="T001",
+        student_id="S001",
+        observable_event=second_event,
+        communication_result=communication_result,
+    )
+
+    first_linear = first_belief["estimated_knowledge"]["linear_equation"]
+    second_linear = second_belief["estimated_knowledge"]["linear_equation"]
+    assert second_linear["score"] > first_linear["score"]
+    assert second_linear["confidence"] > first_linear["confidence"]
+    assert len(second_belief["evidence_history"]) == 2

@@ -577,6 +577,13 @@ data/assessments/teacher_beliefs_latest.json
 data/assessments/teacher_belief_table_latest.csv
 ```
 
+さらに、L001〜L003の3回分の授業を連続実行し、`teacher_belief` が蓄積されるかを検証できます。推定理解度とconfidenceの推移は表とグラフで確認でき、次のCSVにも保存されます。
+
+```text
+data/assessments/teacher_belief_progress_validation.csv
+data/assessments/observable_events_validation.json
+```
+
 この段階では、教師AIの判断はLLMに任せず、まず判断理由を追跡しやすいルールで実装しています。将来的にLLM教師へ置き換える場合は、`src/teacher/prompts.py` のプロンプトに `teacher_context` を渡します。
 
 ## テスト
