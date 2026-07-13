@@ -1,0 +1,169 @@
+{
+  "domain": "linear_equation",
+  "unit_title": "一次方程式",
+  "lesson_goals": [
+    {
+      "goal_id": "transpose_terms",
+      "target_skill": "can_transpose_terms",
+      "goal_text": "移項すると符号が変わることを理解する",
+      "success_criteria": [
+        "x + b = c 型で定数項を正しく移項できる",
+        "反対側へ移すと符号が変わる理由を短く説明できる"
+      ]
+    },
+    {
+      "goal_id": "divide_by_coefficient",
+      "target_skill": "can_divide_by_coefficient",
+      "goal_text": "係数で両辺を割って x を求める",
+      "success_criteria": [
+        "ax = b 型で両辺を a で割れる",
+        "3x = 15 のような式で 3 を引く誤りを避けられる"
+      ]
+    },
+    {
+      "goal_id": "negative_numbers",
+      "target_skill": "can_handle_negative_numbers",
+      "goal_text": "負の数を含む一次方程式を解く",
+      "success_criteria": [
+        "負の係数で割るときの符号を正しく扱える",
+        "定数項の移項と負号を区別できる"
+      ]
+    },
+    {
+      "goal_id": "fractions",
+      "target_skill": "can_handle_fractions",
+      "goal_text": "分数を含む一次方程式を解く",
+      "success_criteria": [
+        "分母を払う手順を選べる",
+        "両辺に同じ数をかける操作を説明できる"
+      ]
+    },
+    {
+      "goal_id": "solve_ax_plus_b_equals_c",
+      "target_skill": "can_solve_ax_plus_b_equals_c",
+      "goal_text": "ax + b = c 型の一次方程式を自力で解く",
+      "success_criteria": [
+        "移項と係数で割る操作を順番に使える",
+        "求めた x を元の式に代入して確認できる"
+      ]
+    }
+  ],
+  "skill_priority": [
+    "can_transpose_terms",
+    "can_divide_by_coefficient",
+    "can_handle_negative_numbers",
+    "can_handle_fractions",
+    "can_solve_ax_plus_b_equals_c"
+  ],
+  "strategy_definitions": [
+    {
+      "strategy_id": "encouragement",
+      "description": "不安や自己効力感の低さがあるとき、正しくできている部分を先に返す"
+    },
+    {
+      "strategy_id": "guided_question",
+      "description": "答えを直接示す前に、次に見るべき操作を短い問いで促す"
+    },
+    {
+      "strategy_id": "worked_example",
+      "description": "理解度が低いとき、同型の例題を1問だけ手順付きで示す"
+    },
+    {
+      "strategy_id": "misconception_confrontation",
+      "description": "誤概念が強い操作について、誤りと正しい操作の違いを明示する"
+    },
+    {
+      "strategy_id": "micro_practice",
+      "description": "集中や手順化が弱いとき、小さい問題を1問ずつ解かせる"
+    },
+    {
+      "strategy_id": "answer_check",
+      "description": "正答後に代入確認をさせ、理解を安定させる"
+    }
+  ],
+  "misconception_map": {
+    "can_transpose_terms": [
+      "移項",
+      "符号",
+      "反対側"
+    ],
+    "can_divide_by_coefficient": [
+      "係数",
+      "割る",
+      "3x",
+      "引く"
+    ],
+    "can_handle_negative_numbers": [
+      "マイナス",
+      "負",
+      "符号"
+    ],
+    "can_handle_fractions": [
+      "分数",
+      "分母",
+      "通分"
+    ]
+  },
+  "next_problem_bank": {
+    "can_transpose_terms": [
+      {
+        "problem": "x + 3 = 8",
+        "answer": "x = 5",
+        "difficulty": 1
+      },
+      {
+        "problem": "x - 4 = 9",
+        "answer": "x = 13",
+        "difficulty": 1
+      }
+    ],
+    "can_divide_by_coefficient": [
+      {
+        "problem": "3x = 15",
+        "answer": "x = 5",
+        "difficulty": 1
+      },
+      {
+        "problem": "5x = 20",
+        "answer": "x = 4",
+        "difficulty": 1
+      }
+    ],
+    "can_handle_negative_numbers": [
+      {
+        "problem": "-2x = 10",
+        "answer": "x = -5",
+        "difficulty": 2
+      },
+      {
+        "problem": "x - 7 = -2",
+        "answer": "x = 5",
+        "difficulty": 2
+      }
+    ],
+    "can_handle_fractions": [
+      {
+        "problem": "x / 2 = 6",
+        "answer": "x = 12",
+        "difficulty": 2
+      },
+      {
+        "problem": "x / 3 + 1 = 4",
+        "answer": "x = 9",
+        "difficulty": 3
+      }
+    ],
+    "can_solve_ax_plus_b_equals_c": [
+      {
+        "problem": "2x + 3 = 11",
+        "answer": "x = 4",
+        "difficulty": 2
+      },
+      {
+        "problem": "4x - 5 = 7",
+        "answer": "x = 3",
+        "difficulty": 2
+      }
+    ]
+  }
+}

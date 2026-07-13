@@ -13,7 +13,8 @@ student-ai/
 ├─ requirements.txt
 ├─ notebooks/
 │  ├─ student_ai_colab.ipynb
-│  └─ personality_experiment.ipynb
+│  ├─ personality_experiment.ipynb
+│  └─ teaching_strategy_experiment.ipynb
 ├─ src/
 │  ├─ __init__.py
 │  ├─ config.py
@@ -27,8 +28,15 @@ student-ai/
 │  ├─ observer/
 │  │  ├─ __init__.py
 │  │  └─ trait_classifier.py
+│  ├─ teacher/
+│  │  ├─ __init__.py
+│  │  ├─ context_builder.py
+│  │  ├─ prompts.py
+│  │  └─ strategy_selector.py
 │  └─ cognitive_model.py
 ├─ data/
+│  ├─ curriculum/
+│  │  └─ linear_equation.json
 │  ├─ students/
 │  │  ├─ S001.json
 │  │  ├─ S002.json
@@ -57,6 +65,7 @@ student-ai/
 - `requirements.txt`: Colabでインストールする依存関係
 - `notebooks/student_ai_colab.ipynb`: Colab実行用ノートブック
 - `notebooks/personality_experiment.ipynb`: 個人特徴による発話差を確認する実験ノートブック
+- `notebooks/teaching_strategy_experiment.ipynb`: 生徒発話、伝達AIの観察、生徒状態から授業方略を決める実験ノートブック
 - `src/config.py`: 既定モデルID、データパス、生成設定
 - `src/model_loader.py`: Transformersモデル読み込み、4bit量子化設定
 - `src/student_agent.py`: 生徒状態をもとにLLM発話を生成するエージェント
@@ -66,6 +75,10 @@ student-ai/
 - `src/prompts.py`: 一次方程式用プロンプト
 - `src/personality_model.py`: 個人特徴を発話スタイル指示へ変換
 - `src/observer/trait_classifier.py`: 伝達AI。生徒発話から個人特徴を分類し、先生AIへ渡す要約を作る
+- `src/teacher/context_builder.py`: 教師AIが判断に使う生徒状態、単元目標、発話観察を1つのコンテキストにまとめる
+- `src/teacher/strategy_selector.py`: 教師AIの授業手法をルールベースで選ぶMVP
+- `src/teacher/prompts.py`: 将来LLM教師に同じコンテキストを渡すためのプロンプト
+- `data/curriculum/linear_equation.json`: 一次方程式の単元目標、スキル優先度、誤概念対応、次に出す問題
 - `src/test_bank.py`: 学力テスト問題セットの読み込み
 - `src/grader.py`: `x = 数値` 形式の採点
 - `src/test_runner.py`: 生徒AIにテストを受けさせる実行器
@@ -523,6 +536,10 @@ data/assessments/personality_judge_prompt.txt
 ```
 
 この `.txt` の中身をChatGPTなどに貼ると、発話だけからプロファイル分類と特徴推定を行わせることができます。テンプレートは `data/prompts/personality_judge_prompt_template.txt` にあります。
+
+授業手法を考える実験は [notebooks/teaching_strategy_experiment.ipynb](notebooks/teaching_strategy_experiment.ipynb) を使います。上から順番に実行すると、GitHubから最新版を取り込み、生徒AIの発話を作り、伝達AIで観察し、`src/teacher/` のルールベース教師が次の授業方略を選びます。
+
+この段階では、教師AIの判断はLLMに任せず、まず判断理由を追跡しやすいルールで実装しています。将来的にLLM教師へ置き換える場合は、`src/teacher/prompts.py` のプロンプトに `teacher_context` を渡します。
 
 ## テスト
 
