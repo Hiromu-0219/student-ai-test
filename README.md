@@ -503,16 +503,17 @@ Colabでは [notebooks/student_ai_colab.ipynb](notebooks/student_ai_colab.ipynb)
 
 個人特徴による発話差を試す場合は [notebooks/personality_experiment.ipynb](notebooks/personality_experiment.ipynb) を使います。同じ知識状態で性格・心理パラメータだけを変え、発話から個人特徴を推定できるかを確認できます。
 
-このノートブックでは `src/observer/trait_classifier.py` の伝達AIも実行します。伝達AIは生徒発話を読み、プロファイル分類、特徴推定、先生AIに渡す要約、授業上の注意点を作ります。
+このノートブックでは標準で実LLMによる生徒発話を生成し、`src/observer/trait_classifier.py` の伝達AIも実行します。伝達AIは生徒発話を読み、プロファイル分類、特徴推定、先生AIに渡す要約、授業上の注意点を作ります。
 
 ```text
 data/assessments/communication_ai_trait_classification.csv
 ```
 
-伝達AIは標準ではルールベース分類です。実LLMで分類させる場合は、`personality_experiment.ipynb` で `USE_MOCK_MODEL=False` にしてから、伝達AIセルの次の値を変更します。
+伝達AIも標準では実LLMで分類します。軽く確認したい場合は、`personality_experiment.ipynb` で次の値を `False` に変更します。
 
 ```python
-USE_LLM_COMMUNICATION_AI = True
+USE_MOCK_MODEL = True
+USE_LLM_COMMUNICATION_AI = False
 ```
 
 このノートブックは、別AIに評価させるためのプロンプトも生成します。
