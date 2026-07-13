@@ -25,10 +25,19 @@ D. 自信あり・発話多め・新しい方法に前向き
 - neuroticism
 
 出力形式:
-次のMarkdown表で答えてください。
+次のMarkdown表だけで答えてください。表の前後に説明文を書かないでください。
 
 | sample_id | profile_prediction | self_efficacy | question_tendency | motivation | extraversion | conscientiousness | neuroticism | reason |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+出力ルール:
+- `profile_prediction` は必ず `A`, `B`, `C`, `D` のいずれか1文字だけにしてください。
+- `self_efficacy`, `question_tendency`, `motivation`, `extraversion`, `conscientiousness`, `neuroticism` は必ず `low`, `medium`, `high` のいずれか1語だけにしてください。
+- `reason` 以外の列に説明文を書かないでください。
+- `reason` は20字から50字程度の日本語1文にしてください。
+- 各行は必ず9列にしてください。
+- セル内で改行しないでください。
+- 判定不能でも空欄にせず、最も近い値を選んでください。
 
 注意:
 - 発話の数学的正誤ではなく、発話スタイルから判断してください。
