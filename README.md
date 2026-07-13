@@ -34,6 +34,7 @@ student-ai/
 │  │  ├─ __init__.py
 │  │  ├─ belief_manager.py
 │  │  ├─ context_builder.py
+│  │  ├─ intervention_planner.py
 │  │  ├─ prompts.py
 │  │  └─ strategy_selector.py
 │  └─ cognitive_model.py
@@ -86,6 +87,7 @@ student-ai/
 - `src/observer/observation_logger.py`: 授業中の観察イベントをJSONLに保存する
 - `src/teacher/context_builder.py`: 教師AIが判断に使う生徒状態、単元目標、発話観察を1つのコンテキストにまとめる
 - `src/teacher/belief_manager.py`: 観察イベントから教師側の生徒推定 `teacher_belief` を更新する
+- `src/teacher/intervention_planner.py`: クラス全体対応と個別対応をルールベースで計画する
 - `src/teacher/strategy_selector.py`: 教師AIの授業手法をルールベースで選ぶMVP
 - `src/teacher/prompts.py`: 将来LLM教師に同じコンテキストを渡すためのプロンプト
 - `data/curriculum/linear_equation.json`: 一次方程式の単元目標、スキル優先度、誤概念対応、次に出す問題
@@ -582,6 +584,12 @@ data/assessments/teacher_belief_table_latest.csv
 ```text
 data/assessments/teacher_belief_progress_validation.csv
 data/assessments/observable_events_validation.json
+```
+
+その後、`src/teacher/intervention_planner.py` により、クラス全体への授業行動と個別支援を分けて計画します。現在はLLMを使わず、クラス要約、教師側belief、直近の正誤から判断します。
+
+```text
+data/assessments/intervention_plan_latest.json
 ```
 
 この段階では、教師AIの判断はLLMに任せず、まず判断理由を追跡しやすいルールで実装しています。将来的にLLM教師へ置き換える場合は、`src/teacher/prompts.py` のプロンプトに `teacher_context` を渡します。
