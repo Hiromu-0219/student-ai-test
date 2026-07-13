@@ -569,6 +569,14 @@ data/assessments/personality_judge_prompt.txt
 
 授業手法を考える実験は [notebooks/teaching_strategy_experiment.ipynb](notebooks/teaching_strategy_experiment.ipynb) を使います。上から順番に実行すると、GitHubから最新版を取り込み、生徒AIの発話を作り、伝達AIで個別観察とクラス全体要約を行い、`src/teacher/` のルールベース教師が次の授業方略を選びます。
 
+このノートブックでは `S001`, `S002`, `S003` の3人を実際に同じ教師発話へ反応させ、観察イベントから教師側推定 `teacher_belief` を更新します。更新後は、推定理解度、confidence、自己効力感、質問傾向、モチベーション、不安傾向を表で確認できます。
+
+```text
+data/assessments/observable_events_latest.json
+data/assessments/teacher_beliefs_latest.json
+data/assessments/teacher_belief_table_latest.csv
+```
+
 この段階では、教師AIの判断はLLMに任せず、まず判断理由を追跡しやすいルールで実装しています。将来的にLLM教師へ置き換える場合は、`src/teacher/prompts.py` のプロンプトに `teacher_context` を渡します。
 
 ## テスト
