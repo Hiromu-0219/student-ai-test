@@ -17,6 +17,7 @@
 - 教師側の生徒理解である `teacher_belief` を観察から更新
 - 複数回授業を行い、`teacher_belief` の推定理解度とconfidenceの推移を表・グラフで確認
 - クラス全体対応と個別対応を分けて授業方略を出力
+- 授業方略を、全体向け発話と個別向け発話に変換
 
 ## 設計上の重要点
 
@@ -47,6 +48,8 @@ teacher_belief
   - 観察イベントから教師側の推定状態を更新
 - `src/teacher/intervention_planner.py`
   - クラス全体対応と個別対応をルールベースで計画
+- `src/teacher/utterance_builder.py`
+  - 授業方略を実際の教師発話に変換
 - `data/teacher_beliefs/`
   - 教師ごとの生徒推定状態を保存
 - `data/observations/`
@@ -67,8 +70,8 @@ teacher_belief
 
 ## 次にやる候補
 
-1. 授業方略を実際に次の教師発話へ反映する
-2. クラス全体対応と個別対応を受けて、次の問題や声かけを生成する
+1. 生成した教師発話を次ターンの生徒AI反応へ接続する
+2. クラス全体対応と個別対応を1授業ループとして自動実行する
 3. 伝達AIまたは教師AIの一部にLLMを入れて、ルールベースとの差を比較する
 4. 授業前後で生徒AIの真の知識状態を更新する仕組みを接続する
 
@@ -82,6 +85,14 @@ teacher_belief
 → 伝達AIによるクラス要約
 → 教師側belief更新
 → クラス全体・個別対応の計画
+→ 教師発話への変換
 ```
 
 教師が生徒の内部パラメータを直接見るのではなく、授業中の観察から徐々に推定する構造にした点が今回の主な進展。
+
+## 2026-07-14 追記
+
+- `intervention_plan` を実際の教師発話へ変換する `RuleBasedTeacherUtteranceBuilder` を追加
+- 全体向け発話と個別向け発話を分けて出力
+- Colabノートブックに「授業方略を教師発話に変換」セルを追加
+- 出力先: `data/assessments/teacher_utterance_plan_latest.json`

@@ -36,7 +36,8 @@ student-ai/
 │  │  ├─ context_builder.py
 │  │  ├─ intervention_planner.py
 │  │  ├─ prompts.py
-│  │  └─ strategy_selector.py
+│  │  ├─ strategy_selector.py
+│  │  └─ utterance_builder.py
 │  └─ cognitive_model.py
 ├─ data/
 │  ├─ curriculum/
@@ -89,6 +90,7 @@ student-ai/
 - `src/teacher/belief_manager.py`: 観察イベントから教師側の生徒推定 `teacher_belief` を更新する
 - `src/teacher/intervention_planner.py`: クラス全体対応と個別対応をルールベースで計画する
 - `src/teacher/strategy_selector.py`: 教師AIの授業手法をルールベースで選ぶMVP
+- `src/teacher/utterance_builder.py`: 授業方略を全体向け・個別向けの教師発話に変換する
 - `src/teacher/prompts.py`: 将来LLM教師に同じコンテキストを渡すためのプロンプト
 - `data/curriculum/linear_equation.json`: 一次方程式の単元目標、スキル優先度、誤概念対応、次に出す問題
 - `src/test_bank.py`: 学力テスト問題セットの読み込み
@@ -590,6 +592,12 @@ data/assessments/observable_events_validation.json
 
 ```text
 data/assessments/intervention_plan_latest.json
+```
+
+さらに、`src/teacher/utterance_builder.py` により、授業方略を実際の教師発話へ変換します。全体向け発話と個別向け発話を分けて出力します。
+
+```text
+data/assessments/teacher_utterance_plan_latest.json
 ```
 
 この段階では、教師AIの判断はLLMに任せず、まず判断理由を追跡しやすいルールで実装しています。将来的にLLM教師へ置き換える場合は、`src/teacher/prompts.py` のプロンプトに `teacher_context` を渡します。
