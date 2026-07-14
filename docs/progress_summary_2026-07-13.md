@@ -18,6 +18,7 @@
 - 複数回授業を行い、`teacher_belief` の推定理解度とconfidenceの推移を表・グラフで確認
 - クラス全体対応と個別対応を分けて授業方略を出力
 - 授業方略を、全体向け発話と個別向け発話に変換
+- 生成した全体向け教師発話を次ターンの生徒AI反応へ接続
 
 ## 設計上の重要点
 
@@ -70,8 +71,8 @@ teacher_belief
 
 ## 次にやる候補
 
-1. 生成した教師発話を次ターンの生徒AI反応へ接続する
-2. クラス全体対応と個別対応を1授業ループとして自動実行する
+1. クラス全体対応と個別対応を1授業ループとして自動実行する
+2. 個別発話を特定生徒だけに届ける分岐を実装する
 3. 伝達AIまたは教師AIの一部にLLMを入れて、ルールベースとの差を比較する
 4. 授業前後で生徒AIの真の知識状態を更新する仕組みを接続する
 
@@ -86,6 +87,7 @@ teacher_belief
 → 教師側belief更新
 → クラス全体・個別対応の計画
 → 教師発話への変換
+→ 次ターンの生徒反応へ接続
 ```
 
 教師が生徒の内部パラメータを直接見るのではなく、授業中の観察から徐々に推定する構造にした点が今回の主な進展。
@@ -96,3 +98,8 @@ teacher_belief
 - 全体向け発話と個別向け発話を分けて出力
 - Colabノートブックに「授業方略を教師発話に変換」セルを追加
 - 出力先: `data/assessments/teacher_utterance_plan_latest.json`
+- 生成した全体向け教師発話を次ターンの3生徒へ投げ、観察、伝達AI要約、teacher_belief更新まで1周するセルを追加
+- 追加出力:
+  - `data/assessments/next_turn_observable_events_latest.json`
+  - `data/assessments/next_turn_teacher_beliefs_latest.json`
+  - `data/assessments/next_turn_belief_table_latest.csv`

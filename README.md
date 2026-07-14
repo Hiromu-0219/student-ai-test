@@ -600,6 +600,14 @@ data/assessments/intervention_plan_latest.json
 data/assessments/teacher_utterance_plan_latest.json
 ```
 
+生成した全体向け教師発話を次ターンの教師発話として再利用し、再度 `S001`, `S002`, `S003` の反応、観察イベント、伝達AI要約、teacher_belief更新まで1周できます。
+
+```text
+data/assessments/next_turn_observable_events_latest.json
+data/assessments/next_turn_teacher_beliefs_latest.json
+data/assessments/next_turn_belief_table_latest.csv
+```
+
 この段階では、教師AIの判断はLLMに任せず、まず判断理由を追跡しやすいルールで実装しています。将来的にLLM教師へ置き換える場合は、`src/teacher/prompts.py` のプロンプトに `teacher_context` を渡します。
 
 ## テスト
