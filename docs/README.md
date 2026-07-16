@@ -8,6 +8,7 @@
 
 - `share_summary.md`: 先輩共有用の簡潔な進捗・方向性・Todo
 - `research_paper_plan.md`: 論文用の研究成果、研究問い、実験設計、Todo整理
+- `research_outcomes.md`: 出せそうな研究成果の一覧と主張の強さ
 - `2026-07-13.md`: 生徒AI MVP、状態管理、テスト、Colab導線
 - `2026-07-14.md`: 教師発話、次ターン接続、観察ログ
 - `2026-07-16.md`: 複数生徒、伝達AI、teacher_belief、講義全体設計
