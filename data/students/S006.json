@@ -1,0 +1,42 @@
+{
+  "student_id": "S006",
+  "name": "Ren",
+  "understanding": {
+    "linear_equation": "18/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "very_low",
+      "score": 18,
+      "can_solve_ax_plus_b_equals_c": 8,
+      "can_transpose_terms": 3,
+      "can_divide_by_coefficient": 0,
+      "can_handle_negative_numbers": 3,
+      "can_handle_fractions": 0
+    }
+  },
+  "error_tendency": [
+    "subtracts coefficients instead of dividing",
+    "guesses without writing steps"
+  ],
+  "misconceptions": [
+    "thinks 3x = 15 should be solved by subtracting 3"
+  ],
+  "learning_speed": "low",
+  "personality": {
+    "response_style": "short answers with little explanation",
+    "classroom_behavior": "stays quiet even when stuck"
+  },
+  "big_five": {
+    "openness": "low",
+    "conscientiousness": "low",
+    "extraversion": "low",
+    "agreeableness": "medium",
+    "neuroticism": "high"
+  },
+  "self_efficacy": "very_low",
+  "question_tendency": "low",
+  "motivation": "low",
+  "learning_history": []
+}

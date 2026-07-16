@@ -1,0 +1,26 @@
+{
+  "class_id": "class_5_mixed",
+  "name": "5-student mixed class",
+  "description": "A compact class with mixed knowledge and question tendency.",
+  "student_ids": [
+    "S001",
+    "S002",
+    "S003",
+    "S004",
+    "S005"
+  ],
+  "class_features": {
+    "size": 5,
+    "understanding_profile": "mixed with low and high learners",
+    "question_tendency_profile": "some students ask for confirmation",
+    "motivation_profile": "mostly medium to high",
+    "misconception_profile": "sign-change misconception appears in low-score students",
+    "teacher_note": "Good for checking whether whole-class and individual support separate cleanly."
+  },
+  "tags": [
+    "mixed_understanding",
+    "misconception_visible",
+    "compact_class"
+  ],
+  "created_for": "small-group strategy comparison"
+}

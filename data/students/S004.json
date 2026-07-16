@@ -1,0 +1,41 @@
+{
+  "student_id": "S004",
+  "name": "Kaito",
+  "understanding": {
+    "linear_equation": "35/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "low",
+      "score": 35,
+      "can_solve_ax_plus_b_equals_c": 30,
+      "can_transpose_terms": 15,
+      "can_divide_by_coefficient": 25,
+      "can_handle_negative_numbers": 10,
+      "can_handle_fractions": 5
+    }
+  },
+  "error_tendency": [
+    "keeps the sign unchanged when transposing terms"
+  ],
+  "misconceptions": [
+    "thinks moving a term to the other side does not change its sign"
+  ],
+  "learning_speed": "low",
+  "personality": {
+    "response_style": "asks for confirmation before answering",
+    "classroom_behavior": "raises hand when unsure"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "medium",
+    "extraversion": "medium",
+    "agreeableness": "high",
+    "neuroticism": "high"
+  },
+  "self_efficacy": "low",
+  "question_tendency": "high",
+  "motivation": "medium",
+  "learning_history": []
+}

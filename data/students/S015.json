@@ -1,0 +1,39 @@
+{
+  "student_id": "S015",
+  "name": "Nana",
+  "understanding": {
+    "linear_equation": "76/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "high",
+      "score": 76,
+      "can_solve_ax_plus_b_equals_c": 79,
+      "can_transpose_terms": 78,
+      "can_divide_by_coefficient": 79,
+      "can_handle_negative_numbers": 72,
+      "can_handle_fractions": 68
+    }
+  },
+  "error_tendency": [
+    "hesitates on fraction coefficients"
+  ],
+  "misconceptions": [],
+  "learning_speed": "high",
+  "personality": {
+    "response_style": "explains reasoning and asks precise questions",
+    "classroom_behavior": "checks edge cases"
+  },
+  "big_five": {
+    "openness": "high",
+    "conscientiousness": "high",
+    "extraversion": "medium",
+    "agreeableness": "high",
+    "neuroticism": "medium"
+  },
+  "self_efficacy": "medium",
+  "question_tendency": "high",
+  "motivation": "high",
+  "learning_history": []
+}

@@ -1,0 +1,41 @@
+{
+  "student_id": "S008",
+  "name": "Sora",
+  "understanding": {
+    "linear_equation": "42/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "medium",
+      "score": 42,
+      "can_solve_ax_plus_b_equals_c": 42,
+      "can_transpose_terms": 24,
+      "can_divide_by_coefficient": 37,
+      "can_handle_negative_numbers": 22,
+      "can_handle_fractions": 22
+    }
+  },
+  "error_tendency": [
+    "changes signs inconsistently"
+  ],
+  "misconceptions": [
+    "confuses inverse operations and transposition"
+  ],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "states uncertainty and asks follow-up questions",
+    "classroom_behavior": "needs teacher prompts to continue"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "medium",
+    "extraversion": "medium",
+    "agreeableness": "medium",
+    "neuroticism": "high"
+  },
+  "self_efficacy": "low",
+  "question_tendency": "high",
+  "motivation": "medium",
+  "learning_history": []
+}

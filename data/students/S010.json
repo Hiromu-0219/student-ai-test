@@ -1,0 +1,39 @@
+{
+  "student_id": "S010",
+  "name": "Takumi",
+  "understanding": {
+    "linear_equation": "80/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "very_high",
+      "score": 80,
+      "can_solve_ax_plus_b_equals_c": 80,
+      "can_transpose_terms": 85,
+      "can_divide_by_coefficient": 82,
+      "can_handle_negative_numbers": 75,
+      "can_handle_fractions": 72
+    }
+  },
+  "error_tendency": [
+    "minor calculation mistakes"
+  ],
+  "misconceptions": [],
+  "learning_speed": "high",
+  "personality": {
+    "response_style": "direct and concise",
+    "classroom_behavior": "works independently"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "high",
+    "extraversion": "medium",
+    "agreeableness": "medium",
+    "neuroticism": "low"
+  },
+  "self_efficacy": "high",
+  "question_tendency": "low",
+  "motivation": "high",
+  "learning_history": []
+}

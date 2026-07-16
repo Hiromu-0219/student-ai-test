@@ -1,0 +1,39 @@
+{
+  "student_id": "S012",
+  "name": "Riku",
+  "understanding": {
+    "linear_equation": "67/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "high",
+      "score": 67,
+      "can_solve_ax_plus_b_equals_c": 72,
+      "can_transpose_terms": 67,
+      "can_divide_by_coefficient": 64,
+      "can_handle_negative_numbers": 60,
+      "can_handle_fractions": 55
+    }
+  },
+  "error_tendency": [
+    "rushes and skips checking"
+  ],
+  "misconceptions": [],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "talks through the solution",
+    "classroom_behavior": "participates actively"
+  },
+  "big_five": {
+    "openness": "high",
+    "conscientiousness": "medium",
+    "extraversion": "high",
+    "agreeableness": "medium",
+    "neuroticism": "medium"
+  },
+  "self_efficacy": "medium",
+  "question_tendency": "medium",
+  "motivation": "high",
+  "learning_history": []
+}

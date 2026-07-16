@@ -1,0 +1,42 @@
+{
+  "class_id": "class_20_mixed",
+  "name": "20-student mixed class",
+  "description": "A full classroom-scale sample for the intended 3-20 student simulation range.",
+  "student_ids": [
+    "S001",
+    "S002",
+    "S003",
+    "S004",
+    "S005",
+    "S006",
+    "S007",
+    "S008",
+    "S009",
+    "S010",
+    "S011",
+    "S012",
+    "S013",
+    "S014",
+    "S015",
+    "S016",
+    "S017",
+    "S018",
+    "S019",
+    "S020"
+  ],
+  "class_features": {
+    "size": 20,
+    "understanding_profile": "full mixed classroom with multiple low, middle, and high learners",
+    "question_tendency_profile": "many quiet students, several confirmation seekers, and active questioners",
+    "motivation_profile": "varied motivation requiring whole-class pacing and individual prompts",
+    "misconception_profile": "sign-change, inverse-operation, coefficient-division, and negative-number risks",
+    "teacher_note": "Use this class when evaluating scalability and class-level summarization."
+  },
+  "tags": [
+    "full_classroom",
+    "3_to_20_range",
+    "mixed_understanding",
+    "class_summary_required"
+  ],
+  "created_for": "classroom-scale education simulation"
+}

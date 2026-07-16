@@ -1,0 +1,39 @@
+{
+  "student_id": "S005",
+  "name": "Yui",
+  "understanding": {
+    "linear_equation": "72/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "high",
+      "score": 72,
+      "can_solve_ax_plus_b_equals_c": 77,
+      "can_transpose_terms": 72,
+      "can_divide_by_coefficient": 77,
+      "can_handle_negative_numbers": 67,
+      "can_handle_fractions": 62
+    }
+  },
+  "error_tendency": [
+    "occasionally drops a minus sign"
+  ],
+  "misconceptions": [],
+  "learning_speed": "high",
+  "personality": {
+    "response_style": "explains steps clearly",
+    "classroom_behavior": "answers after checking work"
+  },
+  "big_five": {
+    "openness": "high",
+    "conscientiousness": "high",
+    "extraversion": "medium",
+    "agreeableness": "high",
+    "neuroticism": "low"
+  },
+  "self_efficacy": "high",
+  "question_tendency": "medium",
+  "motivation": "high",
+  "learning_history": []
+}

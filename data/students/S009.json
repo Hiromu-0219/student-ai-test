@@ -1,0 +1,41 @@
+{
+  "student_id": "S009",
+  "name": "Aoi",
+  "understanding": {
+    "linear_equation": "55/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "medium",
+      "score": 55,
+      "can_solve_ax_plus_b_equals_c": 55,
+      "can_transpose_terms": 50,
+      "can_divide_by_coefficient": 45,
+      "can_handle_negative_numbers": 43,
+      "can_handle_fractions": 40
+    }
+  },
+  "error_tendency": [
+    "omits the final division step"
+  ],
+  "misconceptions": [
+    "sometimes treats ax = b as x = b - a"
+  ],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "answers quietly with partial steps",
+    "classroom_behavior": "rarely asks questions"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "medium",
+    "extraversion": "low",
+    "agreeableness": "medium",
+    "neuroticism": "medium"
+  },
+  "self_efficacy": "medium",
+  "question_tendency": "low",
+  "motivation": "medium",
+  "learning_history": []
+}

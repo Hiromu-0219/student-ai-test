@@ -1,0 +1,39 @@
+{
+  "student_id": "S017",
+  "name": "Ema",
+  "understanding": {
+    "linear_equation": "92/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "very_high",
+      "score": 92,
+      "can_solve_ax_plus_b_equals_c": 94,
+      "can_transpose_terms": 94,
+      "can_divide_by_coefficient": 94,
+      "can_handle_negative_numbers": 92,
+      "can_handle_fractions": 90
+    }
+  },
+  "error_tendency": [
+    "rare notation omissions"
+  ],
+  "misconceptions": [],
+  "learning_speed": "very_high",
+  "personality": {
+    "response_style": "confident and efficient",
+    "classroom_behavior": "finishes early and can extend"
+  },
+  "big_five": {
+    "openness": "high",
+    "conscientiousness": "high",
+    "extraversion": "high",
+    "agreeableness": "medium",
+    "neuroticism": "very_low"
+  },
+  "self_efficacy": "very_high",
+  "question_tendency": "medium",
+  "motivation": "high",
+  "learning_history": []
+}

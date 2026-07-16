@@ -1,0 +1,39 @@
+{
+  "student_id": "S020",
+  "name": "Yuto",
+  "understanding": {
+    "linear_equation": "63/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "high",
+      "score": 63,
+      "can_solve_ax_plus_b_equals_c": 65,
+      "can_transpose_terms": 63,
+      "can_divide_by_coefficient": 59,
+      "can_handle_negative_numbers": 55,
+      "can_handle_fractions": 51
+    }
+  },
+  "error_tendency": [
+    "does not ask when unsure about fractions"
+  ],
+  "misconceptions": [],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "steady and concise",
+    "classroom_behavior": "works silently and submits answers"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "high",
+    "extraversion": "low",
+    "agreeableness": "medium",
+    "neuroticism": "low"
+  },
+  "self_efficacy": "medium",
+  "question_tendency": "low",
+  "motivation": "medium",
+  "learning_history": []
+}

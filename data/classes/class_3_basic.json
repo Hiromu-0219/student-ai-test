@@ -1,0 +1,24 @@
+{
+  "class_id": "class_3_basic",
+  "name": "3-student baseline class",
+  "description": "The original small classroom used for early lesson-planning experiments.",
+  "student_ids": [
+    "S001",
+    "S002",
+    "S003"
+  ],
+  "class_features": {
+    "size": 3,
+    "understanding_profile": "small mixed baseline",
+    "question_tendency_profile": "two students are quiet, one asks often",
+    "motivation_profile": "balanced low-medium-high sample",
+    "misconception_profile": "limited visible misconceptions",
+    "teacher_note": "Use this class when checking the notebook quickly."
+  },
+  "tags": [
+    "baseline",
+    "small_class",
+    "quick_check"
+  ],
+  "created_for": "MVP smoke test"
+}

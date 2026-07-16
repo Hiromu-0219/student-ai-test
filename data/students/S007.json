@@ -1,0 +1,39 @@
+{
+  "student_id": "S007",
+  "name": "Mina",
+  "understanding": {
+    "linear_equation": "88/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "very_high",
+      "score": 88,
+      "can_solve_ax_plus_b_equals_c": 92,
+      "can_transpose_terms": 90,
+      "can_divide_by_coefficient": 92,
+      "can_handle_negative_numbers": 88,
+      "can_handle_fractions": 83
+    }
+  },
+  "error_tendency": [
+    "rare arithmetic slips"
+  ],
+  "misconceptions": [],
+  "learning_speed": "high",
+  "personality": {
+    "response_style": "confident and detailed",
+    "classroom_behavior": "helps summarize the method"
+  },
+  "big_five": {
+    "openness": "high",
+    "conscientiousness": "very_high",
+    "extraversion": "high",
+    "agreeableness": "high",
+    "neuroticism": "low"
+  },
+  "self_efficacy": "high",
+  "question_tendency": "medium",
+  "motivation": "very_high",
+  "learning_history": []
+}

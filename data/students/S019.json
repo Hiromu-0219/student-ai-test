@@ -1,0 +1,39 @@
+{
+  "student_id": "S019",
+  "name": "Rio",
+  "understanding": {
+    "linear_equation": "84/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "very_high",
+      "score": 84,
+      "can_solve_ax_plus_b_equals_c": 88,
+      "can_transpose_terms": 88,
+      "can_divide_by_coefficient": 84,
+      "can_handle_negative_numbers": 82,
+      "can_handle_fractions": 78
+    }
+  },
+  "error_tendency": [
+    "overexplains and may lose track of notation"
+  ],
+  "misconceptions": [],
+  "learning_speed": "high",
+  "personality": {
+    "response_style": "active and exploratory",
+    "classroom_behavior": "asks why a method works"
+  },
+  "big_five": {
+    "openness": "very_high",
+    "conscientiousness": "medium",
+    "extraversion": "high",
+    "agreeableness": "high",
+    "neuroticism": "medium"
+  },
+  "self_efficacy": "high",
+  "question_tendency": "high",
+  "motivation": "high",
+  "learning_history": []
+}

@@ -1,0 +1,39 @@
+{
+  "student_id": "S013",
+  "name": "Mei",
+  "understanding": {
+    "linear_equation": "50/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "medium",
+      "score": 50,
+      "can_solve_ax_plus_b_equals_c": 50,
+      "can_transpose_terms": 42,
+      "can_divide_by_coefficient": 44,
+      "can_handle_negative_numbers": 40,
+      "can_handle_fractions": 32
+    }
+  },
+  "error_tendency": [
+    "needs support for negative constants"
+  ],
+  "misconceptions": [],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "careful but asks many checks",
+    "classroom_behavior": "seeks confirmation after each step"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "high",
+    "extraversion": "medium",
+    "agreeableness": "high",
+    "neuroticism": "medium"
+  },
+  "self_efficacy": "medium",
+  "question_tendency": "high",
+  "motivation": "medium",
+  "learning_history": []
+}

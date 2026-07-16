@@ -1,0 +1,41 @@
+{
+  "student_id": "S016",
+  "name": "Shun",
+  "understanding": {
+    "linear_equation": "46/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "medium",
+      "score": 46,
+      "can_solve_ax_plus_b_equals_c": 46,
+      "can_transpose_terms": 34,
+      "can_divide_by_coefficient": 38,
+      "can_handle_negative_numbers": 31,
+      "can_handle_fractions": 31
+    }
+  },
+  "error_tendency": [
+    "mental calculation before writing equation steps"
+  ],
+  "misconceptions": [
+    "tends to move terms mentally and lose signs"
+  ],
+  "learning_speed": "low",
+  "personality": {
+    "response_style": "answers quickly with few steps",
+    "classroom_behavior": "does not reveal confusion unless asked"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "low",
+    "extraversion": "medium",
+    "agreeableness": "medium",
+    "neuroticism": "low"
+  },
+  "self_efficacy": "medium",
+  "question_tendency": "low",
+  "motivation": "medium",
+  "learning_history": []
+}

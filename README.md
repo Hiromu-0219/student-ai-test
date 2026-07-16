@@ -631,6 +631,41 @@ data/assessments/next_turn_belief_table_latest.csv
 
 この段階では、教師AIの判断はLLMに任せず、まず判断理由を追跡しやすいルールで実装しています。将来的にLLM教師へ置き換える場合は、`src/teacher/prompts.py` のプロンプトに `teacher_context` を渡します。
 
+## クラス管理
+
+複数生徒の実験では、個人状態とクラス条件を分けて管理します。
+
+- 個人状態: `data/students/{student_id}.json`
+- クラス定義: `data/classes/{class_id}.json`
+- 読み込み: `src/class_manager.py`
+
+`data/classes/*.json` には、生徒IDの一覧とクラス全体の特徴を保存します。これにより、同じ生徒AIを使いながら「3人クラス」「10人クラス」「20人クラス」などの授業条件を切り替えられます。
+
+用意済みのクラス:
+
+- `class_3_basic`: 早い確認用の3人クラス
+- `class_5_mixed`: 小規模な混合クラス
+- `class_10_mixed`: 理解度と質問傾向がばらつく10人クラス
+- `class_20_mixed`: 3-20人想定のフルクラス実験用
+
+Colabの `notebooks/teaching_strategy_experiment.ipynb` では、実験設定セルの `CLASS_ID` を変更すると授業シミュレーション対象のクラスを切り替えられます。
+
+```python
+CLASS_ID = "class_20_mixed"
+```
+
+クラス特徴の確認例:
+
+```python
+from src.class_manager import ClassManager
+
+class_manager = ClassManager()
+class_summary = class_manager.summarize_class("class_20_mixed")
+print(class_summary["class_features"])
+print(class_summary["student_count"])
+print(class_summary["trait_counts"])
+```
+
 ## テスト
 
 標準テストではモデルをダウンロードしません。`use_mock_model=True` で実行経路を確認します。

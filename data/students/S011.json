@@ -1,0 +1,41 @@
+{
+  "student_id": "S011",
+  "name": "Hina",
+  "understanding": {
+    "linear_equation": "28/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "low",
+      "score": 28,
+      "can_solve_ax_plus_b_equals_c": 23,
+      "can_transpose_terms": 13,
+      "can_divide_by_coefficient": 10,
+      "can_handle_negative_numbers": 8,
+      "can_handle_fractions": 3
+    }
+  },
+  "error_tendency": [
+    "mixes adding and subtracting on both sides"
+  ],
+  "misconceptions": [
+    "believes the same number should always be subtracted from both sides first"
+  ],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "hesitant and apologetic",
+    "classroom_behavior": "responds when called on"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "low",
+    "extraversion": "medium",
+    "agreeableness": "high",
+    "neuroticism": "high"
+  },
+  "self_efficacy": "low",
+  "question_tendency": "medium",
+  "motivation": "low",
+  "learning_history": []
+}

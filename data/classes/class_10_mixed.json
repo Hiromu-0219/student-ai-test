@@ -1,0 +1,31 @@
+{
+  "class_id": "class_10_mixed",
+  "name": "10-student mixed class",
+  "description": "A mid-sized class with broader variation in achievement and participation.",
+  "student_ids": [
+    "S001",
+    "S002",
+    "S003",
+    "S004",
+    "S005",
+    "S006",
+    "S007",
+    "S008",
+    "S009",
+    "S010"
+  ],
+  "class_features": {
+    "size": 10,
+    "understanding_profile": "wide spread from very low to very high",
+    "question_tendency_profile": "quiet students and high-question students coexist",
+    "motivation_profile": "mixed motivation with several high-motivation students",
+    "misconception_profile": "transposition and coefficient-division misconceptions are common",
+    "teacher_note": "Use this class to test whether the lecture plan changes when low-score risk is present."
+  },
+  "tags": [
+    "wide_variance",
+    "low_score_risk",
+    "mixed_participation"
+  ],
+  "created_for": "lesson-structure experiment"
+}

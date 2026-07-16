@@ -1,0 +1,41 @@
+{
+  "student_id": "S018",
+  "name": "Itsuki",
+  "understanding": {
+    "linear_equation": "38/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "low",
+      "score": 38,
+      "can_solve_ax_plus_b_equals_c": 35,
+      "can_transpose_terms": 23,
+      "can_divide_by_coefficient": 30,
+      "can_handle_negative_numbers": 20,
+      "can_handle_fractions": 18
+    }
+  },
+  "error_tendency": [
+    "reverses operation order"
+  ],
+  "misconceptions": [
+    "thinks the constant term should be handled after dividing first"
+  ],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "quiet but explains when prompted",
+    "classroom_behavior": "waits for teacher feedback"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "medium",
+    "extraversion": "low",
+    "agreeableness": "high",
+    "neuroticism": "high"
+  },
+  "self_efficacy": "low",
+  "question_tendency": "medium",
+  "motivation": "medium",
+  "learning_history": []
+}

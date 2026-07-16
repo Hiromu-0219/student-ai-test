@@ -1,0 +1,41 @@
+{
+  "student_id": "S014",
+  "name": "Daichi",
+  "understanding": {
+    "linear_equation": "22/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "low",
+      "score": 22,
+      "can_solve_ax_plus_b_equals_c": 12,
+      "can_transpose_terms": 2,
+      "can_divide_by_coefficient": 2,
+      "can_handle_negative_numbers": 7,
+      "can_handle_fractions": 2
+    }
+  },
+  "error_tendency": [
+    "copies numbers without applying operations"
+  ],
+  "misconceptions": [
+    "does not connect equation solving to inverse operations"
+  ],
+  "learning_speed": "very_low",
+  "personality": {
+    "response_style": "minimal answers",
+    "classroom_behavior": "may stop working without a prompt"
+  },
+  "big_five": {
+    "openness": "low",
+    "conscientiousness": "low",
+    "extraversion": "low",
+    "agreeableness": "medium",
+    "neuroticism": "medium"
+  },
+  "self_efficacy": "low",
+  "question_tendency": "low",
+  "motivation": "very_low",
+  "learning_history": []
+}
