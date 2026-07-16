@@ -116,3 +116,14 @@ teacher_belief
 - `class_profile` から授業目標、導入、全体説明、例題、個別演習、確認の時間配分を計画
 - Colabノートブックに「クラス全体を見て講義全体の構成を作成」セルを追加
 - 出力先: `data/assessments/lesson_plan_latest.json`
+
+## 2026-07-16 10:04 追記
+
+- Colabノートブックに「クラス状態別に授業構成が変わるか検証」セルを追加
+- 低理解クラス、高理解クラス、理解度混在クラス、質問しにくいクラス、係数処理の誤概念が多いクラスを比較できるようにした
+- 比較結果として、授業目標、平均推定理解度、理解度ばらつき、共通リスク、フェーズ別時間配分を表で表示
+- 検証: `python -m pytest` で 51件通過
+- 出力先:
+  - `data/assessments/lesson_plan_comparison.json`
+  - `data/assessments/lesson_plan_comparison_summary.csv`
+  - `data/assessments/lesson_plan_comparison_structure.csv`

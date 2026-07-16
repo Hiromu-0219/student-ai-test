@@ -594,7 +594,12 @@ data/assessments/observable_events_validation.json
 
 ```text
 data/assessments/lesson_plan_latest.json
+data/assessments/lesson_plan_comparison.json
+data/assessments/lesson_plan_comparison_summary.csv
+data/assessments/lesson_plan_comparison_structure.csv
 ```
+
+`notebooks/teaching_strategy_experiment.ipynb` では、低理解クラス、高理解クラス、理解度がばらつくクラス、質問しにくいクラス、係数処理の誤概念が多いクラスを人工的に作り、同じ授業プランナーに入れて授業目標と時間配分が変わるかを比較できます。
 
 その後、`src/teacher/intervention_planner.py` により、クラス全体への授業行動と個別支援を分けて計画します。現在はLLMを使わず、クラス要約、教師側belief、直近の正誤から判断します。
 

@@ -86,3 +86,45 @@ def test_lesson_planner_uses_misconception_to_select_goal():
     )
 
     assert plan["lesson_goal"]["target_skill"] == "can_divide_by_coefficient"
+
+
+def test_lesson_planner_changes_time_allocation_by_class_profile():
+    planner = RuleBasedLessonPlanner()
+    curriculum = _curriculum()
+
+    low_plan = planner.plan_lesson(
+        teacher_beliefs={
+            "S001": _belief(25, self_efficacy="low", question_tendency="low"),
+            "S002": _belief(35, self_efficacy="low"),
+            "S003": _belief(42, question_tendency="low"),
+        },
+        curriculum=curriculum,
+        total_minutes=30,
+    )
+    mixed_plan = planner.plan_lesson(
+        teacher_beliefs={
+            "S001": _belief(35, self_efficacy="low", neuroticism="high"),
+            "S002": _belief(62),
+            "S003": _belief(88, question_tendency="low"),
+        },
+        curriculum=curriculum,
+        total_minutes=30,
+    )
+    high_plan = planner.plan_lesson(
+        teacher_beliefs={
+            "S001": _belief(72, self_efficacy="high"),
+            "S002": _belief(78),
+            "S003": _belief(85, self_efficacy="high"),
+        },
+        curriculum=curriculum,
+        total_minutes=30,
+    )
+
+    def minutes(plan, phase_name):
+        return next(phase["minutes"] for phase in plan["lesson_structure"] if phase["phase"] == phase_name)
+
+    assert low_plan["lesson_goal"]["target_skill"] == "can_transpose_terms"
+    assert high_plan["lesson_goal"]["target_skill"] == "can_divide_by_coefficient"
+    assert minutes(low_plan, "全体説明") == 8
+    assert minutes(mixed_plan, "全体説明") == 6
+    assert minutes(high_plan, "全体説明") == 5
