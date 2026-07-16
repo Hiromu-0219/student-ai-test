@@ -2,7 +2,7 @@ import shutil
 from pathlib import Path
 
 from src.student_ai import StudentAISimulator
-from src.teacher import LessonSessionRunner
+from src.teacher import LessonSessionRunner, RuleBasedLessonPlanner
 from src.teacher.belief_manager import TeacherBeliefManager
 
 
@@ -81,3 +81,91 @@ def test_lesson_session_runner_executes_all_phases(tmp_path):
     for turn in result["turns"]:
         assert len(turn["events"]) == 3
         assert turn["classroom_observation"]["student_count"] == 3
+
+
+def test_lesson_session_runner_delivers_individual_support_only_in_practice(tmp_path):
+    students_dir = tmp_path / "students"
+    shutil.copytree(Path("data/students"), students_dir)
+    simulator = StudentAISimulator(
+        students_dir=str(students_dir),
+        logs_dir=str(tmp_path / "logs"),
+        use_mock_model=True,
+    )
+    belief_manager = TeacherBeliefManager(tmp_path / "teacher_beliefs")
+    runner = LessonSessionRunner(
+        student_simulator=simulator,
+        belief_manager=belief_manager,
+        teacher_id="T_TEST",
+    )
+    lesson_plan = _lesson_plan()
+    lesson_plan["lesson_structure"][3]["phase"] = "individual_practice"
+    lesson_plan["individual_support_policy"] = [
+        {
+            "student_id": "S001",
+            "target_skill": "can_divide_by_coefficient",
+            "policy": "check the first step before continuing",
+        }
+    ]
+
+    result = runner.run_lesson(
+        lesson_id="LESSON_TEST",
+        student_ids=["S001", "S002", "S003"],
+        lesson_plan=lesson_plan,
+        curriculum=_curriculum(),
+    )
+
+    introduction_turn = result["turns"][0]
+    practice_turn = result["turns"][3]
+
+    assert introduction_turn["student_teacher_messages"]["S001"] == introduction_turn["teacher_message"]
+    assert "個別支援" in practice_turn["student_teacher_messages"]["S001"]
+    assert "check the first step" in practice_turn["student_teacher_messages"]["S001"]
+    assert practice_turn["student_teacher_messages"]["S002"] == practice_turn["teacher_message"]
+    s001_event = next(
+        event for event in practice_turn["events"] if event["student_id"] == "S001"
+    )
+    assert "check the first step" in s001_event["teacher_prompt"]
+
+
+def test_lesson_session_runner_uses_lesson_planner_individual_practice_phase(tmp_path):
+    students_dir = tmp_path / "students"
+    shutil.copytree(Path("data/students"), students_dir)
+    simulator = StudentAISimulator(
+        students_dir=str(students_dir),
+        logs_dir=str(tmp_path / "logs"),
+        use_mock_model=True,
+    )
+    belief_manager = TeacherBeliefManager(tmp_path / "teacher_beliefs")
+    teacher_beliefs = {
+        "S001": belief_manager.load_or_create("T_TEST", "S001"),
+        "S002": belief_manager.load_or_create("T_TEST", "S002"),
+        "S003": belief_manager.load_or_create("T_TEST", "S003"),
+    }
+    teacher_beliefs["S001"]["estimated_traits"]["question_tendency"]["level"] = "low"
+    lesson_plan = RuleBasedLessonPlanner().plan_lesson(
+        teacher_beliefs=teacher_beliefs,
+        curriculum=_curriculum(),
+        total_minutes=30,
+    )
+    runner = LessonSessionRunner(
+        student_simulator=simulator,
+        belief_manager=belief_manager,
+        teacher_id="T_TEST",
+    )
+
+    result = runner.run_lesson(
+        lesson_id="LESSON_TEST",
+        student_ids=["S001", "S002", "S003"],
+        lesson_plan=lesson_plan,
+        curriculum=_curriculum(),
+    )
+
+    individual_message_counts = [
+        sum(
+            1
+            for event in turn["events"]
+            if event["teacher_prompt"] != turn["teacher_message"]
+        )
+        for turn in result["turns"]
+    ]
+    assert max(individual_message_counts) >= 1

@@ -607,6 +607,8 @@ data/assessments/lesson_session_table_latest.csv
 
 さらに `src/teacher/lesson_session_runner.py` により、作成した講義構成の各フェーズを順番に実行できます。各フェーズで複数生徒に教師発話を投げ、正誤判定、観察イベント化、伝達AI要約、`teacher_belief` 更新までを1セッションとして記録します。
 
+個別演習フェーズでは、`lesson_plan["individual_support_policy"]` に基づいて、特定生徒だけに個別支援メッセージを追加して届けられます。Colabの実行結果では `individual_message_count` で、各フェーズ何人に個別メッセージが届いたかを確認できます。
+
 その後、`src/teacher/intervention_planner.py` により、クラス全体への授業行動と個別支援を分けて計画します。現在はLLMを使わず、クラス要約、教師側belief、直近の正誤から判断します。
 
 ```text

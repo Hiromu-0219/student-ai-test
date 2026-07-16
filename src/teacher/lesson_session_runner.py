@@ -51,6 +51,9 @@ class LessonSessionRunner:
             raise ValueError("student_ids must not be empty")
 
         lesson_goal = lesson_plan.get("lesson_goal", {})
+        support_policy_by_student = _support_policy_by_student(
+            lesson_plan.get("individual_support_policy", [])
+        )
         turns = []
         latest_beliefs: dict[str, dict[str, Any]] = {
             student_id: self.belief_manager.load_or_create(self.teacher_id, student_id)
@@ -63,11 +66,17 @@ class LessonSessionRunner:
                 lesson_goal=lesson_goal,
                 curriculum=curriculum,
             )
+            student_teacher_messages = self._student_teacher_messages(
+                student_ids=student_ids,
+                phase=phase,
+                teacher_message=teacher_message,
+                support_policy_by_student=support_policy_by_student,
+            )
             expected_answer = phase.get("expected_answer")
             events = self._run_phase_for_students(
                 lesson_id=f"{lesson_id}_P{phase_index:02d}",
                 student_ids=student_ids,
-                teacher_message=teacher_message,
+                student_teacher_messages=student_teacher_messages,
                 expected_answer=expected_answer,
             )
             classroom_observation = self.communication_ai.summarize_classroom(
@@ -85,6 +94,7 @@ class LessonSessionRunner:
                     "phase_index": phase_index,
                     "phase": phase,
                     "teacher_message": teacher_message,
+                    "student_teacher_messages": student_teacher_messages,
                     "expected_answer": expected_answer,
                     "events": events,
                     "classroom_observation": classroom_observation,
@@ -109,11 +119,12 @@ class LessonSessionRunner:
         *,
         lesson_id: str,
         student_ids: list[str],
-        teacher_message: str,
+        student_teacher_messages: dict[str, str],
         expected_answer: str | None,
     ) -> list[dict[str, Any]]:
         events = []
         for student_id in student_ids:
+            teacher_message = student_teacher_messages[student_id]
             started = time.perf_counter()
             record = self.student_simulator.respond(
                 student_id,
@@ -145,6 +156,24 @@ class LessonSessionRunner:
             event["grade"] = grade
             events.append(event)
         return events
+
+    def _student_teacher_messages(
+        self,
+        *,
+        student_ids: list[str],
+        phase: dict[str, Any],
+        teacher_message: str,
+        support_policy_by_student: dict[str, str],
+    ) -> dict[str, str]:
+        messages = {student_id: teacher_message for student_id in student_ids}
+        if not _is_individual_practice_phase(phase):
+            return messages
+
+        for student_id in student_ids:
+            policy = support_policy_by_student.get(student_id)
+            if policy:
+                messages[student_id] = f"{teacher_message}\n個別支援: {policy}"
+        return messages
 
     def _teacher_message_for_phase(
         self,
@@ -205,3 +234,25 @@ def _first_problem_for_goal(
     if not problems:
         return None
     return problems[0].get("problem")
+
+
+def _support_policy_by_student(
+    individual_support_policy: list[dict[str, Any]],
+) -> dict[str, str]:
+    policies = {}
+    for item in individual_support_policy:
+        student_id = str(item.get("student_id", ""))
+        policy = str(item.get("policy", ""))
+        if student_id and policy:
+            policies[student_id] = policy
+    return policies
+
+
+def _is_individual_practice_phase(phase: dict[str, Any]) -> bool:
+    phase_name = str(phase.get("phase", ""))
+    return (
+        phase_name == "個別演習"
+        or "個別演習" in phase_name
+        or "individual" in phase_name.lower()
+        or "practice" in phase_name.lower()
+    )
