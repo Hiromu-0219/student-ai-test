@@ -46,6 +46,7 @@ class LessonSessionRunner:
         student_ids: list[str],
         lesson_plan: dict[str, Any],
         curriculum: dict[str, Any],
+        initial_teacher_beliefs: dict[str, dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         if not student_ids:
             raise ValueError("student_ids must not be empty")
@@ -56,7 +57,10 @@ class LessonSessionRunner:
         )
         turns = []
         latest_beliefs: dict[str, dict[str, Any]] = {
-            student_id: self.belief_manager.load_or_create(self.teacher_id, student_id)
+            student_id: self._initial_belief(
+                student_id=student_id,
+                initial_teacher_beliefs=initial_teacher_beliefs or {},
+            )
             for student_id in student_ids
         }
 
@@ -113,6 +117,22 @@ class LessonSessionRunner:
             "final_class_profile": final_class_profile,
             "summary": self._session_summary(turns, final_class_profile),
         }
+
+    def _initial_belief(
+        self,
+        *,
+        student_id: str,
+        initial_teacher_beliefs: dict[str, dict[str, Any]],
+    ) -> dict[str, Any]:
+        belief = initial_teacher_beliefs.get(student_id)
+        if belief is None:
+            return self.belief_manager.load_or_create(self.teacher_id, student_id)
+
+        seeded_belief = dict(belief)
+        seeded_belief["teacher_id"] = self.teacher_id
+        seeded_belief["student_id"] = student_id
+        self.belief_manager.save(seeded_belief)
+        return seeded_belief
 
     def _run_phase_for_students(
         self,

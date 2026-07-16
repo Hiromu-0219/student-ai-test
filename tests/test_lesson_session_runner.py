@@ -169,3 +169,41 @@ def test_lesson_session_runner_uses_lesson_planner_individual_practice_phase(tmp
         for turn in result["turns"]
     ]
     assert max(individual_message_counts) >= 1
+
+
+def test_lesson_session_runner_can_start_from_existing_teacher_beliefs(tmp_path):
+    students_dir = tmp_path / "students"
+    shutil.copytree(Path("data/students"), students_dir)
+    simulator = StudentAISimulator(
+        students_dir=str(students_dir),
+        logs_dir=str(tmp_path / "logs"),
+        use_mock_model=True,
+    )
+    belief_manager = TeacherBeliefManager(tmp_path / "teacher_beliefs")
+    initial_beliefs = {
+        student_id: belief_manager.load_or_create("T_TEST", student_id)
+        for student_id in ["S001", "S002", "S003"]
+    }
+    for belief in initial_beliefs.values():
+        belief["estimated_knowledge"]["linear_equation"]["score"] = 68
+        belief["estimated_knowledge"]["linear_equation"]["confidence"] = 0.4
+    runner = LessonSessionRunner(
+        student_simulator=simulator,
+        belief_manager=belief_manager,
+        teacher_id="T_TEST",
+    )
+
+    result = runner.run_lesson(
+        lesson_id="LESSON_TEST",
+        student_ids=["S001", "S002", "S003"],
+        lesson_plan=_lesson_plan(),
+        curriculum=_curriculum(),
+        initial_teacher_beliefs=initial_beliefs,
+    )
+
+    assert result["final_class_profile"]["average_estimated_score"] > 68
+    assert result["final_class_profile"]["high_score_students"] == [
+        "S001",
+        "S002",
+        "S003",
+    ]
