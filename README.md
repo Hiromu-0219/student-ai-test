@@ -36,6 +36,7 @@ student-ai/
 │  │  ├─ context_builder.py
 │  │  ├─ intervention_planner.py
 │  │  ├─ lesson_planner.py
+│  │  ├─ lesson_session_runner.py
 │  │  ├─ prompts.py
 │  │  ├─ strategy_selector.py
 │  │  └─ utterance_builder.py
@@ -91,6 +92,7 @@ student-ai/
 - `src/teacher/belief_manager.py`: 観察イベントから教師側の生徒推定 `teacher_belief` を更新する
 - `src/teacher/intervention_planner.py`: クラス全体対応と個別対応をルールベースで計画する
 - `src/teacher/lesson_planner.py`: クラス全体のteacher_beliefから講義全体の目標・時間配分・構成を計画する
+- `src/teacher/lesson_session_runner.py`: 講義全体の構成に沿って複数ターンの授業を実行し、観察・要約・teacher_belief更新まで回す
 - `src/teacher/strategy_selector.py`: 教師AIの授業手法をルールベースで選ぶMVP
 - `src/teacher/utterance_builder.py`: 授業方略を全体向け・個別向けの教師発話に変換する
 - `src/teacher/prompts.py`: 将来LLM教師に同じコンテキストを渡すためのプロンプト
@@ -597,9 +599,13 @@ data/assessments/lesson_plan_latest.json
 data/assessments/lesson_plan_comparison.json
 data/assessments/lesson_plan_comparison_summary.csv
 data/assessments/lesson_plan_comparison_structure.csv
+data/assessments/lesson_session_result_latest.json
+data/assessments/lesson_session_table_latest.csv
 ```
 
 `notebooks/teaching_strategy_experiment.ipynb` では、低理解クラス、高理解クラス、理解度がばらつくクラス、質問しにくいクラス、係数処理の誤概念が多いクラスを人工的に作り、同じ授業プランナーに入れて授業目標と時間配分が変わるかを比較できます。
+
+さらに `src/teacher/lesson_session_runner.py` により、作成した講義構成の各フェーズを順番に実行できます。各フェーズで複数生徒に教師発話を投げ、正誤判定、観察イベント化、伝達AI要約、`teacher_belief` 更新までを1セッションとして記録します。
 
 その後、`src/teacher/intervention_planner.py` により、クラス全体への授業行動と個別支援を分けて計画します。現在はLLMを使わず、クラス要約、教師側belief、直近の正誤から判断します。
 
