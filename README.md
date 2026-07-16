@@ -35,6 +35,7 @@ student-ai/
 │  │  ├─ belief_manager.py
 │  │  ├─ context_builder.py
 │  │  ├─ intervention_planner.py
+│  │  ├─ lesson_planner.py
 │  │  ├─ prompts.py
 │  │  ├─ strategy_selector.py
 │  │  └─ utterance_builder.py
@@ -89,6 +90,7 @@ student-ai/
 - `src/teacher/context_builder.py`: 教師AIが判断に使う生徒状態、単元目標、発話観察を1つのコンテキストにまとめる
 - `src/teacher/belief_manager.py`: 観察イベントから教師側の生徒推定 `teacher_belief` を更新する
 - `src/teacher/intervention_planner.py`: クラス全体対応と個別対応をルールベースで計画する
+- `src/teacher/lesson_planner.py`: クラス全体のteacher_beliefから講義全体の目標・時間配分・構成を計画する
 - `src/teacher/strategy_selector.py`: 教師AIの授業手法をルールベースで選ぶMVP
 - `src/teacher/utterance_builder.py`: 授業方略を全体向け・個別向けの教師発話に変換する
 - `src/teacher/prompts.py`: 将来LLM教師に同じコンテキストを渡すためのプロンプト
@@ -586,6 +588,12 @@ data/assessments/teacher_belief_table_latest.csv
 ```text
 data/assessments/teacher_belief_progress_validation.csv
 data/assessments/observable_events_validation.json
+```
+
+`src/teacher/lesson_planner.py` により、教師側beliefをクラス全体で集約し、今日の授業目標、導入、全体説明、例題、個別演習、確認の構成を作ります。研究上は、この講義全体の設計が中心です。
+
+```text
+data/assessments/lesson_plan_latest.json
 ```
 
 その後、`src/teacher/intervention_planner.py` により、クラス全体への授業行動と個別支援を分けて計画します。現在はLLMを使わず、クラス要約、教師側belief、直近の正誤から判断します。

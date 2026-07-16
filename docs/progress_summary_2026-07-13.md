@@ -19,6 +19,7 @@
 - クラス全体対応と個別対応を分けて授業方略を出力
 - 授業方略を、全体向け発話と個別向け発話に変換
 - 生成した全体向け教師発話を次ターンの生徒AI反応へ接続
+- クラス全体の状態から、講義全体の目標・時間配分・構成を計画
 
 ## 設計上の重要点
 
@@ -49,6 +50,8 @@ teacher_belief
   - 観察イベントから教師側の推定状態を更新
 - `src/teacher/intervention_planner.py`
   - クラス全体対応と個別対応をルールベースで計画
+- `src/teacher/lesson_planner.py`
+  - クラス全体のteacher_beliefから講義全体の構成を計画
 - `src/teacher/utterance_builder.py`
   - 授業方略を実際の教師発話に変換
 - `data/teacher_beliefs/`
@@ -66,12 +69,12 @@ teacher_belief
 ## 現在の検証結果
 
 - テストは `python -m pytest` で全件通過
-- 現在の最終確認では `45 passed`
+- 現在の最終確認では `50 passed`
 - ColabノートブックはJSONとして読み込み確認済み
 
 ## 次にやる候補
 
-1. クラス全体対応と個別対応を1授業ループとして自動実行する
+1. 講義全体の構成に沿って複数ターンを自動実行する
 2. 個別発話を特定生徒だけに届ける分岐を実装する
 3. 伝達AIまたは教師AIの一部にLLMを入れて、ルールベースとの差を比較する
 4. 授業前後で生徒AIの真の知識状態を更新する仕組みを接続する
@@ -85,6 +88,7 @@ teacher_belief
 → 観察可能情報への変換
 → 伝達AIによるクラス要約
 → 教師側belief更新
+→ 講義全体の構成
 → クラス全体・個別対応の計画
 → 教師発話への変換
 → 次ターンの生徒反応へ接続
@@ -103,3 +107,12 @@ teacher_belief
   - `data/assessments/next_turn_observable_events_latest.json`
   - `data/assessments/next_turn_teacher_beliefs_latest.json`
   - `data/assessments/next_turn_belief_table_latest.csv`
+
+## 2026-07-16 追記
+
+- 研究方針として、単発の声かけ最適化ではなく、クラス全体を見た講義全体の構成最適化を中心に置くことを確認
+- `RuleBasedLessonPlanner` を追加
+- `teacher_belief` をクラス全体で集約し、`class_profile` を作成
+- `class_profile` から授業目標、導入、全体説明、例題、個別演習、確認の時間配分を計画
+- Colabノートブックに「クラス全体を見て講義全体の構成を作成」セルを追加
+- 出力先: `data/assessments/lesson_plan_latest.json`
