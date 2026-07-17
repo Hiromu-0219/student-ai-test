@@ -1,6 +1,6 @@
 transformers>=4.51.0
 accelerate
-bitsandbytes
+bitsandbytes>=0.46.1
 torch
 pytest
 matplotlib

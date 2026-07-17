@@ -34,12 +34,17 @@ class LocalLLM:
             )
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_id, trust_remote_code=True)
+        model_kwargs = {
+            "device_map": "auto",
+            "quantization_config": quantization_config,
+            "trust_remote_code": True,
+        }
+        if not self.load_in_4bit:
+            model_kwargs["dtype"] = compute_dtype
+
         self.model = AutoModelForCausalLM.from_pretrained(
             self.model_id,
-            device_map="auto",
-            quantization_config=quantization_config,
-            torch_dtype=compute_dtype if not self.load_in_4bit else None,
-            trust_remote_code=True,
+            **model_kwargs,
         )
 
     def generate(self, system_prompt: str, user_prompt: str) -> str:
