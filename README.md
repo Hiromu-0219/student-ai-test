@@ -75,6 +75,7 @@ student-ai/
 - `AGENTS.md`: 開発・運用方針
 - `requirements.txt`: Colabでインストールする依存関係
 - `notebooks/student_ai_colab.ipynb`: Colab実行用ノートブック
+- `notebooks/paper_core_experiment.ipynb`: 論文用に研究のコア、MVP範囲、評価指標、優先順位を整理するノートブック
 - `notebooks/personality_experiment.ipynb`: 個人特徴による発話差を確認する実験ノートブック
 - `notebooks/teaching_strategy_experiment.ipynb`: 生徒発話、伝達AIの観察、生徒状態から授業方略を決める実験ノートブック
 - `src/config.py`: 既定モデルID、データパス、生成設定
