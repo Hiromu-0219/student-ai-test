@@ -9,15 +9,15 @@ from typing import Any, Protocol
 LEVELS = ("low", "medium", "high")
 
 
-COMMUNICATION_AI_SYSTEM_PROMPT = """あなたは教育シミュレーションの伝達AIです。
-生徒AIの発話を観察し、先生AIに渡すために個人特徴を分類してください。
+COMMUNICATION_AI_SYSTEM_PROMPT = """You are a communication AI for an education simulation.
+Read only the student's observable classroom utterance and infer traits to pass to a teacher AI.
 
-制約:
-- 数学の正誤ではなく、発話スタイルから判断してください。
-- 必ずJSONだけを返してください。
-- Markdownや説明文をJSONの外に書かないでください。
-- profile_prediction は A, B, C, D のいずれかです。
-- trait_estimates の各値は low, medium, high のいずれかです。
+Rules:
+- Infer from speaking style, not from whether the math answer is correct.
+- Return JSON only.
+- Do not write Markdown or explanations outside JSON.
+- profile_prediction must be one of A, B, C, D.
+- Every trait_estimates value must be one of low, medium, high.
 """
 
 
@@ -253,20 +253,34 @@ class LLMCommunicationAI:
 
 def _extract_features(utterance: str) -> dict[str, bool | int]:
     text = utterance
+    lower_text = text.lower()
     return {
-        "has_low_confidence": any(token in text for token in ["自信はない", "たぶん", "かも", "不安"]),
-        "has_high_confidence": any(token in text for token in ["分かります", "できます", "です。"]),
-        "asks_question": any(token in text for token in ["ですか", "ますか", "合っていますか", "教えて"]),
-        "shows_anxiety": any(token in text for token in ["不安", "迷", "自信はない", "確認"]),
-        "shows_persistence": any(token in text for token in ["もう一度", "考えます", "やってみます", "間違っていたら"]),
-        "shows_steps": any(token in text for token in ["まず", "それから", "移して", "係数", "両辺"]),
+        "has_low_confidence": any(
+            token in lower_text
+            for token in ["not sure", "maybe", "i guess", "confused", "worried"]
+        ),
+        "has_high_confidence": any(
+            token in lower_text
+            for token in ["i know", "i can", "clearly", "definitely", "i understand"]
+        ),
+        "asks_question": any(token in text for token in ["?", "?"])
+        or any(token in lower_text for token in ["is this", "can you", "please tell", "am i"]),
+        "shows_anxiety": any(
+            token in lower_text for token in ["anxious", "worried", "confused", "not sure"]
+        ),
+        "shows_persistence": any(
+            token in lower_text for token in ["try again", "think again", "i will try", "let me"]
+        ),
+        "shows_steps": any(
+            token in lower_text
+            for token in ["first", "then", "because", "moved", "divide", "both sides", "substituting"]
+        ),
         "short_answer": len(text) <= 35,
         "talkative_answer": len(text) >= 75,
-        "accepts_teacher": any(token in text for token in ["はい", "なるほど", "わかりました"]),
-        "prefers_checking_sign": any(token in text for token in ["符号", "移項"]),
+        "accepts_teacher": any(token in lower_text for token in ["yes", "okay", "i see", "understood"]),
+        "prefers_checking_sign": any(token in lower_text for token in ["sign", "move", "moved", "transpose"]),
         "length": len(text),
     }
-
 
 def _build_llm_classification_prompt(
     *,
@@ -274,17 +288,19 @@ def _build_llm_classification_prompt(
     student_id: str | None,
     fallback_result: TraitClassification,
 ) -> str:
-    return f"""分類対象:
+    return f"""Classify the student's observable utterance for a teacher AI.
+
+Input:
 - student_id: {student_id}
 - utterance: {utterance}
 
-候補プロファイル:
-A. 自信低め・質問多め・不安強め
-B. 丁寧・粘り強い・協調的
-C. 短文・質問少なめ・そっけない
-D. 自信あり・発話多め・新しい方法に前向き
+Profile labels:
+A. Low confidence, asks many checks, high anxiety.
+B. Diligent, step-by-step, persistent.
+C. Short/reserved, few questions, low visible motivation.
+D. Confident, talkative, proactive.
 
-推定する特徴:
+Traits to estimate:
 - self_efficacy: low / medium / high
 - question_tendency: low / medium / high
 - motivation: low / medium / high
@@ -292,10 +308,10 @@ D. 自信あり・発話多め・新しい方法に前向き
 - conscientiousness: low / medium / high
 - neuroticism: low / medium / high
 
-参考用のルールベース推定:
+Rule-based reference result:
 {json.dumps(fallback_result.to_dict(), ensure_ascii=False)}
 
-次のJSON形式だけで返してください。
+Return JSON only in this format:
 {{
   "profile_prediction": "A",
   "trait_estimates": {{
@@ -306,12 +322,11 @@ D. 自信あり・発話多め・新しい方法に前向き
     "conscientiousness": "medium",
     "neuroticism": "high"
   }},
-  "evidence": ["根拠1", "根拠2"],
+  "evidence": ["evidence 1", "evidence 2"],
   "confidence": 0.8,
-  "teacher_summary": "先生AIに渡す短い要約",
-  "recommended_teacher_attention": ["授業上の注意1", "授業上の注意2"]
+  "teacher_summary": "Short summary for the teacher AI.",
+  "recommended_teacher_attention": ["attention 1", "attention 2"]
 }}"""
-
 
 def _parse_llm_classification(raw_output: str) -> dict[str, Any] | None:
     text = raw_output.strip()
@@ -544,6 +559,8 @@ def _predict_profile(traits: dict[str, str], features: dict[str, bool | int]) ->
         scores["D"] += 2
     if traits["extraversion"] == "high":
         scores["D"] += 2
+    if features["talkative_answer"]:
+        scores["D"] += 1
     if features["short_answer"]:
         scores["C"] += 1
     if features["shows_steps"] and features["shows_persistence"]:
@@ -555,23 +572,22 @@ def _predict_profile(traits: dict[str, str], features: dict[str, bool | int]) ->
 def _evidence(features: dict[str, bool | int]) -> list[str]:
     evidence = []
     if features["has_low_confidence"]:
-        evidence.append("自信の低さを示す表現がある")
+        evidence.append("shows low confidence")
     if features["has_high_confidence"]:
-        evidence.append("自信を示す表現がある")
+        evidence.append("shows confidence")
     if features["asks_question"]:
-        evidence.append("確認質問がある")
+        evidence.append("asks a question or requests confirmation")
     if features["shows_anxiety"]:
-        evidence.append("不安や迷いの表現がある")
+        evidence.append("shows anxiety or uncertainty")
     if features["shows_persistence"]:
-        evidence.append("再挑戦や粘りの表現がある")
+        evidence.append("shows willingness to try again")
     if features["shows_steps"]:
-        evidence.append("手順や途中式に触れている")
+        evidence.append("explains intermediate steps")
     if features["short_answer"]:
-        evidence.append("返答が短い")
+        evidence.append("answer is short")
     if features["talkative_answer"]:
-        evidence.append("返答量が多い")
-    return evidence or ["発話特徴が弱く、標準的な反応に近い"]
-
+        evidence.append("answer is detailed")
+    return evidence or ["neutral classroom response"]
 
 def _confidence(features: dict[str, bool | int], profile: str) -> float:
     signal_count = sum(
@@ -590,12 +606,12 @@ def _teacher_summary(
     traits: dict[str, str],
     evidence: list[str],
 ) -> str:
-    prefix = f"{student_id} は" if student_id else "この生徒は"
+    prefix = f"{student_id} is" if student_id else "The student is"
     return (
-        f"{prefix}自己効力感={traits['self_efficacy']}、"
-        f"質問傾向={traits['question_tendency']}、"
-        f"不安傾向={traits['neuroticism']} と推定されます。"
-        f"根拠: {'、'.join(evidence[:3])}。"
+        f"{prefix} estimated as self_efficacy={traits['self_efficacy']}, "
+        f"question_tendency={traits['question_tendency']}, "
+        f"neuroticism={traits['neuroticism']}. "
+        f"Evidence: {', '.join(evidence[:3])}."
     )
 
 
@@ -605,15 +621,15 @@ def _recommended_teacher_attention(
 ) -> list[str]:
     attention = []
     if traits["self_efficacy"] == "low":
-        attention.append("小さな成功体験を作り、自信を補強する")
+        attention.append("Create a small success experience and reinforce confidence.")
     if traits["neuroticism"] == "high":
-        attention.append("不安を下げる声かけを入れる")
+        attention.append("Reduce anxiety with a calm confirmation prompt.")
     if traits["question_tendency"] == "low":
-        attention.append("質問しやすい確認を教師側から入れる")
+        attention.append("Ask a teacher-initiated check because the student may not ask questions.")
     if features["prefers_checking_sign"]:
-        attention.append("移項時の符号変化を重点的に確認する")
+        attention.append("Check sign changes during transposition explicitly.")
     if traits["conscientiousness"] == "low":
-        attention.append("途中式を1行だけ書かせる")
+        attention.append("Ask the student to write one intermediate step.")
     if not attention:
-        attention.append("現在の説明ペースを維持する")
+        attention.append("Continue the current explanation pace.")
     return attention
