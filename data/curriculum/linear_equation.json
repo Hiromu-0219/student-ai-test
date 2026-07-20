@@ -66,7 +66,7 @@
     },
     {
       "strategy_id": "worked_example",
-      "description": "理解度が低いとき、同型の例題を1問だけ手順付きで示す"
+      "description": "理解度が低いとき、同じ型の例題を1問だけ手順付きで示す"
     },
     {
       "strategy_id": "misconception_confrontation",
@@ -74,7 +74,7 @@
     },
     {
       "strategy_id": "micro_practice",
-      "description": "集中や手順化が弱いとき、小さい問題を1問ずつ解かせる"
+      "description": "集中や手順化が弱いとき、小さな問題を1問ずつ解かせる"
     },
     {
       "strategy_id": "answer_check",

@@ -80,15 +80,9 @@ class RuleBasedTeacherUtteranceBuilder:
         }
 
 
-TEACHER_UTTERANCE_SYSTEM_PROMPT = """You are a teacher utterance generator for an education simulation.
-Convert a lesson intervention plan into natural classroom utterances.
-
-Rules:
-- Return JSON only.
-- Keep utterances concise and classroom-ready.
-- Do not change next_problem or expected_answer.
-- Preserve every student_id in individual_utterances.
-- The teacher should not mention hidden student parameters directly.
+TEACHER_UTTERANCE_SYSTEM_PROMPT = """You generate concise Japanese teacher utterances for an education simulation.
+Return one valid JSON object only. Do not use Markdown.
+The teacher must not mention hidden student parameters directly.
 """
 
 
@@ -135,24 +129,40 @@ def _build_teacher_utterance_prompt(
     intervention_plan: dict[str, Any],
     fallback_result: dict[str, Any],
 ) -> str:
-    return f"""Create teacher utterances from this intervention plan.
+    whole_class_plan = intervention_plan.get("whole_class_plan", {})
+    individual_supports = intervention_plan.get("individual_supports", [])
+    compact_plan = {
+        "lesson_goal": intervention_plan.get("lesson_goal", {}),
+        "whole_class_plan": whole_class_plan,
+        "individual_supports": individual_supports,
+    }
+    required_students = [
+        str(item.get("student_id", "UNKNOWN")) for item in individual_supports
+    ]
+    fallback_compact = {
+        "whole_class_utterance": fallback_result.get("whole_class_utterance"),
+        "individual_utterances": fallback_result.get("individual_utterances", []),
+    }
+    return f"""Create classroom-ready Japanese utterances.
 
-Intervention plan:
-{json.dumps(intervention_plan, ensure_ascii=False, indent=2)}
+Plan:
+{json.dumps(compact_plan, ensure_ascii=False, indent=2)}
 
-Rule-based reference:
-{json.dumps(fallback_result, ensure_ascii=False, indent=2)}
+Reference wording if needed:
+{json.dumps(fallback_compact, ensure_ascii=False, indent=2)}
 
-Return JSON in this format:
+Required student_ids: {json.dumps(required_students, ensure_ascii=False)}
+
+Return exactly this JSON shape:
 {{
-  "whole_class_utterance": "Teacher message to the whole class.",
+  "whole_class_utterance": "全体向けの短い教師発話",
   "individual_utterances": [
     {{
       "student_id": "S001",
-      "support_type": "confidence_support",
+      "support_type": "micro_practice",
       "target_skill": "can_transpose_terms",
-      "utterance": "Individual teacher message.",
-      "reason": "Why this support is used."
+      "utterance": "個別向けの短い教師発話",
+      "reason": "短い理由"
     }}
   ]
 }}"""

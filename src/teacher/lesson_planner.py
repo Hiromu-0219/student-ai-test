@@ -174,7 +174,7 @@ class RuleBasedLessonPlanner:
             elif _trait_level(traits, "question_tendency") == "low":
                 policy = "教師側から小さな確認質問を入れる"
             elif score < 45:
-                policy = "同型の小問を使い、操作を1つずつ確認する"
+                policy = "同じ型の小問題を使い、操作を1つずつ確認する"
             elif score >= 65:
                 policy = "発展問題や説明役を任せ、理解を言語化させる"
             else:

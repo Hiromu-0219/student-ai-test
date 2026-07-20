@@ -112,7 +112,7 @@ class RuleBasedInterventionPlanner:
             return {
                 "student_id": student_id,
                 "support_type": "micro_practice",
-                "teacher_move": "同じ型の小問を1問だけ出し、途中式を1行書かせる",
+                "teacher_move": "同じ型の小問題を1問出し、途中式を1行書かせる",
                 "target_skill": target_skill,
                 "reason": f"推定理解度={score}、直近正誤={is_correct} のため",
             }
@@ -147,7 +147,7 @@ class RuleBasedInterventionPlanner:
     ) -> str:
         summary = classroom_observation.get("classroom_summary", "")
         observed_count = classroom_observation.get("student_count", len(teacher_beliefs))
-        return f"{observed_count}人分の観察とteacher_beliefに基づく計画。{summary}"
+        return f"{observed_count}人分の観察とteacher_beliefに基づいて計画。{summary}"
 
 
 def _estimated_score(belief: dict[str, Any]) -> int:
