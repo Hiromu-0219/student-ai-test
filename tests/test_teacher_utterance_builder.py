@@ -1,4 +1,14 @@
-from src.teacher import RuleBasedTeacherUtteranceBuilder
+from src.teacher import LLMTeacherUtteranceBuilder, RuleBasedTeacherUtteranceBuilder
+
+
+class FakeTeacherLLM:
+    model_id = "fake-teacher-llm"
+
+    def __init__(self, output):
+        self.output = output
+
+    def generate(self, system_prompt, user_prompt):
+        return self.output
 
 
 def test_teacher_utterance_builder_renders_whole_class_and_individual_moves():
@@ -51,3 +61,56 @@ def test_teacher_utterance_builder_handles_empty_individual_supports():
 
     assert "自分で考える時間" in result["whole_class_utterance"]
     assert result["individual_utterances"] == []
+
+
+def test_llm_teacher_utterance_builder_uses_json_output():
+    plan = {
+        "whole_class_plan": {
+            "next_problem": "3x = 15",
+            "expected_answer": "x = 5",
+        },
+        "individual_supports": [
+            {
+                "student_id": "S002",
+                "support_type": "confidence_support",
+                "target_skill": "can_divide_by_coefficient",
+                "reason": "low confidence",
+            }
+        ],
+    }
+    llm_output = """
+{
+  "whole_class_utterance": "Let's solve one example together first.",
+  "individual_utterances": [
+    {
+      "student_id": "S002",
+      "support_type": "confidence_support",
+      "target_skill": "can_divide_by_coefficient",
+      "utterance": "S002, start with one small step.",
+      "reason": "low confidence"
+    }
+  ]
+}
+""".strip()
+
+    result = LLMTeacherUtteranceBuilder(FakeTeacherLLM(llm_output)).build(plan)
+
+    assert result["generation_mode"] == "llm"
+    assert result["whole_class_utterance"] == "Let's solve one example together first."
+    assert result["individual_utterances"][0]["utterance"] == "S002, start with one small step."
+    assert result["next_problem"] == "3x = 15"
+
+
+def test_llm_teacher_utterance_builder_falls_back_on_invalid_json():
+    plan = {
+        "whole_class_plan": {
+            "next_problem": "3x = 15",
+            "expected_answer": "x = 5",
+        },
+        "individual_supports": [],
+    }
+
+    result = LLMTeacherUtteranceBuilder(FakeTeacherLLM("not json")).build(plan)
+
+    assert result["generation_mode"] == "rule_based_fallback"
+    assert "3x = 15" in result["whole_class_utterance"]

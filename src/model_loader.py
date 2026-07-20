@@ -71,18 +71,19 @@ class LocalLLM:
                     add_generation_prompt=True,
                 )
         else:
-            prompt = f"{system_prompt}\n\n{user_prompt}\n\n回答:"
+            prompt = f"{system_prompt}\n\n{user_prompt}\n\n\u56de\u7b54:"
 
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
-        outputs = self.model.generate(
-            **inputs,
-            max_new_tokens=self.generation_config.max_new_tokens,
-            do_sample=self.generation_config.do_sample,
-            temperature=self.generation_config.temperature,
-            top_p=self.generation_config.top_p,
-            repetition_penalty=self.generation_config.repetition_penalty,
-            pad_token_id=self.tokenizer.eos_token_id,
-        )
+        generation_kwargs = {
+            "max_new_tokens": self.generation_config.max_new_tokens,
+            "do_sample": self.generation_config.do_sample,
+            "repetition_penalty": self.generation_config.repetition_penalty,
+            "pad_token_id": self.tokenizer.eos_token_id,
+        }
+        if self.generation_config.do_sample:
+            generation_kwargs["temperature"] = self.generation_config.temperature
+            generation_kwargs["top_p"] = self.generation_config.top_p
+        outputs = self.model.generate(**inputs, **generation_kwargs)
         generated = outputs[0][inputs["input_ids"].shape[-1] :]
         return self.tokenizer.decode(generated, skip_special_tokens=True).strip()
 

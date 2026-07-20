@@ -46,19 +46,21 @@ class StudentAISimulator:
         use_mock_model: bool = False,
         generation_config: GenerationConfig | None = None,
         model_load_config: ModelLoadConfig | None = None,
+        speech_generator: Any | None = None,
     ) -> None:
         self.state_manager = StateManager(students_dir)
         self.logger = AnswerLogger(logs_dir)
-        self.llm = (
-            RuleBasedMockLLM()
-            if use_mock_model
-            else LocalLLM(
+        if speech_generator is not None:
+            self.llm = speech_generator
+        elif use_mock_model:
+            self.llm = RuleBasedMockLLM()
+        else:
+            self.llm = LocalLLM(
                 model_id=model_id,
                 load_in_4bit=load_in_4bit,
                 generation_config=generation_config,
                 model_load_config=model_load_config,
             )
-        )
         self.agent = StudentAgent(self.llm)
         self.learning_updater = LearningUpdater()
 

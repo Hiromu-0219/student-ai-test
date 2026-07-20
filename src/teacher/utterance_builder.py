@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import re
 from typing import Any
 
 
@@ -59,7 +61,7 @@ class RuleBasedTeacherUtteranceBuilder:
         elif support_type == "misconception_check":
             utterance = (
                 f"{student_id}さん、間違いやすいところを一緒に確認します。"
-                "反対側へ移すとき、符号がどう変わるかだけ見ましょう。"
+                "反対側へ移すとき、符号がどう変わるかを見ましょう。"
             )
         elif support_type == "extension":
             utterance = (
@@ -76,3 +78,137 @@ class RuleBasedTeacherUtteranceBuilder:
             "utterance": utterance,
             "reason": str(support.get("reason", "")),
         }
+
+
+TEACHER_UTTERANCE_SYSTEM_PROMPT = """You are a teacher utterance generator for an education simulation.
+Convert a lesson intervention plan into natural classroom utterances.
+
+Rules:
+- Return JSON only.
+- Keep utterances concise and classroom-ready.
+- Do not change next_problem or expected_answer.
+- Preserve every student_id in individual_utterances.
+- The teacher should not mention hidden student parameters directly.
+"""
+
+
+class LLMTeacherUtteranceBuilder:
+    """Renders teacher utterances with an LLM and rule-based fallback."""
+
+    def __init__(
+        self,
+        text_generator: Any,
+        *,
+        fallback: RuleBasedTeacherUtteranceBuilder | None = None,
+    ) -> None:
+        self.text_generator = text_generator
+        self.fallback = fallback or RuleBasedTeacherUtteranceBuilder()
+
+    def build(self, intervention_plan: dict[str, Any]) -> dict[str, Any]:
+        fallback_result = self.fallback.build(intervention_plan)
+        prompt = _build_teacher_utterance_prompt(intervention_plan, fallback_result)
+        raw_output = self.text_generator.generate(
+            TEACHER_UTTERANCE_SYSTEM_PROMPT,
+            prompt,
+        )
+        parsed = _parse_json_object(raw_output)
+        if parsed is None:
+            return {**fallback_result, "generation_mode": "rule_based_fallback"}
+
+        return {
+            "whole_class_utterance": str(
+                parsed.get("whole_class_utterance")
+                or fallback_result["whole_class_utterance"]
+            ),
+            "individual_utterances": _normalize_individual_utterances(
+                parsed.get("individual_utterances"),
+                fallback_result["individual_utterances"],
+            ),
+            "next_problem": fallback_result.get("next_problem"),
+            "expected_answer": fallback_result.get("expected_answer"),
+            "source_plan": intervention_plan,
+            "generation_mode": "llm",
+        }
+
+
+def _build_teacher_utterance_prompt(
+    intervention_plan: dict[str, Any],
+    fallback_result: dict[str, Any],
+) -> str:
+    return f"""Create teacher utterances from this intervention plan.
+
+Intervention plan:
+{json.dumps(intervention_plan, ensure_ascii=False, indent=2)}
+
+Rule-based reference:
+{json.dumps(fallback_result, ensure_ascii=False, indent=2)}
+
+Return JSON in this format:
+{{
+  "whole_class_utterance": "Teacher message to the whole class.",
+  "individual_utterances": [
+    {{
+      "student_id": "S001",
+      "support_type": "confidence_support",
+      "target_skill": "can_transpose_terms",
+      "utterance": "Individual teacher message.",
+      "reason": "Why this support is used."
+    }}
+  ]
+}}"""
+
+
+def _parse_json_object(raw_output: str) -> dict[str, Any] | None:
+    text = raw_output.strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json)?", "", text).strip()
+        text = re.sub(r"```$", "", text).strip()
+    match = re.search(r"\{.*\}", text, flags=re.DOTALL)
+    if match:
+        text = match.group(0)
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError:
+        return None
+    return parsed if isinstance(parsed, dict) else None
+
+
+def _normalize_individual_utterances(
+    value: Any,
+    fallback: list[dict[str, str]],
+) -> list[dict[str, str]]:
+    if not isinstance(value, list):
+        return fallback
+
+    fallback_by_student = {item["student_id"]: item for item in fallback}
+    normalized = []
+    for item in value:
+        if not isinstance(item, dict):
+            continue
+        student_id = str(item.get("student_id", "")).strip()
+        if not student_id:
+            continue
+        fallback_item = fallback_by_student.get(student_id, {})
+        normalized.append(
+            {
+                "student_id": student_id,
+                "support_type": str(
+                    item.get("support_type")
+                    or fallback_item.get("support_type")
+                    or "support"
+                ),
+                "target_skill": str(
+                    item.get("target_skill")
+                    or fallback_item.get("target_skill")
+                    or "linear_equation"
+                ),
+                "utterance": str(
+                    item.get("utterance")
+                    or fallback_item.get("utterance")
+                    or ""
+                ),
+                "reason": str(item.get("reason") or fallback_item.get("reason") or ""),
+            }
+        )
+
+    return normalized or fallback
