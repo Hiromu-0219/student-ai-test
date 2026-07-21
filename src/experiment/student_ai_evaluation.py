@@ -14,6 +14,18 @@ from src.test_bank import TestBank
 
 
 DEFAULT_UNDERSTANDING_LEVELS = list(range(0, 101, 10))
+LINEAR_EQUATION_SKILLS = [
+    "can_solve_ax_plus_b_equals_c",
+    "can_transpose_terms",
+    "can_divide_by_coefficient",
+    "can_handle_negative_numbers",
+    "can_handle_fractions",
+]
+MISCONCEPTION_TEXTS = [
+    "移項しても符号はそのままだと思っている",
+    "3x = 15 では3を引けばよいと考える",
+]
+MISCONCEPTION_RELATED_SKILLS = {"can_transpose_terms", "can_divide_by_coefficient"}
 
 
 def run_student_ai_evaluation(
@@ -175,7 +187,10 @@ def export_student_ai_evaluation_for_codex(
         [
             "",
             "## Misconception Comparison",
-            "understanding\taccuracy_with\taccuracy_without\tprobability_with\tprobability_without\tprobability_gap",
+            (
+                "understanding\tall_probability_gap\trelated_probability_gap\t"
+                "related_accuracy_with\trelated_accuracy_without"
+            ),
         ]
     )
     for row in result.get("misconception_comparison", {}).get("rows", []):
@@ -183,11 +198,10 @@ def export_student_ai_evaluation_for_codex(
             "\t".join(
                 [
                     str(row.get("understanding")),
-                    str(row.get("accuracy_with_misconception")),
-                    str(row.get("accuracy_without_misconception")),
-                    str(row.get("probability_with_misconception")),
-                    str(row.get("probability_without_misconception")),
-                    str(row.get("probability_gap")),
+                    str(row.get("all_probability_gap")),
+                    str(row.get("related_probability_gap")),
+                    str(row.get("related_accuracy_with_misconception")),
+                    str(row.get("related_accuracy_without_misconception")),
                 ]
             )
         )
@@ -196,7 +210,10 @@ def export_student_ai_evaluation_for_codex(
         [
             "",
             "## Skill Breakdown",
-            "weak_skill\tquestion_count\tcorrect_count\taccuracy\taverage_correct_probability",
+            (
+                "weak_skill\tquestion_count\tweak_skill_probability\tbaseline_probability\t"
+                "target_probability_drop\taccuracy"
+            ),
         ]
     )
     for row in result.get("skill_breakdown", []):
@@ -205,9 +222,10 @@ def export_student_ai_evaluation_for_codex(
                 [
                     str(row.get("weak_skill")),
                     str(row.get("question_count")),
-                    str(row.get("correct_count")),
+                    str(row.get("weak_skill_probability")),
+                    str(row.get("baseline_probability")),
+                    str(row.get("target_probability_drop")),
                     str(row.get("accuracy")),
-                    str(row.get("average_correct_probability")),
                 ]
             )
         )
@@ -241,6 +259,7 @@ def _validity_lines(validity: dict[str, Any]) -> list[str]:
         lines.append(
             f"- {item['criterion']}: score={item['score']}, passed={item['passed']}, reason={item['reason']}"
         )
+    lines.append(f"- claim_scope: {validity.get('claim_scope')}")
     return lines
 
 
@@ -248,6 +267,7 @@ def _auto_interpretation_lines(result: dict[str, Any]) -> list[str]:
     summary = result.get("summary", {})
     learning_curve = result.get("learning_curve", [])
     misconception_rows = result.get("misconception_comparison", {}).get("rows", [])
+    skill_rows = result.get("skill_breakdown", [])
     lines = []
     gain = summary.get("accuracy_gain_from_min_to_max")
     probability_gain = summary.get("probability_gain_from_min_to_max")
@@ -260,11 +280,15 @@ def _auto_interpretation_lines(result: dict[str, Any]) -> list[str]:
             f"{last.get('understanding')} 点で accuracy={last.get('accuracy')} です。"
         )
     if misconception_rows:
-        diffs = [
-            round(row.get("probability_without_misconception", 0) - row.get("probability_with_misconception", 0), 1)
-            for row in misconception_rows
-        ]
-        lines.append(f"- 誤概念なしとの差は平均 {round(mean(diffs), 1)} ポイントです。")
+        related_diffs = [row.get("related_probability_gap", 0) for row in misconception_rows]
+        all_diffs = [row.get("all_probability_gap", 0) for row in misconception_rows]
+        lines.append(
+            f"- 誤概念なしとの差は、全問平均で {round(mean(all_diffs), 1)} ポイント、"
+            f"関連問題平均で {round(mean(related_diffs), 1)} ポイントです。"
+        )
+    if skill_rows:
+        drops = [row.get("target_probability_drop", 0) for row in skill_rows]
+        lines.append(f"- 弱点スキル条件では、基準条件から平均 {round(mean(drops), 1)} ポイント低下しています。")
     lines.append(f"- スキル別弱点条件で最も低い条件は {summary.get('weakest_skill_condition')} です。")
     lines.append("- 発話サンプルでは、教師発話を含まず、生徒1ターン分に収まっているかを確認してください。")
     return lines
@@ -276,14 +300,16 @@ def _evaluate_at_understanding(
     test_data: dict[str, Any],
     cognitive_model: CognitiveModel,
     score: int,
+    questions: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     state = _state_with_uniform_score(base_state, score)
+    selected_questions = questions or test_data["questions"]
     directives = [
         cognitive_model.build_assessment_directive(
             student_state=state,
             question=question,
         )
-        for question in test_data["questions"]
+        for question in selected_questions
     ]
     correct_count = sum(1 for directive in directives if directive["target_correct"])
     probabilities = [directive["correct_probability"] for directive in directives]
@@ -303,40 +329,65 @@ def _evaluate_misconception_effect(
     cognitive_model: CognitiveModel,
 ) -> dict[str, Any]:
     rows = []
+    related_questions = [
+        question
+        for question in test_data["questions"]
+        if question["skill"] in MISCONCEPTION_RELATED_SKILLS
+    ]
     for score in [20, 50, 80]:
         with_misconception = _state_with_uniform_score(base_state, score)
         without_misconception = _state_with_uniform_score(base_state, score)
-        with_misconception["misconceptions"] = [
-            "移項しても符号はそのままだと思っている",
-            "3x = 15 では3を引けばよいと考える",
-        ]
+        with_misconception["misconceptions"] = list(MISCONCEPTION_TEXTS)
         without_misconception["misconceptions"] = []
-        with_row = _evaluate_at_understanding(
+        with_all = _evaluate_at_understanding(
             base_state=with_misconception,
             test_data=test_data,
             cognitive_model=cognitive_model,
             score=score,
         )
-        without_row = _evaluate_at_understanding(
+        without_all = _evaluate_at_understanding(
             base_state=without_misconception,
             test_data=test_data,
             cognitive_model=cognitive_model,
             score=score,
         )
+        with_related = _evaluate_at_understanding(
+            base_state=with_misconception,
+            test_data=test_data,
+            cognitive_model=cognitive_model,
+            score=score,
+            questions=related_questions,
+        )
+        without_related = _evaluate_at_understanding(
+            base_state=without_misconception,
+            test_data=test_data,
+            cognitive_model=cognitive_model,
+            score=score,
+            questions=related_questions,
+        )
         rows.append(
             {
                 "understanding": score,
-                "accuracy_with_misconception": with_row["accuracy"],
-                "accuracy_without_misconception": without_row["accuracy"],
-                "probability_with_misconception": with_row["average_correct_probability"],
-                "probability_without_misconception": without_row["average_correct_probability"],
-                "probability_gap": round(
-                    without_row["average_correct_probability"] - with_row["average_correct_probability"],
+                "all_accuracy_with_misconception": with_all["accuracy"],
+                "all_accuracy_without_misconception": without_all["accuracy"],
+                "all_probability_with_misconception": with_all["average_correct_probability"],
+                "all_probability_without_misconception": without_all["average_correct_probability"],
+                "all_probability_gap": round(
+                    without_all["average_correct_probability"] - with_all["average_correct_probability"],
+                    1,
+                ),
+                "related_question_count": len(related_questions),
+                "related_accuracy_with_misconception": with_related["accuracy"],
+                "related_accuracy_without_misconception": without_related["accuracy"],
+                "related_probability_with_misconception": with_related["average_correct_probability"],
+                "related_probability_without_misconception": without_related["average_correct_probability"],
+                "related_probability_gap": round(
+                    without_related["average_correct_probability"] - with_related["average_correct_probability"],
                     1,
                 ),
             }
         )
-    return {"rows": rows}
+    return {"related_skills": sorted(MISCONCEPTION_RELATED_SKILLS), "rows": rows}
 
 
 def _evaluate_skill_breakdown(
@@ -348,29 +399,37 @@ def _evaluate_skill_breakdown(
     skill_rows = []
     skills = sorted({question["skill"] for question in test_data["questions"]})
     for weak_skill in skills:
-        state = _state_with_uniform_score(base_state, 75)
-        state["knowledge_state"]["linear_equation"][weak_skill] = 25
+        weak_state = _state_with_uniform_score(base_state, 75)
+        baseline_state = _state_with_uniform_score(base_state, 75)
+        weak_state["knowledge_state"]["linear_equation"][weak_skill] = 25
         questions = [question for question in test_data["questions"] if question["skill"] == weak_skill]
-        directives = [
+        weak_directives = [
             cognitive_model.build_assessment_directive(
-                student_state=state,
+                student_state=weak_state,
                 question=question,
             )
             for question in questions
         ]
-        correct_count = sum(1 for directive in directives if directive["target_correct"])
+        baseline_directives = [
+            cognitive_model.build_assessment_directive(
+                student_state=baseline_state,
+                question=question,
+            )
+            for question in questions
+        ]
+        correct_count = sum(1 for directive in weak_directives if directive["target_correct"])
+        weak_probability = mean(directive["correct_probability"] for directive in weak_directives)
+        baseline_probability = mean(directive["correct_probability"] for directive in baseline_directives)
         skill_rows.append(
             {
                 "weak_skill": weak_skill,
                 "question_count": len(questions),
                 "correct_count": correct_count,
                 "accuracy": round(correct_count / len(questions), 3) if questions else None,
-                "average_correct_probability": round(
-                    mean(directive["correct_probability"] for directive in directives),
-                    1,
-                )
-                if directives
-                else None,
+                "weak_skill_probability": round(weak_probability, 1),
+                "baseline_probability": round(baseline_probability, 1),
+                "target_probability_drop": round(baseline_probability - weak_probability, 1),
+                "average_correct_probability": round(weak_probability, 1),
             }
         )
     return skill_rows
@@ -403,7 +462,9 @@ def _generate_personality_utterance_samples(
     }
     samples = []
     for profile_id, overrides in profiles.items():
-        state = _merge_profile(base_state, overrides)
+        state = _state_with_uniform_score(base_state, 80)
+        state["misconceptions"] = []
+        state = _merge_profile(state, overrides)
         prompt_profile = build_personality_profile(state)
         answer = simulator.agent.answer(state, "2x + 3 = 11 を解いてください。")
         samples.append(
@@ -467,32 +528,32 @@ def _criterion_learning_curve(learning_curve: list[dict[str, Any]]) -> dict[str,
 
 def _criterion_misconception_effect(misconception_comparison: dict[str, Any]) -> dict[str, Any]:
     rows = misconception_comparison.get("rows", [])
-    gaps = [row.get("probability_gap", 0) for row in rows]
+    gaps = [row.get("related_probability_gap", 0) for row in rows]
     low_mid_gaps = gaps[:2]
     high_gap = gaps[-1] if gaps else 0
     average_low_mid_gap = mean(low_mid_gaps) if low_mid_gaps else 0
     fades_with_understanding = bool(gaps) and high_gap <= max(gaps)
-    score = min(1.0, average_low_mid_gap / 12)
+    score = min(1.0, average_low_mid_gap / 10)
     if fades_with_understanding:
         score = min(1.0, score + 0.2)
     return {
         "criterion": "misconception_sensitivity",
         "score": round(score, 3),
         "passed": score >= 0.7,
-        "reason": f"低中理解度での誤概念ギャップ平均={round(average_low_mid_gap, 1)}、高理解度ギャップ={round(high_gap, 1)}。",
+        "reason": f"関連問題での低中理解度ギャップ平均={round(average_low_mid_gap, 1)}、高理解度ギャップ={round(high_gap, 1)}。",
     }
 
 
 def _criterion_skill_specificity(skill_breakdown: list[dict[str, Any]]) -> dict[str, Any]:
-    probabilities = [row["average_correct_probability"] for row in skill_breakdown if row["average_correct_probability"] is not None]
-    spread = max(probabilities) - min(probabilities) if probabilities else 0
-    score = min(1.0, spread / 20)
-    weakest = min(skill_breakdown, key=lambda row: row["average_correct_probability"] or 100)
+    drops = [row.get("target_probability_drop", 0) for row in skill_breakdown]
+    average_drop = mean(drops) if drops else 0
+    score = min(1.0, average_drop / 35)
+    weakest = min(skill_breakdown, key=lambda row: row["weak_skill_probability"] or 100)
     return {
         "criterion": "skill_specific_weakness",
         "score": round(score, 3),
-        "passed": score >= 0.5,
-        "reason": f"スキル条件間の平均正答確率の幅={round(spread, 1)}。最弱条件={weakest['weak_skill']}。",
+        "passed": score >= 0.7,
+        "reason": f"弱点スキル化による平均正答確率低下={round(average_drop, 1)}。最弱条件={weakest['weak_skill']}。",
     }
 
 
@@ -502,9 +563,10 @@ def _criterion_personality_separation(utterance_samples: list[dict[str, Any]]) -
     diligent = by_profile.get("diligent_confident", {})
     quiet = by_profile.get("quiet_low_motivation", {})
     checks = [
-        low_conf.get("question_mark_count", 0) >= diligent.get("question_mark_count", 0),
-        low_conf.get("uncertainty_marker_count", 0) > diligent.get("uncertainty_marker_count", 0),
+        low_conf.get("uncertainty_marker_count", 0) >= diligent.get("uncertainty_marker_count", 0),
+        low_conf.get("question_mark_count", 0) >= quiet.get("question_mark_count", 0),
         diligent.get("line_count", 0) >= quiet.get("line_count", 0),
+        quiet.get("char_count", 0) <= low_conf.get("char_count", 0),
         quiet.get("char_count", 0) <= diligent.get("char_count", 0),
     ]
     score = sum(checks) / len(checks)
@@ -517,11 +579,10 @@ def _criterion_personality_separation(utterance_samples: list[dict[str, Any]]) -
 
 
 def _criterion_one_turn_student_utterance(utterance_samples: list[dict[str, Any]]) -> dict[str, Any]:
-    forbidden_labels = ["教師:", "先生:", "生徒:", "教師：", "先生：", "生徒："]
     bad_samples = [
         sample["profile_id"]
         for sample in utterance_samples
-        if any(label in sample["utterance"] for label in forbidden_labels)
+        if sample["utterance_features"].get("has_teacher_label")
     ]
     score = 1.0 if not bad_samples else 0.0
     return {
@@ -555,7 +616,7 @@ def _evaluation_summary(
     last = learning_curve[-1]
     weakest_skill = min(
         skill_breakdown,
-        key=lambda row: row["average_correct_probability"] or 100,
+        key=lambda row: row["weak_skill_probability"] or 100,
     )
     return {
         "accuracy_gain_from_min_to_max": round(last["accuracy"] - first["accuracy"], 3),
@@ -574,13 +635,7 @@ def _state_with_uniform_score(base_state: dict[str, Any], score: int) -> dict[st
     state = copy.deepcopy(base_state)
     linear = state.setdefault("knowledge_state", {}).setdefault("linear_equation", {})
     linear["score"] = score
-    for key in [
-        "can_solve_ax_plus_b_equals_c",
-        "can_transpose_terms",
-        "can_divide_by_coefficient",
-        "can_handle_negative_numbers",
-        "can_handle_fractions",
-    ]:
+    for key in LINEAR_EQUATION_SKILLS:
         linear[key] = score
     return state
 

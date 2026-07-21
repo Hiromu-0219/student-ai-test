@@ -38,11 +38,12 @@ def normalize_student_turn(raw_answer: str, *, assessment: bool = False) -> str:
 
     text = str(raw_answer).strip()
     text = _strip_code_fence(text)
-    text = _remove_speaker_prefix(text)
-    text = _cut_before_forbidden_speaker(text)
-    text = _remove_empty_lines(text)
     if assessment:
+        text = _remove_teacher_lines(text)
+        text = _remove_empty_lines(text)
         return _keep_assessment_answer(text)
+    text = _keep_only_student_speaker_turn(text)
+    text = _remove_empty_lines(text)
     return _limit_sentences(text, max_sentences=4)
 
 
@@ -53,39 +54,81 @@ def _strip_code_fence(text: str) -> str:
     return text
 
 
-def _remove_speaker_prefix(text: str) -> str:
-    return re.sub(r"^\s*(生徒|学生|Student)\s*[:：]\s*", "", text).strip()
+def _speaker_pattern(names: list[str]) -> re.Pattern[str]:
+    joined = "|".join(re.escape(name) for name in names)
+    return re.compile(rf"^\s*(?:{joined})\s*[:：]\s*")
 
 
-def _cut_before_forbidden_speaker(text: str) -> str:
+TEACHER_PREFIX = _speaker_pattern(["教師", "先生", "Teacher"])
+STUDENT_PREFIX = _speaker_pattern(["生徒", "学生", "Student"])
+
+
+def _keep_only_student_speaker_turn(text: str) -> str:
     lines = []
-    for line in text.splitlines():
-        if re.match(r"^\s*(教師|先生|Teacher)\s*[:：]", line):
-            break
-        if lines and re.match(r"^\s*(生徒|学生|Student)\s*[:：]", line):
-            break
-        lines.append(re.sub(r"^\s*(生徒|学生|Student)\s*[:：]\s*", "", line))
+    saw_student_label = False
+    captured_after_student_label = False
+
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+
+        if TEACHER_PREFIX.match(line):
+            if captured_after_student_label:
+                break
+            continue
+
+        student_match = STUDENT_PREFIX.match(line)
+        if student_match:
+            if captured_after_student_label:
+                break
+            saw_student_label = True
+            captured_after_student_label = True
+            stripped = STUDENT_PREFIX.sub("", line).strip()
+            if stripped:
+                lines.append(stripped)
+            continue
+
+        if saw_student_label or not _looks_like_dialogue_label(line):
+            lines.append(_remove_inline_speaker_labels(line))
+
     return "\n".join(lines).strip()
+
+
+def _looks_like_dialogue_label(line: str) -> bool:
+    return bool(re.match(r"^\s*[^:：]{1,12}\s*[:：]", line))
+
+
+def _remove_inline_speaker_labels(line: str) -> str:
+    line = TEACHER_PREFIX.sub("", line)
+    line = STUDENT_PREFIX.sub("", line)
+    return line.strip()
 
 
 def _remove_empty_lines(text: str) -> str:
     return "\n".join(line.strip() for line in text.splitlines() if line.strip()).strip()
 
 
+def _remove_teacher_lines(text: str) -> str:
+    return "\n".join(
+        line for line in text.splitlines() if not TEACHER_PREFIX.match(line.strip())
+    ).strip()
+
+
 def _keep_assessment_answer(text: str) -> str:
-    answer_lines = [line for line in text.splitlines() if "答え:" in line or "答え：" in line]
-    if answer_lines:
-        return answer_lines[-1].replace("答え：", "答え:").strip()
+    answer_matches = re.findall(r"答え\s*[:：]\s*x\s*=\s*[^\s。！？?]+", text)
+    if answer_matches:
+        return answer_matches[-1].replace("答え：", "答え:").strip()
     return _limit_sentences(text, max_sentences=1)
 
 
 def _limit_sentences(text: str, *, max_sentences: int) -> str:
     if not text:
         return text
-    answer_match = re.search(r"(答え\s*[:：]\s*x\s*=\s*[^\s。．.]+)", text)
+    answer_match = re.search(r"(答え\s*[:：]\s*x\s*=\s*[^\s。！？?]+)", text)
     answer_part = answer_match.group(1).replace("答え：", "答え:") if answer_match else None
     before_answer = text[: answer_match.start()].strip() if answer_match else text
-    pieces = re.findall(r"[^。！？!?]+[。！？!?]?", before_answer)
+    pieces = re.findall(r"[^。！？?]+[。！？?]?", before_answer)
     limited = "".join(piece.strip() for piece in pieces[:max_sentences]).strip()
     if answer_part and answer_part not in limited:
         limited = f"{limited} {answer_part}".strip()

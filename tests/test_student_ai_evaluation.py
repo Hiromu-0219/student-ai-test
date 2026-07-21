@@ -28,7 +28,9 @@ def test_student_ai_evaluation_runs_core_student_experiments(tmp_path):
     assert [row["understanding"] for row in result["learning_curve"]] == [0, 50, 100]
     assert result["learning_curve"][0]["average_correct_probability"] < result["learning_curve"][-1]["average_correct_probability"]
     assert result["misconception_comparison"]["rows"]
+    assert "related_probability_gap" in result["misconception_comparison"]["rows"][0]
     assert result["skill_breakdown"]
+    assert "target_probability_drop" in result["skill_breakdown"][0]
     assert len(result["utterance_samples"]) == 3
     assert result["human_replacement_validity"]["overall_score"] >= 0
     assert result["summary"]["human_replacement_verdict"]
@@ -49,4 +51,6 @@ def test_student_ai_evaluation_runs_core_student_experiments(tmp_path):
     assert "Human Replacement Validity" in codex_text
     assert "Auto Interpretation" in codex_text
     assert "Learning Curve" in codex_text
+    assert "related_probability_gap" in codex_text
+    assert "target_probability_drop" in codex_text
     assert "Utterance Samples" in codex_text
