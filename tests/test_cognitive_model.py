@@ -11,7 +11,7 @@ def student_state(score):
                 "can_solve_ax_plus_b_equals_c": score,
             }
         },
-        "misconceptions": [] if score >= 60 else ["移項しても符号は変えなくてよい"],
+        "misconceptions": [] if score >= 60 else ["移項しても符号は変えなくてよいと思っている"],
         "self_efficacy": "medium",
         "motivation": "medium",
     }
@@ -83,8 +83,8 @@ def test_misconception_penalty_fades_as_skill_increases():
     high = student_state(80)
     low["knowledge_state"]["linear_equation"]["can_transpose_terms"] = 20
     high["knowledge_state"]["linear_equation"]["can_transpose_terms"] = 80
-    low["misconceptions"] = ["移項しても符号は変えなくてよい"]
-    high["misconceptions"] = ["移項しても符号は変えなくてよい"]
+    low["misconceptions"] = ["移項しても符号は変えなくてよいと思っている"]
+    high["misconceptions"] = ["移項しても符号は変えなくてよいと思っている"]
 
     low_directive = model.build_assessment_directive(student_state=low, question=question)
     high_directive = model.build_assessment_directive(student_state=high, question=question)

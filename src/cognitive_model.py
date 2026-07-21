@@ -17,6 +17,8 @@ LEVEL_ADJUSTMENT = {
 
 
 class CognitiveModel:
+    """Control answer correctness from external student state."""
+
     def build_assessment_directive(
         self,
         *,
@@ -126,9 +128,9 @@ def _format_fraction(value: Fraction) -> str:
 def _related_misconceptions(misconceptions: list[str], skill: str) -> list[str]:
     keywords = {
         "can_transpose_terms": ["移項", "符号", "反対側"],
-        "can_divide_by_coefficient": ["係数", "割", "引けば"],
+        "can_divide_by_coefficient": ["係数", "割る", "引く", "3x"],
         "can_handle_negative_numbers": ["マイナス", "負", "-"],
-        "can_handle_fractions": ["分数", "/"],
+        "can_handle_fractions": ["分数", "分母", "/"],
     }.get(skill, [])
     return [
         misconception

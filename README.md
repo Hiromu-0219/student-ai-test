@@ -159,6 +159,22 @@ Colabで軽く試す場合は、より小さいモデルを使うか、まず `u
 - `src/teacher/`: 教師AI。teacher_belief、授業計画、個別支援、教師発話を扱う
 - `src/experiment/`: Notebookから呼び出す実験実行・結果保存の入口
 
+生徒AI単体の評価は次のように呼び出せます。
+
+```python
+from src.experiment import run_student_ai_evaluation, export_student_ai_evaluation
+
+result = run_student_ai_evaluation(
+    student_id="S001",
+    test_id="linear_equation_20q_001",
+    understanding_levels=list(range(0, 101, 10)),
+    use_mock_model=True,
+)
+
+export_student_ai_evaluation(result)
+print(result["summary"])
+```
+
 メイン実験は次のように呼び出せます。
 
 ```python
@@ -190,6 +206,9 @@ python -m pytest
 - ファインチューニング: なし
 - 主な検証:
   - 理解度と正答率の関係
+  - スキル別の弱点が正答率に反映されるか
+  - 誤概念の有無で正答確率が変わるか
+  - 個人特徴によって発話スタイルが変わるか
   - 個人特徴が発話に反映されるか
   - 伝達AIが複数生徒の反応を要約できるか
   - 教師AIが要約に基づいて授業構成・個別支援を変えられるか

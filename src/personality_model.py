@@ -135,7 +135,7 @@ def _prompt_instructions(profile: dict[str, str]) -> list[str]:
         instructions.append("間違えてももう一度考えようとする。")
 
     if profile["verbosity"] == "short":
-        instructions.append("返答は短めにする。")
+        instructions.append("返答を短めにする。")
     elif profile["verbosity"] == "talkative":
         instructions.append("考えたことをやや多めに話す。")
 
@@ -152,7 +152,7 @@ def _prompt_instructions(profile: dict[str, str]) -> list[str]:
     if profile["teacher_alignment"] == "cooperative":
         instructions.append("教師の説明を素直に受け止める。")
     elif profile["teacher_alignment"] == "reserved":
-        instructions.append("教師への反応は少しそっけなくする。")
+        instructions.append("教師への反応を少しそっけなくする。")
 
     if profile["strategy_flexibility"] == "accepts_new_methods":
         instructions.append("別の解き方や説明を受け入れやすくする。")

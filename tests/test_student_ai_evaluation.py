@@ -1,0 +1,35 @@
+import shutil
+from pathlib import Path
+
+from src.experiment import export_student_ai_evaluation, run_student_ai_evaluation
+
+
+def test_student_ai_evaluation_runs_core_student_experiments(tmp_path):
+    students_dir = tmp_path / "students"
+    tests_dir = tmp_path / "tests"
+    shutil.copytree(Path("data/students"), students_dir)
+    shutil.copytree(Path("data/tests"), tests_dir)
+
+    result = run_student_ai_evaluation(
+        student_id="S001",
+        test_id="linear_equation_20q_001",
+        understanding_levels=[0, 50, 100],
+        students_dir=students_dir,
+        tests_dir=tests_dir,
+        logs_dir=tmp_path / "logs",
+        use_mock_model=True,
+    )
+
+    assert result["question_count"] == 20
+    assert [row["understanding"] for row in result["learning_curve"]] == [0, 50, 100]
+    assert result["learning_curve"][0]["average_correct_probability"] < result["learning_curve"][-1]["average_correct_probability"]
+    assert result["misconception_comparison"]["rows"]
+    assert result["skill_breakdown"]
+    assert len(result["utterance_samples"]) == 3
+
+    output_path = export_student_ai_evaluation(
+        result,
+        output_path=tmp_path / "student_ai_eval.txt",
+    )
+    assert output_path.exists()
+    assert "Student AI Evaluation Summary" in output_path.read_text(encoding="utf-8")

@@ -17,5 +17,20 @@
 `personality_experiment.ipynb` で個人特徴の推定可能性を見ます。
 最後に `teaching_strategy_experiment.ipynb` で複数生徒クラスに対する授業方略生成を確認します。
 
+生徒AI単体の実験を厚く見る場合は、`student_ai_colab.ipynb` で次の関数を使います。
+
+```python
+from src.experiment import run_student_ai_evaluation, export_student_ai_evaluation
+
+result = run_student_ai_evaluation(
+    student_id="S001",
+    test_id="linear_equation_20q_001",
+    understanding_levels=list(range(0, 101, 10)),
+    use_mock_model=True,
+)
+
+export_student_ai_evaluation(result)
+```
+
 ColabでNotebook自体を更新した場合、Git更新セルだけでは開いているNotebook画面のセル内容は変わらないことがあります。
 その場合はGitHub上の最新版Notebookを開き直してください。
