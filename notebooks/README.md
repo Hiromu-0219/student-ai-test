@@ -20,7 +20,11 @@
 生徒AI単体の実験を厚く見る場合は、`student_ai_colab.ipynb` で次の関数を使います。
 
 ```python
-from src.experiment import run_student_ai_evaluation, export_student_ai_evaluation
+from src.experiment import (
+    export_student_ai_evaluation,
+    export_student_ai_evaluation_for_codex,
+    run_student_ai_evaluation,
+)
 
 result = run_student_ai_evaluation(
     student_id="S001",
@@ -30,7 +34,10 @@ result = run_student_ai_evaluation(
 )
 
 export_student_ai_evaluation(result)
+export_student_ai_evaluation_for_codex(result)
 ```
+
+このチャットに共有する場合は、`data/assessments/student_ai_evaluation_for_codex.txt` を添付してください。
 
 ColabでNotebook自体を更新した場合、Git更新セルだけでは開いているNotebook画面のセル内容は変わらないことがあります。
 その場合はGitHub上の最新版Notebookを開き直してください。

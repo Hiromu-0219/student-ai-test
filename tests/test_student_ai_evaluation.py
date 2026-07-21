@@ -1,7 +1,11 @@
 import shutil
 from pathlib import Path
 
-from src.experiment import export_student_ai_evaluation, run_student_ai_evaluation
+from src.experiment import (
+    export_student_ai_evaluation,
+    export_student_ai_evaluation_for_codex,
+    run_student_ai_evaluation,
+)
 
 
 def test_student_ai_evaluation_runs_core_student_experiments(tmp_path):
@@ -33,3 +37,12 @@ def test_student_ai_evaluation_runs_core_student_experiments(tmp_path):
     )
     assert output_path.exists()
     assert "Student AI Evaluation Summary" in output_path.read_text(encoding="utf-8")
+
+    codex_path = export_student_ai_evaluation_for_codex(
+        result,
+        output_path=tmp_path / "student_ai_eval_for_codex.txt",
+    )
+    codex_text = codex_path.read_text(encoding="utf-8")
+    assert "Student AI Evaluation For Codex" in codex_text
+    assert "Learning Curve" in codex_text
+    assert "Utterance Samples" in codex_text

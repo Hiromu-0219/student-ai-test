@@ -162,7 +162,11 @@ Colabで軽く試す場合は、より小さいモデルを使うか、まず `u
 生徒AI単体の評価は次のように呼び出せます。
 
 ```python
-from src.experiment import run_student_ai_evaluation, export_student_ai_evaluation
+from src.experiment import (
+    export_student_ai_evaluation,
+    export_student_ai_evaluation_for_codex,
+    run_student_ai_evaluation,
+)
 
 result = run_student_ai_evaluation(
     student_id="S001",
@@ -172,8 +176,11 @@ result = run_student_ai_evaluation(
 )
 
 export_student_ai_evaluation(result)
+export_student_ai_evaluation_for_codex(result)
 print(result["summary"])
 ```
+
+このチャットに結果を渡す場合は、`data/assessments/student_ai_evaluation_for_codex.txt` を添付してください。
 
 メイン実験は次のように呼び出せます。
 

@@ -56,13 +56,22 @@ def main() -> None:
 - スキル別の弱点比較
 - 個人特徴を変えた発話サンプル
 
-結果は `data/assessments/student_ai_evaluation_summary.txt` に保存されます。
+結果は次の2つに保存されます。
+
+- `data/assessments/student_ai_evaluation_summary.txt`
+- `data/assessments/student_ai_evaluation_for_codex.txt`
+
+このチャットに渡すときは、`student_ai_evaluation_for_codex.txt` を添付してください。
 """
             ),
             code_cell(
                 """from pprint import pprint
 
-from src.experiment import export_student_ai_evaluation, run_student_ai_evaluation
+from src.experiment import (
+    export_student_ai_evaluation,
+    export_student_ai_evaluation_for_codex,
+    run_student_ai_evaluation,
+)
 
 student_ai_evaluation = run_student_ai_evaluation(
     student_id=STUDENT_ID,
@@ -72,8 +81,10 @@ student_ai_evaluation = run_student_ai_evaluation(
 )
 
 summary_path = export_student_ai_evaluation(student_ai_evaluation)
+codex_path = export_student_ai_evaluation_for_codex(student_ai_evaluation)
 
 print("summary_path:", summary_path)
+print("codex_share_path:", codex_path)
 print("\\nsummary:")
 pprint(student_ai_evaluation["summary"])
 

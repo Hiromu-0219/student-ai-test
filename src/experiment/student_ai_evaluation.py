@@ -26,11 +26,7 @@ def run_student_ai_evaluation(
     logs_dir: str | Path = "data/logs",
     use_mock_model: bool = True,
 ) -> dict[str, Any]:
-    """Run a richer student-AI-only evaluation.
-
-    This does not update saved student state. It evaluates the cognitive control
-    model and speech-style control from copied student states.
-    """
+    """Run student-AI-only evaluation without updating saved student state."""
 
     state_manager = StateManager(students_dir)
     base_state = state_manager.load_student(student_id)
@@ -117,6 +113,100 @@ def export_student_ai_evaluation(
         ]
     )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return path
+
+
+def export_student_ai_evaluation_for_codex(
+    result: dict[str, Any],
+    *,
+    output_path: str | Path = "data/assessments/student_ai_evaluation_for_codex.txt",
+) -> Path:
+    """Export a compact txt file that can be attached to this chat."""
+
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        "# Student AI Evaluation For Codex",
+        "",
+        "このファイルをCodex/ChatGPTに渡すときは、このtxtをそのまま添付してください。",
+        "",
+        "## Basic Info",
+        f"student_id: {result.get('student_id')}",
+        f"test_id: {result.get('test_id')}",
+        f"question_count: {result.get('question_count')}",
+        "",
+        "## Summary",
+        json.dumps(result.get("summary", {}), ensure_ascii=False, indent=2),
+        "",
+        "## Learning Curve",
+        "understanding\tcorrect_count\ttotal_count\taccuracy\taverage_correct_probability",
+    ]
+    for row in result.get("learning_curve", []):
+        lines.append(
+            "\t".join(
+                [
+                    str(row.get("understanding")),
+                    str(row.get("correct_count")),
+                    str(row.get("total_count")),
+                    str(row.get("accuracy")),
+                    str(row.get("average_correct_probability")),
+                ]
+            )
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Misconception Comparison",
+            "understanding\taccuracy_with\taccuracy_without\tprobability_with\tprobability_without",
+        ]
+    )
+    for row in result.get("misconception_comparison", {}).get("rows", []):
+        lines.append(
+            "\t".join(
+                [
+                    str(row.get("understanding")),
+                    str(row.get("accuracy_with_misconception")),
+                    str(row.get("accuracy_without_misconception")),
+                    str(row.get("probability_with_misconception")),
+                    str(row.get("probability_without_misconception")),
+                ]
+            )
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Skill Breakdown",
+            "weak_skill\tquestion_count\tcorrect_count\taccuracy\taverage_correct_probability",
+        ]
+    )
+    for row in result.get("skill_breakdown", []):
+        lines.append(
+            "\t".join(
+                [
+                    str(row.get("weak_skill")),
+                    str(row.get("question_count")),
+                    str(row.get("correct_count")),
+                    str(row.get("accuracy")),
+                    str(row.get("average_correct_probability")),
+                ]
+            )
+        )
+
+    lines.extend(["", "## Utterance Samples"])
+    for sample in result.get("utterance_samples", []):
+        lines.extend(
+            [
+                f"profile_id: {sample.get('profile_id')}",
+                f"utterance: {sample.get('utterance')}",
+                "personality_profile:",
+                json.dumps(sample.get("personality_profile", {}), ensure_ascii=False, indent=2),
+                "",
+            ]
+        )
+
+    path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     return path
 
 
