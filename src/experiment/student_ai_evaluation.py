@@ -138,6 +138,9 @@ def export_student_ai_evaluation_for_codex(
         "## Summary",
         json.dumps(result.get("summary", {}), ensure_ascii=False, indent=2),
         "",
+        "## Auto Interpretation",
+        *_auto_interpretation_lines(result),
+        "",
         "## Learning Curve",
         "understanding\tcorrect_count\ttotal_count\taccuracy\taverage_correct_probability",
     ]
@@ -208,6 +211,32 @@ def export_student_ai_evaluation_for_codex(
 
     path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     return path
+
+
+def _auto_interpretation_lines(result: dict[str, Any]) -> list[str]:
+    summary = result.get("summary", {})
+    learning_curve = result.get("learning_curve", [])
+    misconception_rows = result.get("misconception_comparison", {}).get("rows", [])
+    lines = []
+    gain = summary.get("accuracy_gain_from_min_to_max")
+    probability_gain = summary.get("probability_gain_from_min_to_max")
+    lines.append(f"- 理解度の上昇により正答率は {gain}、平均正答確率は {probability_gain} ポイント上昇しています。")
+    if learning_curve:
+        first = learning_curve[0]
+        last = learning_curve[-1]
+        lines.append(
+            f"- 学習曲線は {first.get('understanding')} 点で accuracy={first.get('accuracy')}、"
+            f"{last.get('understanding')} 点で accuracy={last.get('accuracy')} です。"
+        )
+    if misconception_rows:
+        diffs = [
+            round(row.get("probability_without_misconception", 0) - row.get("probability_with_misconception", 0), 1)
+            for row in misconception_rows
+        ]
+        lines.append(f"- 誤概念なしとの差は平均 {round(mean(diffs), 1)} ポイントです。")
+    lines.append(f"- スキル別弱点条件で最も低い条件は {summary.get('weakest_skill_condition')} です。")
+    lines.append("- 発話サンプルでは、教師発話を含まず、生徒1ターン分に収まっているかを確認してください。")
+    return lines
 
 
 def _evaluate_at_understanding(

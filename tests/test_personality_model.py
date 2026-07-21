@@ -54,6 +54,7 @@ def test_student_prompt_contains_personality_instructions():
     assert "発話スタイル:" in prompt
     assert "自信なさげに、断定を避けて答える。" in prompt
     assert "わからない点があれば具体的に質問する。" in prompt
+    assert "教師や先生の発話を書かない" in prompt
 
 
 def test_mock_llm_reflects_personality_style():

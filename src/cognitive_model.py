@@ -163,8 +163,8 @@ def _misconception_penalty(strength: str, skill_score: int, overall_score: int) 
         return 0
     effective_score = max(skill_score, overall_score)
     multiplier = {
-        "weak": 0.10,
-        "medium": 0.18,
-        "strong": 0.30,
+        "weak": 0.12,
+        "medium": 0.25,
+        "strong": 0.40,
     }[strength]
     return max(0, round((100 - effective_score) * multiplier))

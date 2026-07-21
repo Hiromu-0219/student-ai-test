@@ -44,5 +44,6 @@ def test_student_ai_evaluation_runs_core_student_experiments(tmp_path):
     )
     codex_text = codex_path.read_text(encoding="utf-8")
     assert "Student AI Evaluation For Codex" in codex_text
+    assert "Auto Interpretation" in codex_text
     assert "Learning Curve" in codex_text
     assert "Utterance Samples" in codex_text

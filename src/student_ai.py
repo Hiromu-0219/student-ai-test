@@ -153,7 +153,7 @@ def _extract_problem(prompt: str) -> str:
         return prompt.split(marker, 1)[1].split("生徒AIとして", 1)[0].strip()
     marker = "問題:"
     if marker in prompt:
-        return prompt.split(marker, 1)[1].split("生徒AIとして", 1)[0].strip()
+        return prompt.split(marker, 1)[1].split("解答だけ", 1)[0].strip()
     return prompt
 
 
