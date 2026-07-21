@@ -6,11 +6,7 @@ from typing import Any
 
 
 class RuleBasedTeacherUtteranceBuilder:
-    """Turns an intervention plan into concrete teacher utterances.
-
-    This is deliberately rule-based for now. The plan decides what to do; this
-    class only renders it into classroom-ready wording.
-    """
+    """Turn an intervention plan into concrete teacher utterances."""
 
     def build(self, intervention_plan: dict[str, Any]) -> dict[str, Any]:
         whole_class_plan = intervention_plan.get("whole_class_plan", {})
@@ -87,7 +83,7 @@ The teacher must not mention hidden student parameters directly.
 
 
 class LLMTeacherUtteranceBuilder:
-    """Renders teacher utterances with an LLM and rule-based fallback."""
+    """Render teacher utterances with an LLM and rule-based fallback."""
 
     def __init__(
         self,

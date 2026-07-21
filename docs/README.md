@@ -1,14 +1,20 @@
 # docs
 
-教育シミュレーション・生徒AIプロジェクトの進捗メモです。
+教育シミュレーション・生徒AIプロジェクトの研究メモ置き場です。
 
-日付ごとに作業内容を分け、先輩共有用の要約は `share_summary.md` にまとめます。
+## 主要ファイル
 
-## ファイル一覧
+- `share_summary.md`: 先輩共有用の進捗・方向性・Todo
+- `research_paper_plan.md`: 論文用の研究計画、問い、実験設計
+- `research_outcomes.md`: 出せそうな研究成果の整理
+- `paper_experiment_core.md`: 論文に使うコア実験の概要
 
-- `share_summary.md`: 先輩共有用の簡潔な進捗・方向性・Todo
-- `research_paper_plan.md`: 論文用の研究成果、研究問い、実験設計、Todo整理
-- `research_outcomes.md`: 出せそうな研究成果の一覧と主張の強さ
-- `2026-07-13.md`: 生徒AI MVP、状態管理、テスト、Colab導線
+## 日付別メモ
+
+- `2026-07-13.md`: 生徒AI MVP、状態管理、Colab導入
 - `2026-07-14.md`: 教師発話、次ターン接続、観察ログ
 - `2026-07-16.md`: 複数生徒、伝達AI、teacher_belief、講義全体設計
+- `2026-07-16-class-management.md`: クラス管理と生徒集団データ
+- `2026-07-17.md`: 論文用コア実験の整理
+- `2026-07-20.md`: 授業方略実験の進捗
+- `2026-07-21.md`: Notebook構造整理と内部構造整理

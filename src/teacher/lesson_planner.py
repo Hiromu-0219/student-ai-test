@@ -5,10 +5,10 @@ from typing import Any
 
 
 class RuleBasedLessonPlanner:
-    """Plans the whole lesson from class-level teacher beliefs.
+    """Plan a whole lesson from class-level teacher beliefs.
 
-    This sits above intervention planning. It decides the lesson goal and phase
-    structure before individual teacher moves are rendered.
+    This class decides the lesson goal and phase structure. It does not generate
+    final teacher utterances; that is handled by utterance builders.
     """
 
     def build_class_profile(
@@ -95,6 +95,7 @@ class RuleBasedLessonPlanner:
             return _goal_for_skill(curriculum, "can_divide_by_coefficient")
         if any(token in misconception_text for token in ["移項", "符号"]):
             return _goal_for_skill(curriculum, "can_transpose_terms")
+
         student_count = max(1, int(class_profile.get("student_count", 1)))
         low_count = len(class_profile.get("low_score_students", []))
         if low_count / student_count >= 0.5:
@@ -174,7 +175,7 @@ class RuleBasedLessonPlanner:
             elif _trait_level(traits, "question_tendency") == "low":
                 policy = "教師側から小さな確認質問を入れる"
             elif score < 45:
-                policy = "同じ型の小問題を使い、操作を1つずつ確認する"
+                policy = "同じ型の小問を使い、操作を1つずつ確認する"
             elif score >= 65:
                 policy = "発展問題や説明役を任せ、理解を言語化させる"
             else:

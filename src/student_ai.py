@@ -20,14 +20,17 @@ from src.state_manager import StateManager
 
 
 class RuleBasedMockLLM:
+    """Small deterministic text generator used by tests and quick Colab checks."""
+
     model_id = "rule-based-mock"
 
     def generate(self, system_prompt: str, user_prompt: str) -> str:
         target_answer = _extract_target_answer(user_prompt)
         if target_answer:
-            if "学力テスト" in system_prompt:
+            if "学力テスト" in system_prompt or "assessment" in system_prompt.lower():
                 return f"答え: {target_answer}"
             return f"考えてみると、{target_answer} だと思います。答え: {target_answer}"
+
         problem = _extract_problem(user_prompt)
         answer = _solve_simple_linear_equation(problem)
         if answer is None:
@@ -93,6 +96,7 @@ class StudentAISimulator:
                 student_answer=answer,
             )
             learning_event["update_enabled"] = True
+
         record = self.logger.log_interaction(
             student_id=student_id,
             problem=teacher_message,
@@ -167,7 +171,7 @@ def _extract_target_answer(prompt: str) -> str | None:
 
 
 def _style_mock_answer(prompt: str, answer: str) -> str:
-    if "返答は短めにする" in prompt:
+    if "返答を短めにする" in prompt:
         base = f"x = {answer}。"
     elif "途中式や手順を丁寧に出す" in prompt:
         base = f"まず定数を移して、それから係数で割ります。x = {answer} です。"
@@ -186,8 +190,8 @@ def _style_mock_answer(prompt: str, answer: str) -> str:
     if "わからない点があれば具体的に質問する" in prompt:
         base += " 移項の符号はこの考え方で合っていますか。"
     if "間違えてももう一度考えようとする" in prompt:
-        base += " 間違っていたらもう一度考えます。"
-    if "教師への反応は少しそっけなくする" in prompt:
+        base += " 間違っていたら、もう一度考えます。"
+    if "教師への反応を少しそっけなくする" in prompt:
         base = base.replace("これは分かります。", "")
 
     return f"{base} 答え: x = {answer}"

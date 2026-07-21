@@ -17,10 +17,10 @@ TRAIT_KEYS = [
 
 
 class TeacherBeliefManager:
-    """Stores a teacher's estimated view of each student.
+    """Store a teacher's estimated view of each student.
 
-    This is separate from true student state. It should be updated only from
-    observable lesson events and communication AI outputs.
+    This is separate from the true student state. It should be updated only
+    from observable lesson events and communication AI outputs.
     """
 
     def __init__(self, base_dir: str | Path = "data/teacher_beliefs") -> None:
@@ -181,6 +181,9 @@ def _update_misconceptions(
     observable_event: dict[str, Any],
     communication_result: dict[str, Any],
 ) -> None:
+    if observable_event.get("is_correct") is not False:
+        return
+
     text = " ".join(
         str(part)
         for part in [
@@ -189,8 +192,6 @@ def _update_misconceptions(
             " ".join(communication_result.get("evidence", [])),
         ]
     )
-    if observable_event.get("is_correct") is not False:
-        return
     candidate = None
     if any(token in text for token in ["符号", "移項", "反対側"]):
         candidate = "移項時の符号変化に誤概念がある可能性"

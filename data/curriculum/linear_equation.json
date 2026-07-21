@@ -66,7 +66,7 @@
     },
     {
       "strategy_id": "worked_example",
-      "description": "理解度が低いとき、同じ型の例題を1問だけ手順付きで示す"
+      "description": "理解度が低いとき、同じ型の例題を1問だけ手順つきで示す"
     },
     {
       "strategy_id": "misconception_confrontation",

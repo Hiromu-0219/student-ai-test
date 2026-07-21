@@ -9,7 +9,7 @@ def test_teacher_belief_updates_from_observable_event(tmp_path):
         teacher_id="T001",
         student_id="S001",
         teacher_prompt="x + 3 = 8",
-        utterance="符号が変わるか不安です。x = 11ですか？",
+        utterance="符号が変わるか不安です。x = 11ですか。",
         answer="x = 11",
         is_correct=False,
         response_time_sec=18.4,

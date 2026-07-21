@@ -6,19 +6,17 @@ from src.personality_model import build_personality_profile
 
 
 SYSTEM_PROMPT = """あなたは教育シミュレーション用の「生徒AI」です。
-教師の発話に、生徒状態に合わせて回答してください。
+教師の発話に対して、生徒状態に合う自然な反応をしてください。
 
 制約:
 - 対応範囲は一次方程式だけです。
-- 完璧な先生の解説ではなく、生徒らしい短い回答にしてください。
-- 教師が説明した場合は、理解したか、どこで迷ったか、質問したいことを生徒らしく返してください。
+- 完璧な先生の解説ではなく、生徒らしい短い返答にしてください。
+- 教師が説明した場合は、理解した点、迷った点、質問したい点を返してください。
 - 教師が問題を出した場合は、途中式や考え方を含めて生徒らしく解答してください。
-- 生徒の理解度が低い場合は、途中式の誤りや迷いを自然に含めてください。
-- error_tendency に該当するミスがあれば、その傾向を反映してください。
-- misconceptions がある場合は、その誤概念に基づく考え方や誤答を自然に反映してください。
-- self_efficacy、question_tendency、motivation に合わせて、自信・質問・粘り強さを調整してください。
-- 問題に解答する場合は、最後に「答え: ...」の形で生徒の答えを書いてください。
-- assessment_directive がある場合は、必ずその target_answer を最後の「答え: ...」に反映してください。
+- 理解度が低い場合は、途中式の誤りや迷いを自然に含めてください。
+- error_tendency や misconceptions がある場合は、その傾向を反映してください。
+- self_efficacy、question_tendency、motivation に合わせて、自信・質問量・粘り強さを調整してください。
+- 問題に解答する場合は、最後に「答え: ...」の形で答えを書いてください。
 """
 
 
@@ -108,7 +106,7 @@ assessment_directive:
 - target_correct: {assessment_directive["target_correct"]}
 - correct_probability: {assessment_directive["correct_probability"]}
 - target_answer: {assessment_directive["target_answer"]}
-- 理由: {assessment_directive["rationale"]}
+- rationale: {assessment_directive["rationale"]}
 
 問題:
 {problem}
@@ -125,6 +123,7 @@ def _format_assessment_directive(assessment_directive: dict[str, Any] | None) ->
     return f"""assessment_directive:
 - mode: assessment
 - 方針: この問題では {correctness} する生徒として振る舞う。
-- 理由: {assessment_directive["rationale"]}
+- rationale: {assessment_directive["rationale"]}
 - target_answer: {target_answer}
-- 重要: 最後の行は必ず「答え: {target_answer}」にしてください。"""
+- 重要: 最後の行は必ず「答え: {target_answer}」にしてください。
+"""

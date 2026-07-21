@@ -4,7 +4,7 @@ from typing import Any
 
 
 class RuleBasedInterventionPlanner:
-    """Plans whole-class and individual teacher actions without using an LLM."""
+    """Plan whole-class and individual teacher actions without using an LLM."""
 
     def plan(
         self,
@@ -112,7 +112,7 @@ class RuleBasedInterventionPlanner:
             return {
                 "student_id": student_id,
                 "support_type": "micro_practice",
-                "teacher_move": "同じ型の小問題を1問出し、途中式を1行書かせる",
+                "teacher_move": "同じ型の小問を1問出し、途中式を1行書かせる",
                 "target_skill": target_skill,
                 "reason": f"推定理解度={score}、直近正誤={is_correct} のため",
             }

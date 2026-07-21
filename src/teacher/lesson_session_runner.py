@@ -15,11 +15,11 @@ from src.teacher.lesson_planner import RuleBasedLessonPlanner
 
 
 class LessonSessionRunner:
-    """Runs a planned lesson structure across multiple students.
+    """Run a planned lesson structure across multiple students.
 
-    The runner is intentionally thin: it does not decide the lesson plan. It
-    executes each phase, records observable events, asks CommunicationAI to
-    summarize the class, and updates teacher_belief from observable evidence.
+    The runner executes each phase, records observable events, asks
+    CommunicationAI to summarize the class, and updates teacher_belief from
+    observable evidence. It does not decide the lesson plan itself.
     """
 
     def __init__(
@@ -211,13 +211,13 @@ class LessonSessionRunner:
         if phase_name == "導入":
             return f"今日の目標は「{goal_text}」です。まず前回の考え方を短く確認しましょう。"
         if phase_name == "全体説明":
-            return f"全体説明です。{goal_text} ために、式の左右で同じ操作をすることを確認します。"
+            return f"全体説明です。{goal_text}ために、式の左右で同じ操作をすることを確認します。"
         if phase_name == "例題":
             return f"例題です。{problem} を1手ずつ考えて、答えを書いてください。"
         if phase_name == "個別演習":
             return f"個別演習です。{problem} を自分で解いて、途中で迷ったらその点も書いてください。"
         if phase_name == "確認":
-            return f"確認問題です。{problem} を解いて、答えだけでなく確認した点も短く書いてください。"
+            return f"確認問題です。{problem} を解いて、答えだけでなく確認した式も短く書いてください。"
         return f"{phase_name}です。{goal_text} について考えてください。"
 
     def _session_summary(
