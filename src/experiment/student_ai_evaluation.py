@@ -62,6 +62,12 @@ def run_student_ai_evaluation(
         simulator=simulator,
         base_state=base_state,
     )
+    validity = _human_replacement_validity(
+        learning_curve=learning_curve,
+        misconception_comparison=misconception_comparison,
+        skill_breakdown=skill_breakdown,
+        utterance_samples=utterance_samples,
+    )
 
     return {
         "student_id": student_id,
@@ -71,10 +77,12 @@ def run_student_ai_evaluation(
         "misconception_comparison": misconception_comparison,
         "skill_breakdown": skill_breakdown,
         "utterance_samples": utterance_samples,
+        "human_replacement_validity": validity,
         "summary": _evaluation_summary(
             learning_curve=learning_curve,
             misconception_comparison=misconception_comparison,
             skill_breakdown=skill_breakdown,
+            validity=validity,
         ),
     }
 
@@ -91,6 +99,9 @@ def export_student_ai_evaluation(
         "",
         "## Summary",
         json.dumps(result["summary"], ensure_ascii=False, indent=2),
+        "",
+        "## Human Replacement Validity",
+        json.dumps(result.get("human_replacement_validity", {}), ensure_ascii=False, indent=2),
         "",
         "## Learning Curve",
     ]
@@ -138,6 +149,9 @@ def export_student_ai_evaluation_for_codex(
         "## Summary",
         json.dumps(result.get("summary", {}), ensure_ascii=False, indent=2),
         "",
+        "## Human Replacement Validity",
+        *_validity_lines(result.get("human_replacement_validity", {})),
+        "",
         "## Auto Interpretation",
         *_auto_interpretation_lines(result),
         "",
@@ -161,7 +175,7 @@ def export_student_ai_evaluation_for_codex(
         [
             "",
             "## Misconception Comparison",
-            "understanding\taccuracy_with\taccuracy_without\tprobability_with\tprobability_without",
+            "understanding\taccuracy_with\taccuracy_without\tprobability_with\tprobability_without\tprobability_gap",
         ]
     )
     for row in result.get("misconception_comparison", {}).get("rows", []):
@@ -173,6 +187,7 @@ def export_student_ai_evaluation_for_codex(
                     str(row.get("accuracy_without_misconception")),
                     str(row.get("probability_with_misconception")),
                     str(row.get("probability_without_misconception")),
+                    str(row.get("probability_gap")),
                 ]
             )
         )
@@ -203,6 +218,8 @@ def export_student_ai_evaluation_for_codex(
             [
                 f"profile_id: {sample.get('profile_id')}",
                 f"utterance: {sample.get('utterance')}",
+                "utterance_features:",
+                json.dumps(sample.get("utterance_features", {}), ensure_ascii=False, indent=2),
                 "personality_profile:",
                 json.dumps(sample.get("personality_profile", {}), ensure_ascii=False, indent=2),
                 "",
@@ -211,6 +228,20 @@ def export_student_ai_evaluation_for_codex(
 
     path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     return path
+
+
+def _validity_lines(validity: dict[str, Any]) -> list[str]:
+    if not validity:
+        return ["- human replacement validity result is not available."]
+    lines = [
+        f"- overall_score: {validity.get('overall_score')} / 1.0",
+        f"- verdict: {validity.get('verdict')}",
+    ]
+    for item in validity.get("criteria", []):
+        lines.append(
+            f"- {item['criterion']}: score={item['score']}, passed={item['passed']}, reason={item['reason']}"
+        )
+    return lines
 
 
 def _auto_interpretation_lines(result: dict[str, Any]) -> list[str]:
@@ -277,7 +308,7 @@ def _evaluate_misconception_effect(
         without_misconception = _state_with_uniform_score(base_state, score)
         with_misconception["misconceptions"] = [
             "移項しても符号はそのままだと思っている",
-            "3x = 15 で 3 を引けばよいと考える",
+            "3x = 15 では3を引けばよいと考える",
         ]
         without_misconception["misconceptions"] = []
         with_row = _evaluate_at_understanding(
@@ -299,6 +330,10 @@ def _evaluate_misconception_effect(
                 "accuracy_without_misconception": without_row["accuracy"],
                 "probability_with_misconception": with_row["average_correct_probability"],
                 "probability_without_misconception": without_row["average_correct_probability"],
+                "probability_gap": round(
+                    without_row["average_correct_probability"] - with_row["average_correct_probability"],
+                    1,
+                ),
             }
         )
     return {"rows": rows}
@@ -370,15 +405,143 @@ def _generate_personality_utterance_samples(
     for profile_id, overrides in profiles.items():
         state = _merge_profile(base_state, overrides)
         prompt_profile = build_personality_profile(state)
-        answer = simulator.agent.answer(state, "2x + 3 = 11 を解いてください")
+        answer = simulator.agent.answer(state, "2x + 3 = 11 を解いてください。")
         samples.append(
             {
                 "profile_id": profile_id,
                 "personality_profile": prompt_profile,
                 "utterance": answer,
+                "utterance_features": _extract_utterance_features(answer),
             }
         )
     return samples
+
+
+def _human_replacement_validity(
+    *,
+    learning_curve: list[dict[str, Any]],
+    misconception_comparison: dict[str, Any],
+    skill_breakdown: list[dict[str, Any]],
+    utterance_samples: list[dict[str, Any]],
+) -> dict[str, Any]:
+    criteria = [
+        _criterion_learning_curve(learning_curve),
+        _criterion_misconception_effect(misconception_comparison),
+        _criterion_skill_specificity(skill_breakdown),
+        _criterion_personality_separation(utterance_samples),
+        _criterion_one_turn_student_utterance(utterance_samples),
+    ]
+    overall_score = round(mean(item["score"] for item in criteria), 3)
+    if overall_score >= 0.8:
+        verdict = "limited_human_proxy_ready"
+    elif overall_score >= 0.6:
+        verdict = "usable_for_pilot_with_cautions"
+    else:
+        verdict = "needs_redesign_before_human_proxy_claim"
+    return {
+        "overall_score": overall_score,
+        "verdict": verdict,
+        "criteria": criteria,
+        "claim_scope": (
+            "この結果が支持するのは、人間全体の完全な代替ではなく、"
+            "一次方程式学習における理解度・誤概念・個人特徴を制御した限定的な学習者代理である。"
+        ),
+    }
+
+
+def _criterion_learning_curve(learning_curve: list[dict[str, Any]]) -> dict[str, Any]:
+    probabilities = [row["average_correct_probability"] for row in learning_curve]
+    monotonic_pairs = sum(
+        1 for before, after in zip(probabilities, probabilities[1:]) if after >= before
+    )
+    monotonic_rate = monotonic_pairs / max(1, len(probabilities) - 1)
+    gain = probabilities[-1] - probabilities[0]
+    score = 0.5 * monotonic_rate + 0.5 * min(1.0, max(0.0, gain / 70))
+    return {
+        "criterion": "cognitive_learning_curve",
+        "score": round(score, 3),
+        "passed": score >= 0.7,
+        "reason": f"理解度上昇に対する平均正答確率の上昇量={round(gain, 1)}、単調性={round(monotonic_rate, 3)}。",
+    }
+
+
+def _criterion_misconception_effect(misconception_comparison: dict[str, Any]) -> dict[str, Any]:
+    rows = misconception_comparison.get("rows", [])
+    gaps = [row.get("probability_gap", 0) for row in rows]
+    low_mid_gaps = gaps[:2]
+    high_gap = gaps[-1] if gaps else 0
+    average_low_mid_gap = mean(low_mid_gaps) if low_mid_gaps else 0
+    fades_with_understanding = bool(gaps) and high_gap <= max(gaps)
+    score = min(1.0, average_low_mid_gap / 12)
+    if fades_with_understanding:
+        score = min(1.0, score + 0.2)
+    return {
+        "criterion": "misconception_sensitivity",
+        "score": round(score, 3),
+        "passed": score >= 0.7,
+        "reason": f"低中理解度での誤概念ギャップ平均={round(average_low_mid_gap, 1)}、高理解度ギャップ={round(high_gap, 1)}。",
+    }
+
+
+def _criterion_skill_specificity(skill_breakdown: list[dict[str, Any]]) -> dict[str, Any]:
+    probabilities = [row["average_correct_probability"] for row in skill_breakdown if row["average_correct_probability"] is not None]
+    spread = max(probabilities) - min(probabilities) if probabilities else 0
+    score = min(1.0, spread / 20)
+    weakest = min(skill_breakdown, key=lambda row: row["average_correct_probability"] or 100)
+    return {
+        "criterion": "skill_specific_weakness",
+        "score": round(score, 3),
+        "passed": score >= 0.5,
+        "reason": f"スキル条件間の平均正答確率の幅={round(spread, 1)}。最弱条件={weakest['weak_skill']}。",
+    }
+
+
+def _criterion_personality_separation(utterance_samples: list[dict[str, Any]]) -> dict[str, Any]:
+    by_profile = {sample["profile_id"]: sample["utterance_features"] for sample in utterance_samples}
+    low_conf = by_profile.get("low_confidence_questioner", {})
+    diligent = by_profile.get("diligent_confident", {})
+    quiet = by_profile.get("quiet_low_motivation", {})
+    checks = [
+        low_conf.get("question_mark_count", 0) >= diligent.get("question_mark_count", 0),
+        low_conf.get("uncertainty_marker_count", 0) > diligent.get("uncertainty_marker_count", 0),
+        diligent.get("line_count", 0) >= quiet.get("line_count", 0),
+        quiet.get("char_count", 0) <= diligent.get("char_count", 0),
+    ]
+    score = sum(checks) / len(checks)
+    return {
+        "criterion": "personality_observable_separation",
+        "score": round(score, 3),
+        "passed": score >= 0.75,
+        "reason": "自信の低さ、質問傾向、丁寧さ、短さが発話特徴として分離しているかを判定。",
+    }
+
+
+def _criterion_one_turn_student_utterance(utterance_samples: list[dict[str, Any]]) -> dict[str, Any]:
+    forbidden_labels = ["教師:", "先生:", "生徒:", "教師：", "先生：", "生徒："]
+    bad_samples = [
+        sample["profile_id"]
+        for sample in utterance_samples
+        if any(label in sample["utterance"] for label in forbidden_labels)
+    ]
+    score = 1.0 if not bad_samples else 0.0
+    return {
+        "criterion": "one_turn_student_response",
+        "score": score,
+        "passed": not bad_samples,
+        "reason": "教師発話や話者ラベルを混入させず、生徒1ターンとして観察可能かを判定。",
+    }
+
+
+def _extract_utterance_features(text: str) -> dict[str, Any]:
+    uncertainty_markers = ["かな", "かも", "不安", "迷", "わから", "自信", "教えて"]
+    return {
+        "char_count": len(text),
+        "line_count": len([line for line in text.splitlines() if line.strip()]),
+        "question_mark_count": text.count("?") + text.count("？"),
+        "uncertainty_marker_count": sum(text.count(marker) for marker in uncertainty_markers),
+        "has_answer_label": "答え:" in text or "答え：" in text,
+        "has_teacher_label": any(label in text for label in ["教師:", "先生:", "教師：", "先生："]),
+    }
 
 
 def _evaluation_summary(
@@ -386,6 +549,7 @@ def _evaluation_summary(
     learning_curve: list[dict[str, Any]],
     misconception_comparison: dict[str, Any],
     skill_breakdown: list[dict[str, Any]],
+    validity: dict[str, Any],
 ) -> dict[str, Any]:
     first = learning_curve[0]
     last = learning_curve[-1]
@@ -401,6 +565,8 @@ def _evaluation_summary(
         ),
         "weakest_skill_condition": weakest_skill["weak_skill"],
         "misconception_rows": len(misconception_comparison["rows"]),
+        "human_replacement_validity_score": validity["overall_score"],
+        "human_replacement_verdict": validity["verdict"],
     }
 
 

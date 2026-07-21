@@ -1,44 +1,41 @@
+import json
+
 from src.student_ai import StudentAISimulator
 
 
 def _write_student(path, *, score=50, misconceptions=None):
-    misconceptions = misconceptions or []
-    path.write_text(
-        f"""
-{{
-  "student_id": "S999",
-  "name": "Test",
-  "understanding": {{"linear_equation": "basic"}},
-  "knowledge_state": {{
-    "linear_equation": {{
-      "level": "medium",
-      "score": {score},
-      "can_solve_ax_plus_b_equals_c": {score},
-      "can_transpose_terms": {score},
-      "can_divide_by_coefficient": {score},
-      "can_handle_negative_numbers": 25,
-      "can_handle_fractions": 10
-    }}
-  }},
-  "error_tendency": [],
-  "misconceptions": {misconceptions!r},
-  "learning_speed": "medium",
-  "personality": {{"confidence": "medium"}},
-  "big_five": {{
-    "openness": "medium",
-    "conscientiousness": "medium",
-    "extraversion": "medium",
-    "agreeableness": "medium",
-    "neuroticism": "medium"
-  }},
-  "self_efficacy": "medium",
-  "question_tendency": "medium",
-  "motivation": "medium",
-  "learning_history": []
-}}
-""".strip().replace("'", '"'),
-        encoding="utf-8",
-    )
+    state = {
+        "student_id": "S999",
+        "name": "Test",
+        "understanding": {"linear_equation": "basic"},
+        "knowledge_state": {
+            "linear_equation": {
+                "level": "medium",
+                "score": score,
+                "can_solve_ax_plus_b_equals_c": score,
+                "can_transpose_terms": score,
+                "can_divide_by_coefficient": score,
+                "can_handle_negative_numbers": 25,
+                "can_handle_fractions": 10,
+            }
+        },
+        "error_tendency": [],
+        "misconceptions": misconceptions or [],
+        "learning_speed": "medium",
+        "personality": {"confidence": "medium"},
+        "big_five": {
+            "openness": "medium",
+            "conscientiousness": "medium",
+            "extraversion": "medium",
+            "agreeableness": "medium",
+            "neuroticism": "medium",
+        },
+        "self_efficacy": "medium",
+        "question_tendency": "medium",
+        "motivation": "medium",
+        "learning_history": [],
+    }
+    path.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def test_simulator_mock_answer_logs_and_updates_history(tmp_path):

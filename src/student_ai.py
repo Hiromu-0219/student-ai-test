@@ -153,7 +153,7 @@ def _extract_problem(prompt: str) -> str:
         return prompt.split(marker, 1)[1].split("生徒AIとして", 1)[0].strip()
     marker = "問題:"
     if marker in prompt:
-        return prompt.split(marker, 1)[1].split("解答だけ", 1)[0].strip()
+        return prompt.split(marker, 1)[1].split("解答だけを", 1)[0].strip()
     return prompt
 
 
@@ -172,9 +172,9 @@ def _extract_target_answer(prompt: str) -> str | None:
 
 def _style_mock_answer(prompt: str, answer: str) -> str:
     if "返答を短めにする" in prompt:
-        base = f"x = {answer}。"
+        base = f"x = {answer} です。"
     elif "途中式や手順を丁寧に出す" in prompt:
-        base = f"まず定数を移して、それから係数で割ります。x = {answer} です。"
+        base = f"まず定数項を移して、そのあと係数で割ります。x = {answer} です。"
     elif "途中式を省略しがちにする" in prompt:
         base = f"たぶん x = {answer} です。"
     else:
@@ -188,7 +188,7 @@ def _style_mock_answer(prompt: str, answer: str) -> str:
     if "不安や確認したい気持ちを少し出す" in prompt:
         base += " 符号が合っているか少し不安です。"
     if "わからない点があれば具体的に質問する" in prompt:
-        base += " 移項の符号はこの考え方で合っていますか。"
+        base += " 移項の符号はこの考え方で合っていますか？"
     if "間違えてももう一度考えようとする" in prompt:
         base += " 間違っていたら、もう一度考えます。"
     if "教師への反応を少しそっけなくする" in prompt:
@@ -203,7 +203,7 @@ def _solve_simple_linear_equation(text: str) -> str | None:
         .replace("\u3000", "")
         .replace("を解いてください。", "")
         .replace("を解いてください", "")
-        .replace("を解いてみましょう。", "")
+        .replace("を解きましょう。", "")
     )
     match = re.search(r"([+-]?\d*)x([+-]\d+)?=([+-]?\d+)", normalized)
     if not match:
@@ -249,8 +249,9 @@ def main() -> None:
             top_p=args.top_p,
             repetition_penalty=args.repetition_penalty,
         ),
+        model_load_config=ModelLoadConfig(load_in_4bit=not args.no_4bit),
     )
-    result = sim.answer(args.student_id, args.problem)
+    result = sim.respond(args.student_id, args.problem)
     print(result["answer"])
 
 

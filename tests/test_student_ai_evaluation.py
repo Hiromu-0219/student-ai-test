@@ -30,6 +30,8 @@ def test_student_ai_evaluation_runs_core_student_experiments(tmp_path):
     assert result["misconception_comparison"]["rows"]
     assert result["skill_breakdown"]
     assert len(result["utterance_samples"]) == 3
+    assert result["human_replacement_validity"]["overall_score"] >= 0
+    assert result["summary"]["human_replacement_verdict"]
 
     output_path = export_student_ai_evaluation(
         result,
@@ -44,6 +46,7 @@ def test_student_ai_evaluation_runs_core_student_experiments(tmp_path):
     )
     codex_text = codex_path.read_text(encoding="utf-8")
     assert "Student AI Evaluation For Codex" in codex_text
+    assert "Human Replacement Validity" in codex_text
     assert "Auto Interpretation" in codex_text
     assert "Learning Curve" in codex_text
     assert "Utterance Samples" in codex_text

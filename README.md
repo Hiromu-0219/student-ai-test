@@ -1,52 +1,41 @@
 # Student AI Education Simulation
 
-一次方程式を学習する生徒AIと、複数生徒クラスを観察して授業方略を考える教育シミュレーションのMVPです。
+一次方程式を学習する生徒AIと、複数生徒クラスを観察して授業方針を考える教育シミュレーションのMVPです。
 
 このプロジェクトでは、LLMを主に「発話生成器」として使います。生徒の理解度、誤概念、個人特徴、学習履歴はLLM内部ではなく、`data/students/*.json` で管理します。
 
-## 研究上のコア
+## 研究のコア
 
-現在の中心テーマは、次の流れが教育シミュレーションとして成立するかを検証することです。
+現在の研究上の中心は、AI生徒を人間の完全な代替として使うことではありません。
 
-```text
-真の生徒状態
-  ↓ 生徒AIの授業中反応
-観察可能な発話・回答・正誤
-  ↓ 伝達AIによる個人特徴推定とクラス要約
-教師AIが持つ生徒理解 teacher_belief
-  ↓
-授業構成・個別支援・教師発話の生成
-```
+主張する範囲は次です。
 
-教師AIや伝達AIは、生徒の内部JSONを直接見る前提にはしません。授業中に観察できる情報から、徐々に生徒理解を更新する設計です。
+> 一次方程式の学習場面において、理解度・誤概念・個人特徴を外部状態として制御した生徒AIが、教師AIの授業設計を検証するための「限定的な学習者代理」として利用可能かを検証する。
 
-## ディレクトリ構造
+見るべきポイント:
+
+- 理解度が上がると正答率が上がるか
+- 誤概念があると関連問題で誤答しやすくなるか
+- 理解度が上がると誤概念の影響が弱まるか
+- 弱点スキルを変えると結果が変わるか
+- 自己効力感、質問傾向、意欲、Big Five が発話に反映されるか
+- 教師AI・伝達AIが内部状態ではなく、授業中に観察できる情報だけを使って判断できるか
+
+詳しくは [docs/paper_experiment_core.md](docs/paper_experiment_core.md) を見てください。
+
+## ディレクトリ構成
 
 ```text
 student-ai/
   notebooks/
-    README.md
     paper_core_experiment.ipynb
     student_ai_colab.ipynb
     personality_experiment.ipynb
     teaching_strategy_experiment.ipynb
   src/
     experiment/
-      experiment_config.py
-      teaching_strategy_runner.py
-      result_exporter.py
     observer/
-      observation_filter.py
-      observation_logger.py
-      trait_classifier.py
     teacher/
-      belief_manager.py
-      context_builder.py
-      intervention_planner.py
-      lesson_planner.py
-      lesson_session_runner.py
-      strategy_selector.py
-      utterance_builder.py
     class_manager.py
     cognitive_model.py
     model_loader.py
@@ -59,23 +48,21 @@ student-ai/
     classes/
     curriculum/
     students/
-    teacher_beliefs/
+    tests/
     logs/
     assessments/
-  tests/
   docs/
+  tests/
 ```
 
 ## Notebookの役割
 
-| Notebook | 目的 |
+| Notebook | 役割 |
 | --- | --- |
-| `paper_core_experiment.ipynb` | 論文用の最小実験、使用ソースコード、確認観点を整理 |
-| `student_ai_colab.ipynb` | 生徒AIの設計確認、理解度と正答率の学習曲線確認 |
-| `personality_experiment.ipynb` | 個人特徴が発話に反映され、伝達AIが分類できるか確認 |
-| `teaching_strategy_experiment.ipynb` | 複数生徒クラス、伝達AI要約、教師AIの授業方略を確認 |
-
-詳細は `notebooks/README.md` にまとめています。
+| `notebooks/student_ai_colab.ipynb` | 生徒AI単体の設計確認、学習曲線、誤概念、個人特徴の評価 |
+| `notebooks/personality_experiment.ipynb` | 個人特徴が発話に出るか、伝達AIが分類できるかの確認 |
+| `notebooks/teaching_strategy_experiment.ipynb` | 複数生徒クラス、伝達AI要約、教師AIの授業方針生成の確認 |
+| `notebooks/paper_core_experiment.ipynb` | 論文用に使う最小実験と出力確認 |
 
 ## Colabでの実行手順
 
@@ -94,7 +81,7 @@ REPO_URL = "https://github.com/Hiromu-0219/student-ai-test.git"
 %cd /content/student-ai
 ```
 
-3. 依存関係をインストールします。
+3. 依存関係を入れます。
 
 ```python
 !pip install -q -r requirements.txt
@@ -102,12 +89,11 @@ REPO_URL = "https://github.com/Hiromu-0219/student-ai-test.git"
 
 4. Notebookを上から実行します。
 
-まず軽く確認する場合は、`student_ai_colab.ipynb` のmock model確認から実行してください。
-授業方略のメイン実験は `teaching_strategy_experiment.ipynb` を使います。
+まず軽く確認する場合は `student_ai_colab.ipynb` の mock model 条件から実行してください。LLMを使う場合はGPUとHugging Faceのモデルアクセスが必要になることがあります。
 
 ## ColabでGitHub更新を反映する
 
-Colab上のrepoを更新する場合は、次を実行します。
+Colab上のrepoを最新にする場合:
 
 ```python
 %cd /content/student-ai
@@ -116,7 +102,44 @@ Colab上のrepoを更新する場合は、次を実行します。
 !git log -1 --oneline
 ```
 
-注意: Git更新セルを実行しても、すでに開いているColab Notebook画面のセル内容は自動では書き換わらないことがあります。Notebook自体を更新した場合は、GitHub上の最新版Notebookを開き直してください。
+注意: すでに開いているNotebookのセル内容は自動で書き換わらないことがあります。Notebook自体を更新した場合は、GitHub上の最新版Notebookを開き直してください。
+
+## 生徒AI単体評価
+
+人間学習者の限定的代理として使えるかを見る基本実験です。
+
+```python
+from src.experiment import (
+    export_student_ai_evaluation,
+    export_student_ai_evaluation_for_codex,
+    run_student_ai_evaluation,
+)
+
+result = run_student_ai_evaluation(
+    student_id="S002",
+    test_id="linear_equation_20q_001",
+    understanding_levels=list(range(0, 101, 10)),
+    use_mock_model=True,
+)
+
+export_student_ai_evaluation(result)
+export_student_ai_evaluation_for_codex(result)
+print(result["summary"])
+```
+
+このチャットに結果を渡す場合は、次のファイルを添付してください。
+
+```text
+data/assessments/student_ai_evaluation_for_codex.txt
+```
+
+出力には次が含まれます。
+
+- Learning Curve
+- Misconception Comparison
+- Skill Breakdown
+- Utterance Samples
+- Human Replacement Validity
 
 ## LLM設定
 
@@ -127,7 +150,7 @@ Colab上のrepoを更新する場合は、次を実行します。
 - `Qwen/Qwen3-4B`
 - `google/gemma-3-4b-it`
 
-Colabで軽く試す場合は、より小さいモデルを使うか、まず `use_mock_model=True` で動作確認してください。Gemma系のgated modelを使う場合は、Hugging Face loginが必要になることがあります。
+ColabでLLMを使う場合、初回ロードには時間がかかります。動作確認だけなら `use_mock_model=True` を使ってください。
 
 ## 生徒状態
 
@@ -139,63 +162,13 @@ Colabで軽く試す場合は、より小さいモデルを使うか、まず `u
 - `misconceptions`: 誤概念
 - `error_tendency`: 誤答傾向
 - `learning_speed`: 学習速度
-- `big_five`: Big Five特性
+- `big_five`: Big Five 特性
 - `self_efficacy`: 自己効力感
 - `question_tendency`: 質問傾向
 - `motivation`: モチベーション
 - `learning_history`: 学習履歴
 
 性格・心理系の段階評価は原則として `very_low`, `low`, `medium`, `high`, `very_high` の5段階です。
-
-## 内部構造
-
-主要な責務は次のように分けています。
-
-- `src/student_ai.py`: 生徒AIシミュレータの入口
-- `src/prompts.py`: 生徒AI用プロンプト
-- `src/cognitive_model.py`: 理解度に基づく正答・誤答制御
-- `src/personality_model.py`: 個人特徴を発話スタイルへ変換
-- `src/observer/`: 伝達AI。観察可能な発話から特徴推定・クラス要約を行う
-- `src/teacher/`: 教師AI。teacher_belief、授業計画、個別支援、教師発話を扱う
-- `src/experiment/`: Notebookから呼び出す実験実行・結果保存の入口
-
-生徒AI単体の評価は次のように呼び出せます。
-
-```python
-from src.experiment import (
-    export_student_ai_evaluation,
-    export_student_ai_evaluation_for_codex,
-    run_student_ai_evaluation,
-)
-
-result = run_student_ai_evaluation(
-    student_id="S001",
-    test_id="linear_equation_20q_001",
-    understanding_levels=list(range(0, 101, 10)),
-    use_mock_model=True,
-)
-
-export_student_ai_evaluation(result)
-export_student_ai_evaluation_for_codex(result)
-print(result["summary"])
-```
-
-このチャットに結果を渡す場合は、`data/assessments/student_ai_evaluation_for_codex.txt` を添付してください。
-
-メイン実験は次のように呼び出せます。
-
-```python
-from src.experiment import TeachingStrategyExperimentConfig, run_teaching_strategy_experiment
-
-result = run_teaching_strategy_experiment(
-    TeachingStrategyExperimentConfig(
-        class_id="class_3_basic",
-        use_mock_student=True,
-    )
-)
-
-print(result["summary"])
-```
 
 ## テスト
 
@@ -204,18 +177,3 @@ print(result["summary"])
 ```bash
 python -m pytest
 ```
-
-## 現在のスコープ
-
-- 対応科目: 数学
-- 対応単元: 一次方程式
-- 対応人数: 3-20人程度のクラス
-- ファインチューニング: なし
-- 主な検証:
-  - 理解度と正答率の関係
-  - スキル別の弱点が正答率に反映されるか
-  - 誤概念の有無で正答確率が変わるか
-  - 個人特徴によって発話スタイルが変わるか
-  - 個人特徴が発話に反映されるか
-  - 伝達AIが複数生徒の反応を要約できるか
-  - 教師AIが要約に基づいて授業構成・個別支援を変えられるか
