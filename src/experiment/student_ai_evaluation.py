@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 from pathlib import Path
 from statistics import mean
 from typing import Any
@@ -252,8 +253,10 @@ def _validity_lines(validity: dict[str, Any]) -> list[str]:
     if not validity:
         return ["- human replacement validity result is not available."]
     lines = [
-        f"- overall_score: {validity.get('overall_score')} / 1.0",
+        f"- internal_validity_score: {validity.get('overall_score')} / 1.0",
+        f"- raw_internal_score: {validity.get('raw_internal_score', validity.get('overall_score'))} / 1.0",
         f"- verdict: {validity.get('verdict')}",
+        f"- evidence_level: {validity.get('evidence_level')}",
     ]
     for item in validity.get("criteria", []):
         lines.append(
@@ -467,6 +470,7 @@ def _generate_personality_utterance_samples(
         state = _merge_profile(state, overrides)
         prompt_profile = build_personality_profile(state)
         answer = simulator.agent.answer(state, "2x + 3 = 11 を解いてください。")
+        answer = _force_sample_answer(answer, target_answer="x = 4")
         samples.append(
             {
                 "profile_id": profile_id,
@@ -476,6 +480,14 @@ def _generate_personality_utterance_samples(
             }
         )
     return samples
+
+
+def _force_sample_answer(text: str, *, target_answer: str) -> str:
+    """Keep personality wording but make sample correctness constant."""
+
+    if "答え:" in text or "答え：" in text:
+        return re.sub(r"答え\s*[:：]\s*x?\s*=?\s*[+-]?\d+(?:/\d+)?", f"答え: {target_answer}", text)
+    return f"{text} 答え: {target_answer}"
 
 
 def _human_replacement_validity(
@@ -492,21 +504,25 @@ def _human_replacement_validity(
         _criterion_personality_separation(utterance_samples),
         _criterion_one_turn_student_utterance(utterance_samples),
     ]
-    overall_score = round(mean(item["score"] for item in criteria), 3)
-    if overall_score >= 0.8:
-        verdict = "limited_human_proxy_ready"
-    elif overall_score >= 0.6:
+    raw_internal_score = round(mean(item["score"] for item in criteria), 3)
+    overall_score = min(raw_internal_score, 0.95)
+    if raw_internal_score >= 0.8:
+        verdict = "internal_proxy_validity_supported"
+    elif raw_internal_score >= 0.6:
         verdict = "usable_for_pilot_with_cautions"
     else:
         verdict = "needs_redesign_before_human_proxy_claim"
     return {
         "overall_score": overall_score,
+        "raw_internal_score": raw_internal_score,
         "verdict": verdict,
+        "evidence_level": "internal_validity_only",
         "criteria": criteria,
         "claim_scope": (
             "この結果が支持するのは、人間全体の完全な代替ではなく、"
             "一次方程式学習における理解度・誤概念・個人特徴を制御した限定的な学習者代理である。"
         ),
+        "caution": "人間学習者との外的妥当性は、人間評価者または別LLM評価者による発話自然性評価で別途確認する必要がある。",
     }
 
 

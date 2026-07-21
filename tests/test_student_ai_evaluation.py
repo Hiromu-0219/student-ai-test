@@ -33,7 +33,10 @@ def test_student_ai_evaluation_runs_core_student_experiments(tmp_path):
     assert "target_probability_drop" in result["skill_breakdown"][0]
     assert len(result["utterance_samples"]) == 3
     assert result["human_replacement_validity"]["overall_score"] >= 0
+    assert result["human_replacement_validity"]["overall_score"] <= 0.95
+    assert result["human_replacement_validity"]["evidence_level"] == "internal_validity_only"
     assert result["summary"]["human_replacement_verdict"]
+    assert all("答え: x = 4" in sample["utterance"] for sample in result["utterance_samples"])
 
     output_path = export_student_ai_evaluation(
         result,
@@ -49,6 +52,8 @@ def test_student_ai_evaluation_runs_core_student_experiments(tmp_path):
     codex_text = codex_path.read_text(encoding="utf-8")
     assert "Student AI Evaluation For Codex" in codex_text
     assert "Human Replacement Validity" in codex_text
+    assert "internal_validity_score" in codex_text
+    assert "evidence_level" in codex_text
     assert "Auto Interpretation" in codex_text
     assert "Learning Curve" in codex_text
     assert "related_probability_gap" in codex_text

@@ -96,6 +96,8 @@ def _keep_only_student_speaker_turn(text: str) -> str:
 
 
 def _looks_like_dialogue_label(line: str) -> bool:
+    if "答え:" in line or "答え：" in line:
+        return False
     return bool(re.match(r"^\s*[^:：]{1,12}\s*[:：]", line))
 
 
@@ -116,6 +118,7 @@ def _remove_teacher_lines(text: str) -> str:
 
 
 def _keep_assessment_answer(text: str) -> str:
+    text = _normalize_answer_label(text)
     answer_matches = re.findall(r"答え\s*[:：]\s*x\s*=\s*[^\s。！？?]+", text)
     if answer_matches:
         return answer_matches[-1].replace("答え：", "答え:").strip()
@@ -125,6 +128,7 @@ def _keep_assessment_answer(text: str) -> str:
 def _limit_sentences(text: str, *, max_sentences: int) -> str:
     if not text:
         return text
+    text = _normalize_answer_label(text)
     answer_match = re.search(r"(答え\s*[:：]\s*x\s*=\s*[^\s。！？?]+)", text)
     answer_part = answer_match.group(1).replace("答え：", "答え:") if answer_match else None
     before_answer = text[: answer_match.start()].strip() if answer_match else text
@@ -133,3 +137,11 @@ def _limit_sentences(text: str, *, max_sentences: int) -> str:
     if answer_part and answer_part not in limited:
         limited = f"{limited} {answer_part}".strip()
     return limited or (answer_part or text)
+
+
+def _normalize_answer_label(text: str) -> str:
+    return re.sub(
+        r"答え\s*[:：]\s*(?!x\s*=)([+-]?\d+(?:/\d+)?)",
+        r"答え: x = \1",
+        text,
+    )

@@ -32,3 +32,9 @@ def test_normalize_assessment_keeps_answer_line_only():
 教師：解説します。"""
 
     assert normalize_student_turn(raw, assessment=True) == "答え: x = 4"
+
+
+def test_normalize_student_turn_adds_x_to_numeric_answer_label():
+    raw = "両辺を2で割ります。答え: 4"
+
+    assert normalize_student_turn(raw) == "両辺を2で割ります。 答え: x = 4"
