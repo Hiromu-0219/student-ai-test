@@ -4,7 +4,8 @@
 
 ## 主要ファイル
 
-- `share_summary.md`: 先輩共有用の進捗・方向性・Todo
+- `student_ai_design.md`: 生徒AIの設計仕様書
+- `share_summary.md`: 先輩共有用の進捗、方向性、Todo
 - `research_paper_plan.md`: 論文用の研究計画、問い、実験設計
 - `research_outcomes.md`: 出せそうな研究成果の整理
 - `paper_experiment_core.md`: 論文に使うコア実験の概要
@@ -17,4 +18,5 @@
 - `2026-07-16-class-management.md`: クラス管理と生徒集団データ
 - `2026-07-17.md`: 論文用コア実験の整理
 - `2026-07-20.md`: 授業方略実験の進捗
-- `2026-07-21.md`: Notebook構造整理と内部構造整理
+- `2026-07-21.md`: Notebook構造整理、内部構造整理、生徒AI評価
+- `2026-07-23.md`: 生徒AI設計仕様の固定

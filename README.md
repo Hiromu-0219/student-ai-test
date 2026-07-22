@@ -21,7 +21,7 @@
 - 自己効力感、質問傾向、意欲、Big Five が発話に反映されるか
 - 教師AI・伝達AIが内部状態ではなく、授業中に観察できる情報だけを使って判断できるか
 
-詳しくは [docs/paper_experiment_core.md](docs/paper_experiment_core.md) を見てください。
+生徒AIそのものの設計は [docs/student_ai_design.md](docs/student_ai_design.md) を見てください。論文用の実験設計は [docs/paper_experiment_core.md](docs/paper_experiment_core.md) に整理しています。
 
 ## ディレクトリ構成
 
