@@ -22,6 +22,21 @@ def export_teaching_strategy_summary(
         "## Experiment Summary",
         json.dumps(result.get("summary", {}), ensure_ascii=False, indent=2),
         "",
+        "## Lecture Design",
+        json.dumps(
+            {
+                "objective": result.get("lecture_design", {}).get("objective"),
+                "class_diagnosis": result.get("lecture_design", {}).get("class_diagnosis"),
+                "optimization_targets": result.get("lecture_design", {}).get("optimization_targets"),
+                "whole_class_policy": result.get("lecture_design", {})
+                .get("recommended_lecture", {})
+                .get("whole_class_policy"),
+                "observable_input_policy": result.get("lecture_design", {}).get("observable_input_policy"),
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        "",
         "## Lesson Goal",
         json.dumps(result.get("lesson_plan", {}).get("lesson_goal", {}), ensure_ascii=False, indent=2),
         "",

@@ -27,6 +27,8 @@ def test_teaching_strategy_experiment_runs_with_mock_model(tmp_path):
     )
 
     assert result["student_ids"] == ["S001", "S002", "S003"]
+    assert result["lecture_design"]["role"] == "lecture_design_ai"
+    assert result["lecture_design"]["recommended_lecture"]["lesson_structure"]
     assert result["lesson_plan"]["lesson_structure"]
     assert result["summary"]["turn_count"] == 5
     assert len(result["phase_summary"]) == 5

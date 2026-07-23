@@ -7,7 +7,7 @@ from typing import Any
 from src.class_manager import ClassManager
 from src.experiment.experiment_config import TeachingStrategyExperimentConfig
 from src.student_ai import StudentAISimulator
-from src.teacher import LessonSessionRunner, RuleBasedLessonPlanner
+from src.teacher import LessonSessionRunner, RuleBasedLectureDesignAI
 from src.teacher.belief_manager import TeacherBeliefManager
 
 
@@ -38,11 +38,13 @@ def run_teaching_strategy_experiment(
         student_id: belief_manager.load_or_create(config.teacher_id, student_id)
         for student_id in student_ids
     }
-    lesson_plan = RuleBasedLessonPlanner().plan_lesson(
+    lecture_design = RuleBasedLectureDesignAI().design_lecture(
         teacher_beliefs=initial_teacher_beliefs,
         curriculum=curriculum,
         total_minutes=config.total_minutes,
+        lecture_id=f"{config.class_id}_lecture_design",
     )
+    lesson_plan = lecture_design["lesson_plan"]
     student_simulator = StudentAISimulator(
         use_mock_model=config.use_mock_student,
         model_id=config.model_id,
@@ -68,6 +70,7 @@ def run_teaching_strategy_experiment(
         "config": config,
         "class_state": class_state,
         "student_ids": student_ids,
+        "lecture_design": lecture_design,
         "lesson_plan": lesson_plan,
         "session_result": session_result,
         "phase_summary": summarize_phases(session_result),
