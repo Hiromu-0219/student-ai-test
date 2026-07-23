@@ -7,6 +7,7 @@
 - `student_ai_design.md`: 生徒AIの設計仕様書
 - `internal_validity_experiment.md`: 生徒AIの内部妥当性評価手順
 - `share_summary.md`: 先輩共有用の進捗、方向性、Todo
+- `student_ai_progress_report.md`: 生徒AI設計に絞った進捗報告
 - `research_paper_plan.md`: 論文用の研究計画、問い、実験設計
 - `research_outcomes.md`: 出せそうな研究成果の整理
 - `paper_experiment_core.md`: 論文に使うコア実験の概要
