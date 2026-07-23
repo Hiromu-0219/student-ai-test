@@ -10,6 +10,7 @@
 - `research_paper_plan.md`: 論文用の研究計画、問い、実験設計
 - `research_outcomes.md`: 出せそうな研究成果の整理
 - `paper_experiment_core.md`: 論文に使うコア実験の概要
+- `reference_mapping.md`: 設計要素と参考文献・参考資料の対応表
 
 ## 日付別メモ
 
