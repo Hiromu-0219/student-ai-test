@@ -5,6 +5,7 @@
 ## 主要ファイル
 
 - `student_ai_design.md`: 生徒AIの設計仕様書
+- `internal_validity_experiment.md`: 生徒AIの内部妥当性評価手順
 - `share_summary.md`: 先輩共有用の進捗、方向性、Todo
 - `research_paper_plan.md`: 論文用の研究計画、問い、実験設計
 - `research_outcomes.md`: 出せそうな研究成果の整理
