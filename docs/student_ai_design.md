@@ -152,6 +152,37 @@ P(correct) = sigmoid(skill_mastery - problem_difficulty)
 
 実装上は、この2つを厳密な統計モデルとして推定するのではなく、教育シミュレーション用に解釈可能な近似モデルとして使う。
 
+実装では、比較のために2種類の認知モデルを用意している。
+
+| モデル | クラス | 役割 |
+| --- | --- | --- |
+| 従来モデル | `CognitiveModel` | 理解度・スキルスコアを中心に正答確率を決める |
+| BKT/IRT寄りモデル | `BKTIRTCognitiveModel` | スキル習得度、問題難易度、guess、slipを加味して正答確率を決める |
+
+比較実験は `compare_cognitive_models()` で実行できる。
+
+```python
+from src.experiment import (
+    compare_cognitive_models,
+    export_cognitive_model_comparison_for_codex,
+)
+
+result = compare_cognitive_models(
+    student_id="S001",
+    test_id="linear_equation_20q_001",
+    understanding_levels=list(range(0, 101, 10)),
+    use_mock_model=True,
+)
+
+export_cognitive_model_comparison_for_codex(result)
+```
+
+出力ファイル:
+
+```text
+data/assessments/cognitive_model_comparison_for_codex.txt
+```
+
 これにより、同じ問題でも次の違いを表現できる。
 
 - 理解度・スキル習得度が高い生徒は正答しやすい

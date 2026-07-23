@@ -133,6 +133,30 @@ print(result["summary"])
 data/assessments/student_ai_evaluation_for_codex.txt
 ```
 
+従来の認知モデルとBKT/IRT寄りの認知モデルを比較する場合:
+
+```python
+from src.experiment import (
+    compare_cognitive_models,
+    export_cognitive_model_comparison_for_codex,
+)
+
+comparison = compare_cognitive_models(
+    student_id="S002",
+    test_id="linear_equation_20q_001",
+    understanding_levels=list(range(0, 101, 10)),
+    use_mock_model=True,
+)
+
+export_cognitive_model_comparison_for_codex(comparison)
+```
+
+共有用ファイル:
+
+```text
+data/assessments/cognitive_model_comparison_for_codex.txt
+```
+
 出力には次が含まれます。
 
 - Learning Curve

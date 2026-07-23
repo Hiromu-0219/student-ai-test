@@ -1,4 +1,4 @@
-from src.cognitive_model import CognitiveModel
+from src.cognitive_model import BKTIRTCognitiveModel, CognitiveModel, create_cognitive_model
 
 
 def student_state(score):
@@ -108,3 +108,34 @@ def test_misconception_strength_disappears_at_high_understanding_even_if_text_re
     assert directive["misconception_strength"] == "none"
     assert directive["misconception_penalty"] == 0
     assert directive["active_misconceptions"] == []
+
+
+def test_bkt_irt_model_uses_item_difficulty():
+    model = BKTIRTCognitiveModel()
+    state = student_state(60)
+    easy_question = {
+        "question_id": "Q_EASY",
+        "answer": "x = 4",
+        "skill": "can_solve_ax_plus_b_equals_c",
+        "difficulty": 1,
+    }
+    hard_question = {
+        "question_id": "Q_HARD",
+        "answer": "x = 4",
+        "skill": "can_solve_ax_plus_b_equals_c",
+        "difficulty": 4,
+    }
+
+    easy = model.build_assessment_directive(student_state=state, question=easy_question)
+    hard = model.build_assessment_directive(student_state=state, question=hard_question)
+
+    assert easy["cognitive_model"] == "bkt_irt"
+    assert easy["correct_probability"] > hard["correct_probability"]
+    assert easy["difficulty_score"] < hard["difficulty_score"]
+    assert "guess_probability" in easy
+    assert "slip_probability" in easy
+
+
+def test_create_cognitive_model_factory():
+    assert create_cognitive_model("legacy").model_name == "legacy"
+    assert create_cognitive_model("bkt_irt").model_name == "bkt_irt"

@@ -12,6 +12,11 @@
 - `paper_experiment_core.md`: 論文に使うコア実験の概要
 - `reference_mapping.md`: 設計要素と参考文献・参考資料の対応表
 
+## 共有用出力
+
+- `data/assessments/student_ai_evaluation_for_codex.txt`: 生徒AI単体評価の共有用txt
+- `data/assessments/cognitive_model_comparison_for_codex.txt`: 従来モデルとBKT/IRT寄りモデル比較の共有用txt
+
 ## 日付別メモ
 
 - `2026-07-13.md`: 生徒AI MVP、状態管理、Colab導入

@@ -2,6 +2,8 @@ import shutil
 from pathlib import Path
 
 from src.experiment import (
+    compare_cognitive_models,
+    export_cognitive_model_comparison_for_codex,
     export_student_ai_evaluation,
     export_student_ai_evaluation_for_codex,
     run_student_ai_evaluation,
@@ -61,3 +63,34 @@ def test_student_ai_evaluation_runs_core_student_experiments(tmp_path):
     assert "related_probability_gap" in codex_text
     assert "target_probability_drop" in codex_text
     assert "Utterance Samples" in codex_text
+
+
+def test_cognitive_model_comparison_runs(tmp_path):
+    students_dir = tmp_path / "students"
+    tests_dir = tmp_path / "tests"
+    shutil.copytree(Path("data/students"), students_dir)
+    shutil.copytree(Path("data/tests"), tests_dir)
+
+    result = compare_cognitive_models(
+        student_id="S001",
+        test_id="linear_equation_20q_001",
+        understanding_levels=[0, 50, 100],
+        students_dir=students_dir,
+        tests_dir=tests_dir,
+        logs_dir=tmp_path / "logs",
+        use_mock_model=True,
+    )
+
+    assert set(result["models"]) == {"legacy", "bkt_irt"}
+    assert len(result["learning_curve_comparison"]) == 3
+    assert result["summary"]["model_pair"] == "legacy_vs_bkt_irt"
+    assert "probability_delta" in result["learning_curve_comparison"][0]
+
+    output_path = export_cognitive_model_comparison_for_codex(
+        result,
+        output_path=tmp_path / "cognitive_model_comparison.txt",
+    )
+    text = output_path.read_text(encoding="utf-8")
+    assert "Cognitive Model Comparison For Codex" in text
+    assert "legacy_accuracy" in text
+    assert "bkt_irt_accuracy" in text

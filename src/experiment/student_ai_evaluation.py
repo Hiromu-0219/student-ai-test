@@ -7,7 +7,7 @@ from pathlib import Path
 from statistics import mean
 from typing import Any
 
-from src.cognitive_model import CognitiveModel
+from src.cognitive_model import CognitiveModel, create_cognitive_model
 from src.personality_model import build_personality_profile
 from src.state_manager import StateManager
 from src.student_ai import StudentAISimulator
@@ -38,13 +38,14 @@ def run_student_ai_evaluation(
     tests_dir: str | Path = "data/tests",
     logs_dir: str | Path = "data/logs",
     use_mock_model: bool = True,
+    cognitive_model_type: str = "legacy",
 ) -> dict[str, Any]:
     """Run student-AI-only evaluation without updating saved student state."""
 
     state_manager = StateManager(students_dir)
     base_state = state_manager.load_student(student_id)
     test_data = TestBank(tests_dir).load_test(test_id)
-    cognitive_model = CognitiveModel()
+    cognitive_model = create_cognitive_model(cognitive_model_type)
     simulator = StudentAISimulator(
         students_dir=str(students_dir),
         logs_dir=str(logs_dir),
@@ -85,6 +86,7 @@ def run_student_ai_evaluation(
     return {
         "student_id": student_id,
         "test_id": test_id,
+        "cognitive_model": cognitive_model.model_name,
         "question_count": len(test_data["questions"]),
         "learning_curve": learning_curve,
         "misconception_comparison": misconception_comparison,
@@ -97,6 +99,69 @@ def run_student_ai_evaluation(
             skill_breakdown=skill_breakdown,
             validity=validity,
         ),
+    }
+
+
+def compare_cognitive_models(
+    *,
+    student_id: str = "S001",
+    test_id: str = "linear_equation_20q_001",
+    understanding_levels: list[int] | None = None,
+    students_dir: str | Path = "data/students",
+    tests_dir: str | Path = "data/tests",
+    logs_dir: str | Path = "data/logs",
+    use_mock_model: bool = True,
+) -> dict[str, Any]:
+    """Run legacy and BKT/IRT-inspired models and summarize differences."""
+
+    model_results = {}
+    for model_type in ["legacy", "bkt_irt"]:
+        model_results[model_type] = run_student_ai_evaluation(
+            student_id=student_id,
+            test_id=test_id,
+            understanding_levels=understanding_levels,
+            students_dir=students_dir,
+            tests_dir=tests_dir,
+            logs_dir=logs_dir,
+            use_mock_model=use_mock_model,
+            cognitive_model_type=model_type,
+        )
+
+    legacy_curve = {
+        row["understanding"]: row
+        for row in model_results["legacy"]["learning_curve"]
+    }
+    bkt_irt_curve = {
+        row["understanding"]: row
+        for row in model_results["bkt_irt"]["learning_curve"]
+    }
+    comparison_rows = []
+    for understanding in sorted(set(legacy_curve) & set(bkt_irt_curve)):
+        legacy_row = legacy_curve[understanding]
+        bkt_irt_row = bkt_irt_curve[understanding]
+        comparison_rows.append(
+            {
+                "understanding": understanding,
+                "legacy_accuracy": legacy_row["accuracy"],
+                "bkt_irt_accuracy": bkt_irt_row["accuracy"],
+                "accuracy_delta": round(bkt_irt_row["accuracy"] - legacy_row["accuracy"], 3),
+                "legacy_average_correct_probability": legacy_row["average_correct_probability"],
+                "bkt_irt_average_correct_probability": bkt_irt_row["average_correct_probability"],
+                "probability_delta": round(
+                    bkt_irt_row["average_correct_probability"]
+                    - legacy_row["average_correct_probability"],
+                    1,
+                ),
+            }
+        )
+
+    return {
+        "student_id": student_id,
+        "test_id": test_id,
+        "question_count": model_results["legacy"]["question_count"],
+        "models": model_results,
+        "learning_curve_comparison": comparison_rows,
+        "summary": _cognitive_model_comparison_summary(comparison_rows),
     }
 
 
@@ -137,6 +202,63 @@ def export_student_ai_evaluation(
         ]
     )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return path
+
+
+def export_cognitive_model_comparison_for_codex(
+    result: dict[str, Any],
+    *,
+    output_path: str | Path = "data/assessments/cognitive_model_comparison_for_codex.txt",
+) -> Path:
+    """Export legacy vs BKT/IRT comparison as a compact txt file."""
+
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        "# Cognitive Model Comparison For Codex",
+        "",
+        "このファイルをCodex/ChatGPTに渡すときは、このtxtをそのまま添付してください。",
+        "",
+        "## Basic Info",
+        f"student_id: {result.get('student_id')}",
+        f"test_id: {result.get('test_id')}",
+        f"question_count: {result.get('question_count')}",
+        "",
+        "## Summary",
+        json.dumps(result.get("summary", {}), ensure_ascii=False, indent=2),
+        "",
+        "## Learning Curve Comparison",
+        (
+            "understanding\tlegacy_accuracy\tbkt_irt_accuracy\taccuracy_delta\t"
+            "legacy_probability\tbkt_irt_probability\tprobability_delta"
+        ),
+    ]
+    for row in result.get("learning_curve_comparison", []):
+        lines.append(
+            "\t".join(
+                [
+                    str(row.get("understanding")),
+                    str(row.get("legacy_accuracy")),
+                    str(row.get("bkt_irt_accuracy")),
+                    str(row.get("accuracy_delta")),
+                    str(row.get("legacy_average_correct_probability")),
+                    str(row.get("bkt_irt_average_correct_probability")),
+                    str(row.get("probability_delta")),
+                ]
+            )
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Interpretation",
+            "- legacy: 従来の理解度中心モデル。理解度・スキル値が正答確率へ比較的直接反映される。",
+            "- bkt_irt: BKT/IRT寄りモデル。スキル習得度を潜在状態とし、問題難易度、guess、slipを加味する。",
+            "- bkt_irtでは、低理解度でもguessにより正答確率が残り、高理解度でもslipにより100%にはならない。",
+            "- bkt_irtでは、同じ理解度でも難しい問題ほど正答確率が下がる。",
+        ]
+    )
+    path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     return path
 
 
@@ -647,6 +769,34 @@ def _evaluation_summary(
         "evidence_level": validity["evidence_level"],
         "human_replacement_validity_score": validity["overall_score"],
         "human_replacement_verdict": validity["verdict"],
+    }
+
+
+def _cognitive_model_comparison_summary(comparison_rows: list[dict[str, Any]]) -> dict[str, Any]:
+    if not comparison_rows:
+        return {
+            "model_pair": "legacy_vs_bkt_irt",
+            "row_count": 0,
+            "average_probability_delta": None,
+            "average_accuracy_delta": None,
+        }
+    probability_deltas = [row["probability_delta"] for row in comparison_rows]
+    accuracy_deltas = [row["accuracy_delta"] for row in comparison_rows]
+    largest_probability_gap = max(
+        comparison_rows,
+        key=lambda row: abs(row["probability_delta"]),
+    )
+    return {
+        "model_pair": "legacy_vs_bkt_irt",
+        "row_count": len(comparison_rows),
+        "average_probability_delta": round(mean(probability_deltas), 1),
+        "average_accuracy_delta": round(mean(accuracy_deltas), 3),
+        "largest_probability_gap_understanding": largest_probability_gap["understanding"],
+        "largest_probability_gap": largest_probability_gap["probability_delta"],
+        "interpretation": (
+            "bkt_irt reflects item difficulty, guess, and slip; legacy mainly maps "
+            "understanding and skill score directly to correctness probability."
+        ),
     }
 
 
