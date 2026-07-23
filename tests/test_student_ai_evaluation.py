@@ -33,6 +33,10 @@ def test_student_ai_evaluation_runs_core_student_experiments(tmp_path):
     assert "related_probability_gap" in result["misconception_comparison"]["rows"][0]
     assert result["skill_breakdown"]
     assert "target_probability_drop" in result["skill_breakdown"][0]
+    assert result["difficulty_breakdown"]
+    assert "average_correct_probability" in result["difficulty_breakdown"][0]
+    assert result["parameter_guide"]
+    assert result["summary"]["difficulty_rows"] == len(result["difficulty_breakdown"])
     assert len(result["utterance_samples"]) == 3
     assert result["human_replacement_validity"]["overall_score"] >= 0
     assert result["human_replacement_validity"]["overall_score"] <= 0.95
@@ -62,6 +66,8 @@ def test_student_ai_evaluation_runs_core_student_experiments(tmp_path):
     assert "Learning Curve" in codex_text
     assert "related_probability_gap" in codex_text
     assert "target_probability_drop" in codex_text
+    assert "Parameter Guide" in codex_text
+    assert "Difficulty Breakdown" in codex_text
     assert "Utterance Samples" in codex_text
 
 
@@ -85,6 +91,7 @@ def test_cognitive_model_comparison_runs(tmp_path):
     assert len(result["learning_curve_comparison"]) == 3
     assert result["summary"]["model_pair"] == "legacy_vs_bkt_irt"
     assert "probability_delta" in result["learning_curve_comparison"][0]
+    assert result["models"]["bkt_irt"]["difficulty_breakdown"]
 
     output_path = export_cognitive_model_comparison_for_codex(
         result,
@@ -94,3 +101,4 @@ def test_cognitive_model_comparison_runs(tmp_path):
     assert "Cognitive Model Comparison For Codex" in text
     assert "legacy_accuracy" in text
     assert "bkt_irt_accuracy" in text
+    assert "Difficulty Breakdown By Model" in text

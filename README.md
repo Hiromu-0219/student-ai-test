@@ -160,8 +160,10 @@ data/assessments/cognitive_model_comparison_for_codex.txt
 出力には次が含まれます。
 
 - Learning Curve
+- Difficulty Breakdown
 - Misconception Comparison
 - Skill Breakdown
+- Parameter Guide
 - Utterance Samples
 - Human Replacement Validity
 

@@ -27,6 +27,58 @@ MISCONCEPTION_TEXTS = [
     "3x = 15 では3を引けばよいと考える",
 ]
 MISCONCEPTION_RELATED_SKILLS = {"can_transpose_terms", "can_divide_by_coefficient"}
+PARAMETER_GUIDE_ROWS = [
+    {
+        "parameter": "knowledge_state.linear_equation.score",
+        "meaning": "単元全体の潜在的な理解度",
+        "visible_effect": "高いほど全体の正答確率が上がる",
+    },
+    {
+        "parameter": "knowledge_state.linear_equation.<skill>",
+        "meaning": "スキル別の潜在的な習得度",
+        "visible_effect": "該当スキルの問題だけ正答確率が変わる",
+    },
+    {
+        "parameter": "question.difficulty",
+        "meaning": "問題難易度",
+        "visible_effect": "同じ理解度でも難しい問題ほど正答確率が下がる",
+    },
+    {
+        "parameter": "misconceptions",
+        "meaning": "誤概念",
+        "visible_effect": "関連問題の正答確率が下がり、誤答傾向が出る",
+    },
+    {
+        "parameter": "guess_probability",
+        "meaning": "未習得でも正答する確率",
+        "visible_effect": "低理解度でも正答率が0%に張り付かない",
+    },
+    {
+        "parameter": "slip_probability",
+        "meaning": "習得済みでも誤答する確率",
+        "visible_effect": "高理解度でも正答率が100%に張り付かない",
+    },
+    {
+        "parameter": "self_efficacy",
+        "meaning": "自己効力感",
+        "visible_effect": "発話の自信表現と正答確率の小補正に効く",
+    },
+    {
+        "parameter": "question_tendency",
+        "meaning": "質問傾向",
+        "visible_effect": "質問や確認発話の出やすさに効く",
+    },
+    {
+        "parameter": "motivation",
+        "meaning": "モチベーション",
+        "visible_effect": "粘り強さ、返答の短さ、正答確率の小補正に効く",
+    },
+    {
+        "parameter": "big_five",
+        "meaning": "性格特性",
+        "visible_effect": "発話の丁寧さ、不安、外向性などの見え方に効く",
+    },
+]
 
 
 def run_student_ai_evaluation(
@@ -72,6 +124,11 @@ def run_student_ai_evaluation(
         test_data=test_data,
         cognitive_model=cognitive_model,
     )
+    difficulty_breakdown = _evaluate_difficulty_breakdown(
+        base_state=base_state,
+        test_data=test_data,
+        cognitive_model=cognitive_model,
+    )
     utterance_samples = _generate_personality_utterance_samples(
         simulator=simulator,
         base_state=base_state,
@@ -91,12 +148,15 @@ def run_student_ai_evaluation(
         "learning_curve": learning_curve,
         "misconception_comparison": misconception_comparison,
         "skill_breakdown": skill_breakdown,
+        "difficulty_breakdown": difficulty_breakdown,
+        "parameter_guide": PARAMETER_GUIDE_ROWS,
         "utterance_samples": utterance_samples,
         "human_replacement_validity": validity,
         "summary": _evaluation_summary(
             learning_curve=learning_curve,
             misconception_comparison=misconception_comparison,
             skill_breakdown=skill_breakdown,
+            difficulty_breakdown=difficulty_breakdown,
             validity=validity,
         ),
     }
@@ -197,6 +257,20 @@ def export_student_ai_evaluation(
     lines.extend(
         [
             "",
+            "## Difficulty Breakdown",
+        ]
+    )
+    lines.extend(json.dumps(row, ensure_ascii=False) for row in result["difficulty_breakdown"])
+    lines.extend(
+        [
+            "",
+            "## Parameter Guide",
+        ]
+    )
+    lines.extend(json.dumps(row, ensure_ascii=False) for row in result["parameter_guide"])
+    lines.extend(
+        [
+            "",
             "## Utterance Samples",
             json.dumps(result["utterance_samples"], ensure_ascii=False, indent=2),
         ]
@@ -252,12 +326,35 @@ def export_cognitive_model_comparison_for_codex(
         [
             "",
             "## Interpretation",
-            "- legacy: 従来の理解度中心モデル。理解度・スキル値が正答確率へ比較的直接反映される。",
-            "- bkt_irt: BKT/IRT寄りモデル。スキル習得度を潜在状態とし、問題難易度、guess、slipを加味する。",
-            "- bkt_irtでは、低理解度でもguessにより正答確率が残り、高理解度でもslipにより100%にはならない。",
-            "- bkt_irtでは、同じ理解度でも難しい問題ほど正答確率が下がる。",
+            "- legacy: previous understanding-centered model.",
+            "- bkt_irt: BKT/IRT-inspired model using skill mastery, item difficulty, guess, and slip.",
+            "- bkt_irt keeps non-zero correctness at low understanding through guess.",
+            "- bkt_irt avoids 100% correctness at high understanding through slip.",
+            "- bkt_irt lowers probability for harder items under the same understanding.",
+            "",
+            "## Difficulty Breakdown By Model",
+            (
+                "model\tdifficulty\tlabel\tquestion_count\taccuracy\t"
+                "average_correct_probability\taverage_guess_probability\taverage_slip_probability"
+            ),
         ]
     )
+    for model_name, model_result in result.get("models", {}).items():
+        for row in model_result.get("difficulty_breakdown", []):
+            lines.append(
+                "\t".join(
+                    [
+                        str(model_name),
+                        str(row.get("difficulty")),
+                        str(row.get("label")),
+                        str(row.get("question_count")),
+                        str(row.get("accuracy")),
+                        str(row.get("average_correct_probability")),
+                        str(row.get("average_guess_probability")),
+                        str(row.get("average_slip_probability")),
+                    ]
+                )
+            )
     path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     return path
 
@@ -290,9 +387,27 @@ def export_student_ai_evaluation_for_codex(
         "## Auto Interpretation",
         *_auto_interpretation_lines(result),
         "",
+        "## Parameter Guide",
+        "parameter\tmeaning\tvisible_effect",
+    ]
+    for row in result.get("parameter_guide", []):
+        lines.append(
+            "\t".join(
+                [
+                    str(row.get("parameter")),
+                    str(row.get("meaning")),
+                    str(row.get("visible_effect")),
+                ]
+            )
+        )
+
+    lines.extend(
+        [
+        "",
         "## Learning Curve",
         "understanding\tcorrect_count\ttotal_count\taccuracy\taverage_correct_probability",
-    ]
+        ]
+    )
     for row in result.get("learning_curve", []):
         lines.append(
             "\t".join(
@@ -353,6 +468,32 @@ def export_student_ai_evaluation_for_codex(
             )
         )
 
+    lines.extend(
+        [
+            "",
+            "## Difficulty Breakdown",
+            (
+                "difficulty\tlabel\tquestion_count\tcorrect_count\taccuracy\t"
+                "average_correct_probability\taverage_guess_probability\taverage_slip_probability"
+            ),
+        ]
+    )
+    for row in result.get("difficulty_breakdown", []):
+        lines.append(
+            "\t".join(
+                [
+                    str(row.get("difficulty")),
+                    str(row.get("label")),
+                    str(row.get("question_count")),
+                    str(row.get("correct_count")),
+                    str(row.get("accuracy")),
+                    str(row.get("average_correct_probability")),
+                    str(row.get("average_guess_probability")),
+                    str(row.get("average_slip_probability")),
+                ]
+            )
+        )
+
     lines.extend(["", "## Utterance Samples"])
     for sample in result.get("utterance_samples", []):
         lines.extend(
@@ -393,6 +534,7 @@ def _auto_interpretation_lines(result: dict[str, Any]) -> list[str]:
     learning_curve = result.get("learning_curve", [])
     misconception_rows = result.get("misconception_comparison", {}).get("rows", [])
     skill_rows = result.get("skill_breakdown", [])
+    difficulty_rows = result.get("difficulty_breakdown", [])
     lines = []
     gain = summary.get("accuracy_gain_from_min_to_max")
     probability_gain = summary.get("probability_gain_from_min_to_max")
@@ -414,6 +556,13 @@ def _auto_interpretation_lines(result: dict[str, Any]) -> list[str]:
     if skill_rows:
         drops = [row.get("target_probability_drop", 0) for row in skill_rows]
         lines.append(f"- 弱点スキル条件では、基準条件から平均 {round(mean(drops), 1)} ポイント低下しています。")
+    if difficulty_rows:
+        easy = min(difficulty_rows, key=lambda row: row.get("difficulty", 0))
+        hard = max(difficulty_rows, key=lambda row: row.get("difficulty", 0))
+        lines.append(
+            f"- 難易度別では easy={easy.get('average_correct_probability')}、"
+            f"hard={hard.get('average_correct_probability')} です。"
+        )
     lines.append(f"- スキル別弱点条件で最も低い条件は {summary.get('weakest_skill_condition')} です。")
     lines.append("- 発話サンプルでは、教師発話を含まず、生徒1ターン分に収まっているかを確認してください。")
     return lines
@@ -558,6 +707,57 @@ def _evaluate_skill_breakdown(
             }
         )
     return skill_rows
+
+
+def _evaluate_difficulty_breakdown(
+    *,
+    base_state: dict[str, Any],
+    test_data: dict[str, Any],
+    cognitive_model: CognitiveModel,
+    score: int = 60,
+) -> list[dict[str, Any]]:
+    state = _state_with_uniform_score(base_state, score)
+    rows = []
+    difficulties = sorted({question.get("difficulty", 1) for question in test_data["questions"]})
+    for difficulty in difficulties:
+        questions = [
+            question
+            for question in test_data["questions"]
+            if question.get("difficulty", 1) == difficulty
+        ]
+        directives = [
+            cognitive_model.build_assessment_directive(
+                student_state=state,
+                question=question,
+            )
+            for question in questions
+        ]
+        probabilities = [directive["correct_probability"] for directive in directives]
+        guesses = [
+            directive["guess_probability"]
+            for directive in directives
+            if "guess_probability" in directive
+        ]
+        slips = [
+            directive["slip_probability"]
+            for directive in directives
+            if "slip_probability" in directive
+        ]
+        correct_count = sum(1 for directive in directives if directive["target_correct"])
+        rows.append(
+            {
+                "difficulty": difficulty,
+                "label": _difficulty_label(difficulty),
+                "understanding": score,
+                "question_count": len(questions),
+                "correct_count": correct_count,
+                "accuracy": round(correct_count / len(questions), 3) if questions else None,
+                "average_correct_probability": round(mean(probabilities), 1) if probabilities else None,
+                "average_guess_probability": round(mean(guesses), 1) if guesses else None,
+                "average_slip_probability": round(mean(slips), 1) if slips else None,
+            }
+        )
+    return rows
 
 
 def _generate_personality_utterance_samples(
@@ -748,6 +948,7 @@ def _evaluation_summary(
     learning_curve: list[dict[str, Any]],
     misconception_comparison: dict[str, Any],
     skill_breakdown: list[dict[str, Any]],
+    difficulty_breakdown: list[dict[str, Any]],
     validity: dict[str, Any],
 ) -> dict[str, Any]:
     first = learning_curve[0]
@@ -756,6 +957,14 @@ def _evaluation_summary(
         skill_breakdown,
         key=lambda row: row["weak_skill_probability"] or 100,
     )
+    easiest = min(
+        difficulty_breakdown,
+        key=lambda row: row["difficulty"],
+    ) if difficulty_breakdown else {}
+    hardest = max(
+        difficulty_breakdown,
+        key=lambda row: row["difficulty"],
+    ) if difficulty_breakdown else {}
     return {
         "accuracy_gain_from_min_to_max": round(last["accuracy"] - first["accuracy"], 3),
         "probability_gain_from_min_to_max": round(
@@ -763,6 +972,17 @@ def _evaluation_summary(
             1,
         ),
         "weakest_skill_condition": weakest_skill["weak_skill"],
+        "difficulty_rows": len(difficulty_breakdown),
+        "easy_average_correct_probability": easiest.get("average_correct_probability"),
+        "hard_average_correct_probability": hardest.get("average_correct_probability"),
+        "difficulty_probability_gap": (
+            round(
+                easiest["average_correct_probability"] - hardest["average_correct_probability"],
+                1,
+            )
+            if easiest and hardest
+            else None
+        ),
         "misconception_rows": len(misconception_comparison["rows"]),
         "internal_validity_score": validity["overall_score"],
         "internal_validity_verdict": validity["verdict"],
@@ -770,6 +990,16 @@ def _evaluation_summary(
         "human_replacement_validity_score": validity["overall_score"],
         "human_replacement_verdict": validity["verdict"],
     }
+
+
+def _difficulty_label(difficulty: Any) -> str:
+    if difficulty == 1:
+        return "easy"
+    if difficulty == 2:
+        return "medium"
+    if difficulty == 3:
+        return "hard"
+    return f"difficulty_{difficulty}"
 
 
 def _cognitive_model_comparison_summary(comparison_rows: list[dict[str, Any]]) -> dict[str, Any]:

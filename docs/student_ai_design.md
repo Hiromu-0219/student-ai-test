@@ -183,6 +183,24 @@ export_cognitive_model_comparison_for_codex(result)
 data/assessments/cognitive_model_comparison_for_codex.txt
 ```
 
+また、生徒AI単体評価では、パラメータの意味と観測される効果をすぐ確認できるように `Parameter Guide` を出力する。
+
+出力ファイル:
+
+```text
+data/assessments/student_ai_evaluation_for_codex.txt
+```
+
+主に見る表:
+
+| 表 | 確認すること |
+| --- | --- |
+| `Parameter Guide` | 各パラメータが何を意味し、何に影響するか |
+| `Learning Curve` | 理解度・スキル習得度と正答率の関係 |
+| `Difficulty Breakdown` | 難易度別に正答率・正答確率が変わるか |
+| `Skill Breakdown` | 弱点化したスキルの問題で正答確率が下がるか |
+| `Misconception Comparison` | 誤概念が関連問題に効いているか |
+
 これにより、同じ問題でも次の違いを表現できる。
 
 - 理解度・スキル習得度が高い生徒は正答しやすい
