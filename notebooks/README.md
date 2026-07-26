@@ -6,14 +6,26 @@ Colabで実行する実験Notebookの使い分けです。LLMロードは時間�
 
 | 順番 | Notebook | 目的 |
 | --- | --- | --- |
-| 1 | `student_ai_colab.ipynb` | 生徒AI単体の妥当性確認。理解度、誤概念、難易度、スキル弱点、発話サンプルを見る |
-| 2 | `personality_experiment.ipynb` | 個人特徴が発話に反映され、伝達AIが分類できるかを見る |
-| 3 | `teaching_strategy_experiment.ipynb` | 複数生徒クラスを観察し、伝達AI、講義設計AI、教師発話AIの流れを見る |
-| 4 | `paper_core_experiment.ipynb` | 論文に使う最小実験と出力結果をまとめて確認する |
+| 1 | `student_ai_presentation_experiment.ipynb` | 生徒AI設計の発表用。認知モデル、テスト結果、性格別発話、複数生徒分布をまとめて見る |
+| 2 | `student_ai_colab.ipynb` | 生徒AI単体の詳細確認。理解度、誤概念、難易度、スキル弱点、発話サンプルを見る |
+| 3 | `personality_experiment.ipynb` | 個人特徴が発話に反映され、伝達AIが分類できるかを見る |
+| 4 | `teaching_strategy_experiment.ipynb` | 複数生徒クラスを観察し、伝達AI、講義設計AI、教師発話AIの流れを見る |
+| 5 | `paper_core_experiment.ipynb` | 論文に使う最小実験と出力結果をまとめて確認する |
 
 ## 最初に実行するNotebook
 
-生徒AIの設計を確認したい場合は `student_ai_colab.ipynb` から始めます。
+進捗報告や発表では、まず `student_ai_presentation_experiment.ipynb` から始めます。
+
+発表用Notebookで確認するもの:
+
+- 認知モデルの式
+- 理解度とテスト結果の関係
+- 問題難易度、誤概念、スキル弱点の影響
+- 性格別の発話サンプル
+- 複数生徒AIにしたときのクラス分布
+- 従来モデルとBKT/IRT寄りモデルの補助比較
+
+詳細に掘り下げたい場合は `student_ai_colab.ipynb` を使います。
 
 主に確認するもの:
 
