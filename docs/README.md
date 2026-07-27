@@ -7,6 +7,7 @@
 | ファイル | 役割 |
 | --- | --- |
 | `student_ai_design.md` | 生徒AIの設計仕様書。状態、認知モデル、発話生成、評価範囲を説明 |
+| `classroom_level_cognitive_model_rationale.md` | 認知モデル制御を、教室全体を見る研究目的から説明する資料 |
 | `internal_validity_experiment.md` | 生徒AIを内部妥当性から検証するための評価手順 |
 | `paper_experiment_core.md` | 論文に使う実験のコア、必要な出力、Notebookで確認する内容 |
 | `reference_mapping.md` | BKT/IRTなど、設計要素と参考文献の対応表 |
@@ -26,6 +27,7 @@
 
 ```text
 docs/daily/
+  2026-07-28.md
   2026-07-26.md
   2026-07-13.md
   2026-07-14.md
@@ -46,3 +48,4 @@ data/assessments/student_ai_evaluation_for_codex.txt
 data/assessments/cognitive_model_comparison_for_codex.txt
 data/assessments/teaching_strategy_result_summary.txt
 ```
+
