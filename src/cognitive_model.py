@@ -215,10 +215,10 @@ def _format_fraction(value: Fraction) -> str:
 
 def _related_misconceptions(misconceptions: list[str], skill: str) -> list[str]:
     keywords = {
-        "can_transpose_terms": ["移項", "符号", "反対側", "遘", "隨", "蜿"],
-        "can_divide_by_coefficient": ["係数", "割", "引", "3x", "菫", "蜑", "蠑"],
-        "can_handle_negative_numbers": ["マイナス", "負", "-", "繝槭う繝翫せ", "雋"],
-        "can_handle_fractions": ["分数", "分母", "/", "蛻"],
+        "can_transpose_terms": ["移項", "符号", "反対側"],
+        "can_divide_by_coefficient": ["係数", "割", "引", "3x"],
+        "can_handle_negative_numbers": ["マイナス", "負", "-"],
+        "can_handle_fractions": ["分数", "分母", "/"],
     }.get(skill, [])
     return [
         misconception
