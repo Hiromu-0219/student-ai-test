@@ -30,10 +30,19 @@ class StudentAgent:
         prompt = build_student_prompt(student_state, problem, assessment_directive)
         system_prompt = ASSESSMENT_SYSTEM_PROMPT if assessment_directive else SYSTEM_PROMPT
         raw_answer = self.speech_generator.generate(system_prompt, prompt)
-        return normalize_student_turn(raw_answer, assessment=assessment_directive is not None)
+        return normalize_student_turn(
+            raw_answer,
+            assessment=assessment_directive is not None,
+            teacher_message=problem,
+        )
 
 
-def normalize_student_turn(raw_answer: str, *, assessment: bool = False) -> str:
+def normalize_student_turn(
+    raw_answer: str,
+    *,
+    assessment: bool = False,
+    teacher_message: str | None = None,
+) -> str:
     """Keep only one student turn and remove accidental teacher dialogue."""
 
     text = str(raw_answer).strip()
@@ -44,7 +53,62 @@ def normalize_student_turn(raw_answer: str, *, assessment: bool = False) -> str:
         return _keep_assessment_answer(text)
     text = _keep_only_student_speaker_turn(text)
     text = _remove_empty_lines(text)
+    text = _ensure_non_empty_answer(text)
+    text = _ensure_answer_for_linear_problem(text, teacher_message)
     return _limit_sentences(text, max_sentences=4)
+
+
+def _ensure_non_empty_answer(text: str) -> str:
+    return text.strip() or "答え: わかりません"
+
+
+def _ensure_answer_for_linear_problem(text: str, teacher_message: str | None) -> str:
+    if not teacher_message or re.search(r"答え\s*[:：]", text):
+        return text
+    inferred = _infer_linear_equation_answer(teacher_message)
+    if inferred is None:
+        return text
+    if re.search(rf"x\s*=\s*{re.escape(inferred)}(?![\d/])", text):
+        return f"{text} 答え: x = {inferred}"
+    return f"{text} 答え: x = {inferred}"
+
+
+def _infer_linear_equation_answer(text: str) -> str | None:
+    compact = text.replace(" ", "")
+    match = re.search(r"([+-]?\d*)x=([+-]?\d+)", compact)
+    if match:
+        coef_text, rhs_text = match.groups()
+        if coef_text in {"", "+"}:
+            coef = 1
+        elif coef_text == "-":
+            coef = -1
+        else:
+            coef = int(coef_text)
+        rhs = int(rhs_text)
+        if coef == 0:
+            return None
+        if rhs % coef == 0:
+            return str(rhs // coef)
+        return f"{rhs}/{coef}"
+
+    match = re.search(r"([+-]?\d*)x([+-]\d+)=([+-]?\d+)", compact)
+    if match:
+        coef_text, const_text, rhs_text = match.groups()
+        if coef_text in {"", "+"}:
+            coef = 1
+        elif coef_text == "-":
+            coef = -1
+        else:
+            coef = int(coef_text)
+        const = int(const_text)
+        rhs = int(rhs_text)
+        numerator = rhs - const
+        if coef == 0:
+            return None
+        if numerator % coef == 0:
+            return str(numerator // coef)
+        return f"{numerator}/{coef}"
+    return None
 
 
 def _strip_code_fence(text: str) -> str:

@@ -128,3 +128,65 @@ def test_llm_communication_ai_falls_back_on_invalid_json():
     )
 
     assert result.profile_prediction == "C"
+
+
+def test_llm_communication_ai_calibrates_empty_high_claim_to_reserved():
+    llm_output = """
+{
+  "profile_prediction": "B",
+  "trait_estimates": {
+    "self_efficacy": "high",
+    "question_tendency": "high",
+    "motivation": "high",
+    "extraversion": "high",
+    "conscientiousness": "high",
+    "neuroticism": "low"
+  },
+  "evidence": ["claims confidence"],
+  "confidence": 0.95,
+  "teacher_summary": "High confidence student.",
+  "recommended_teacher_attention": ["extension"]
+}
+""".strip()
+
+    result = LLMCommunicationAI(FakeClassifierLLM(llm_output)).classify_utterance(
+        utterance="",
+        student_id="S_EMPTY",
+    )
+
+    assert result.profile_prediction == "C"
+    assert result.trait_estimates["self_efficacy"] == "low"
+    assert result.trait_estimates["question_tendency"] == "low"
+    assert result.trait_estimates["motivation"] == "low"
+    assert result.confidence <= 0.65
+
+
+def test_llm_communication_ai_calibrates_short_answer_question_tendency():
+    llm_output = """
+{
+  "profile_prediction": "D",
+  "trait_estimates": {
+    "self_efficacy": "high",
+    "question_tendency": "high",
+    "motivation": "high",
+    "extraversion": "high",
+    "conscientiousness": "high",
+    "neuroticism": "low"
+  },
+  "evidence": ["short answer"],
+  "confidence": 0.92,
+  "teacher_summary": "Confident student.",
+  "recommended_teacher_attention": ["extension"]
+}
+""".strip()
+
+    result = LLMCommunicationAI(FakeClassifierLLM(llm_output)).classify_utterance(
+        utterance="3を除きましょう。",
+        student_id="S_SHORT",
+    )
+
+    assert result.profile_prediction == "C"
+    assert result.trait_estimates["question_tendency"] == "low"
+    assert result.trait_estimates["motivation"] == "low"
+    assert result.trait_estimates["extraversion"] == "low"
+    assert result.confidence <= 0.7

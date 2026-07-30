@@ -13,7 +13,10 @@ COMMUNICATION_AI_SYSTEM_PROMPT = """You are a communication AI for an education 
 Read only the student's observable classroom utterance and infer traits to pass to a teacher AI.
 
 Rules:
-- Infer from speaking style, not from whether the math answer is correct.
+- Infer only from observable classroom evidence: utterance text, no-response, question marks, shown work, response time, and correctness.
+- Do not infer high confidence, high motivation, or high question tendency without explicit observable evidence.
+- Empty or very short answers are reserved/low-visible-engagement unless there is clear contrary evidence.
+- Incorrect answers can indicate a knowledge risk, but do not automatically mean low personality traits.
 - Return JSON only.
 - Do not write Markdown or explanations outside JSON.
 - profile_prediction must be one of A, B, C, D.
@@ -178,11 +181,14 @@ class LLMCommunicationAI:
         if parsed is None:
             return fallback_result
 
+        observable_features = _extract_features(utterance)
         traits = _normalize_traits(parsed.get("trait_estimates", {}), fallback_result.trait_estimates)
+        traits = _calibrate_traits_with_observation(traits, observable_features)
         profile = _normalize_profile(
             parsed.get("profile_prediction"),
             fallback_result.profile_prediction,
         )
+        profile = _calibrate_profile_with_observation(profile, traits, observable_features)
         evidence = _normalize_string_list(parsed.get("evidence"), fallback_result.evidence)
         attention = _normalize_string_list(
             parsed.get("recommended_teacher_attention"),
@@ -190,6 +196,7 @@ class LLMCommunicationAI:
         )
         teacher_summary = str(parsed.get("teacher_summary") or fallback_result.teacher_summary)
         confidence = _normalize_confidence(parsed.get("confidence"), fallback_result.confidence)
+        confidence = _calibrate_confidence_with_observation(confidence, observable_features)
 
         return TraitClassification(
             profile_prediction=profile,
@@ -252,33 +259,47 @@ class LLMCommunicationAI:
 
 
 def _extract_features(utterance: str) -> dict[str, bool | int]:
-    text = utterance
+    text = utterance.strip()
     lower_text = text.lower()
+    no_response = len(text) == 0
     return {
+        "no_response": no_response,
         "has_low_confidence": any(
             token in lower_text
-            for token in ["not sure", "maybe", "i guess", "confused", "worried"]
+            for token in [
+                "not sure",
+                "maybe",
+                "i guess",
+                "confused",
+                "worried",
+                "自信",
+                "不安",
+                "たぶん",
+                "わかりません",
+                "分かりません",
+                "迷",
+            ]
         ),
         "has_high_confidence": any(
             token in lower_text
-            for token in ["i know", "i can", "clearly", "definitely", "i understand"]
+            for token in ["i know", "i can", "clearly", "definitely", "i understand", "分かります", "できます", "確実"]
         ),
-        "asks_question": any(token in text for token in ["?", "?"])
-        or any(token in lower_text for token in ["is this", "can you", "please tell", "am i"]),
+        "asks_question": any(token in text for token in ["?", "？"])
+        or any(token in lower_text for token in ["is this", "can you", "please tell", "am i", "ですか", "でしょうか", "教えて"]),
         "shows_anxiety": any(
-            token in lower_text for token in ["anxious", "worried", "confused", "not sure"]
+            token in lower_text for token in ["anxious", "worried", "confused", "not sure", "不安", "迷", "自信はない"]
         ),
         "shows_persistence": any(
-            token in lower_text for token in ["try again", "think again", "i will try", "let me"]
+            token in lower_text for token in ["try again", "think again", "i will try", "let me", "もう一度", "考え直", "やってみ"]
         ),
         "shows_steps": any(
             token in lower_text
-            for token in ["first", "then", "because", "moved", "divide", "both sides", "substituting"]
+            for token in ["first", "then", "because", "moved", "divide", "both sides", "substituting", "まず", "両辺", "割", "移", "だから", "ので"]
         ),
         "short_answer": len(text) <= 35,
         "talkative_answer": len(text) >= 75,
         "accepts_teacher": any(token in lower_text for token in ["yes", "okay", "i see", "understood"]),
-        "prefers_checking_sign": any(token in lower_text for token in ["sign", "move", "moved", "transpose"]),
+        "prefers_checking_sign": any(token in lower_text for token in ["sign", "move", "moved", "transpose", "符号", "移項"]),
         "length": len(text),
     }
 
@@ -293,12 +314,20 @@ def _build_llm_classification_prompt(
 Input:
 - student_id: {student_id}
 - utterance: {utterance}
+- observable_features: {json.dumps(_extract_features(utterance), ensure_ascii=False)}
 
 Profile labels:
-A. Low confidence, asks many checks, high anxiety.
+A. Low confidence, asks checks, high anxiety.
 B. Diligent, step-by-step, persistent.
-C. Short/reserved, few questions, low visible motivation.
+C. Short/reserved, few questions, low visible motivation or no response.
 D. Confident, talkative, proactive.
+
+Observation constraints:
+- If utterance is empty, choose C unless there is explicit contrary evidence.
+- If utterance is short and has no question, question_tendency should be low.
+- If there is no confidence expression, self_efficacy should usually be medium, not high.
+- If there is no persistence expression, motivation should usually be medium or low, not high.
+- Use concrete evidence strings, not placeholders such as "evidence 1".
 
 Traits to estimate:
 - self_efficacy: low / medium / high
@@ -341,6 +370,80 @@ def _parse_llm_classification(raw_output: str) -> dict[str, Any] | None:
     except json.JSONDecodeError:
         return None
     return parsed if isinstance(parsed, dict) else None
+
+
+def _calibrate_traits_with_observation(
+    traits: dict[str, str],
+    features: dict[str, bool | int],
+) -> dict[str, str]:
+    calibrated = dict(traits)
+    if features["no_response"]:
+        calibrated["self_efficacy"] = "low"
+        calibrated["question_tendency"] = "low"
+        calibrated["motivation"] = "low"
+        calibrated["extraversion"] = "low"
+        calibrated["conscientiousness"] = "low"
+        calibrated["neuroticism"] = "medium"
+        return calibrated
+
+    if features["short_answer"] and not features["asks_question"]:
+        calibrated["question_tendency"] = "low"
+        calibrated["extraversion"] = "low"
+        if not features["shows_steps"]:
+            calibrated["conscientiousness"] = "low"
+        if not features["shows_persistence"]:
+            calibrated["motivation"] = "low"
+
+    if not features["has_high_confidence"]:
+        calibrated["self_efficacy"] = _cap_level(calibrated["self_efficacy"], "medium")
+    if not features["asks_question"]:
+        calibrated["question_tendency"] = _cap_level(calibrated["question_tendency"], "medium")
+    if not features["shows_persistence"] and not features["talkative_answer"]:
+        calibrated["motivation"] = _cap_level(calibrated["motivation"], "medium")
+    if not features["talkative_answer"]:
+        calibrated["extraversion"] = _cap_level(calibrated["extraversion"], "medium")
+    return calibrated
+
+
+def _calibrate_profile_with_observation(
+    profile: str,
+    traits: dict[str, str],
+    features: dict[str, bool | int],
+) -> str:
+    if features["no_response"]:
+        return "C"
+    if (
+        features["short_answer"]
+        and traits.get("motivation") == "low"
+        and not features["has_high_confidence"]
+    ):
+        return "C"
+    if profile == "D" and not (features["has_high_confidence"] or features["talkative_answer"]):
+        return _predict_profile(traits, features)
+    if profile == "B" and not (features["shows_steps"] or features["shows_persistence"]):
+        return _predict_profile(traits, features)
+    return profile
+
+
+def _calibrate_confidence_with_observation(
+    confidence: float,
+    features: dict[str, bool | int],
+) -> float:
+    if features["no_response"]:
+        return min(confidence, 0.65)
+    if (
+        features["short_answer"]
+        and not features["asks_question"]
+        and not features["has_high_confidence"]
+    ):
+        return min(confidence, 0.7)
+    return confidence
+
+
+def _cap_level(value: str, maximum: str) -> str:
+    order = {"low": 0, "medium": 1, "high": 2}
+    reverse = {0: "low", 1: "medium", 2: "high"}
+    return reverse[min(order.get(value, 1), order[maximum])]
 
 
 def _normalize_profile(value: Any, fallback: str) -> str:

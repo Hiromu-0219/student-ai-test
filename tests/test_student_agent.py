@@ -38,3 +38,15 @@ def test_normalize_student_turn_adds_x_to_numeric_answer_label():
     raw = "両辺を2で割ります。答え: 4"
 
     assert normalize_student_turn(raw) == "両辺を2で割ります。 答え: x = 4"
+
+
+def test_normalize_student_turn_fills_linear_equation_answer_from_teacher_message():
+    raw = "3をどう扱うかを考えています。"
+
+    result = normalize_student_turn(raw, teacher_message="3x = 15 を解いてください。")
+
+    assert result.endswith("答え: x = 5")
+
+
+def test_normalize_student_turn_converts_empty_to_unknown_answer():
+    assert normalize_student_turn("   ") == "答え: わかりません"
