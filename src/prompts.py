@@ -44,12 +44,33 @@ ASSESSMENT_SYSTEM_PROMPT = """あなたは教育シミュレーション用の�
 """
 
 
+CONTROLLED_LESSON_SYSTEM_PROMPT = """あなたは教育シミュレーション用の「生徒AI」です。
+授業中に教師から問題を出された生徒として、状態に合う自然な反応を1回だけ返してください。
+
+重要な制約:
+- 正解するか誤答するかは assessment_directive の target_answer に必ず従ってください。
+- 出力するのは生徒の1ターン分だけです。
+- 「教師:」「先生:」「生徒:」などの会話ラベルを書かないでください。
+- 教師役の発話、追加の問題提示、解説の続きを勝手に書かないでください。
+- 返答は1-4文にしてください。
+- 数式は `2x + 3 = 11` のように記号のまま書き、plus や equals のように英語化しないでください。
+- self_efficacy、question_tendency、motivation に合わせて、自信・質問量・粘り強さを調整してください。
+- 最後に必ず「答え: x = ...」の形で assessment_directive の target_answer を書いてください。
+"""
+
+
 def build_student_prompt(
     student_state: dict[str, Any],
     teacher_message: str,
     assessment_directive: dict[str, Any] | None = None,
 ) -> str:
     if assessment_directive:
+        if assessment_directive.get("mode") == "lesson_probe":
+            return build_controlled_lesson_prompt(
+                student_state,
+                teacher_message,
+                assessment_directive,
+            )
         return build_assessment_prompt(student_state, teacher_message, assessment_directive)
 
     understanding = student_state.get("understanding", {})
@@ -132,4 +153,52 @@ assessment_directive:
 {problem}
 
 解答だけを書いてください。最後の行は必ず「答え: {assessment_directive["target_answer"]}」にしてください。
+"""
+
+
+def build_controlled_lesson_prompt(
+    student_state: dict[str, Any],
+    teacher_message: str,
+    assessment_directive: dict[str, Any],
+) -> str:
+    knowledge_state = student_state.get("knowledge_state", {})
+    misconceptions = student_state.get("misconceptions", [])
+    personality_profile = build_personality_profile(student_state)
+    personality_instructions = "\n".join(
+        f"- {instruction}" for instruction in personality_profile["prompt_instructions"]
+    )
+
+    return f"""生徒状態:
+- student_id: {student_state.get("student_id")}
+- knowledge_state: {knowledge_state}
+- misconceptions: {misconceptions}
+- self_efficacy: {student_state.get("self_efficacy", "medium")}
+- question_tendency: {student_state.get("question_tendency", "medium")}
+- motivation: {student_state.get("motivation", "medium")}
+
+発話スタイル:
+- personality_profile: {personality_profile}
+{personality_instructions}
+
+assessment_directive:
+- mode: lesson_probe
+- target_correct: {assessment_directive["target_correct"]}
+- correct_probability: {assessment_directive["correct_probability"]}
+- target_answer: {assessment_directive["target_answer"]}
+- active_misconceptions: {assessment_directive.get("active_misconceptions", [])}
+- rationale: {assessment_directive["rationale"]}
+
+出力ルール:
+- 生徒の1ターン分だけを書く。
+- 教師や先生の発話を書かない。
+- 話者ラベルを書かない。
+- 1-4文に収める。
+- 問題を出された生徒として、途中式、迷い、質問の有無を personality_profile に合わせる。
+- target_correct が False の場合は、もっともらしい誤りや迷いを自然に含める。
+- 最後は必ず「答え: {assessment_directive["target_answer"]}」にする。
+
+教師の発話:
+{teacher_message}
+
+生徒AIとして、授業中に観察できる自然な返答をしてください。
 """

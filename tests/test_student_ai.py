@@ -150,3 +150,32 @@ def test_assessment_response_uses_answer_only_format(tmp_path):
     )
 
     assert result["answer"] == "答え: x = 4"
+
+
+def test_lesson_probe_response_keeps_student_style_with_controlled_answer(tmp_path):
+    students_dir = tmp_path / "students"
+    logs_dir = tmp_path / "logs"
+    students_dir.mkdir()
+    _write_student(students_dir / "S999.json", score=50)
+
+    sim = StudentAISimulator(
+        students_dir=str(students_dir),
+        logs_dir=str(logs_dir),
+        use_mock_model=True,
+    )
+    result = sim.respond(
+        "S999",
+        "2x+3=11 を解いてください",
+        update_knowledge=False,
+        assessment_directive={
+            "mode": "lesson_probe",
+            "target_correct": False,
+            "target_answer": "x = 5",
+            "correct_probability": 20,
+            "rationale": "controlled wrong answer for lesson observation",
+        },
+    )
+
+    assert result["answer"] != "答え: x = 5"
+    assert "答え: x = 5" in result["answer"]
+    assert "教師" not in result["answer"]

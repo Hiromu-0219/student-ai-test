@@ -27,9 +27,9 @@ class RuleBasedMockLLM:
     def generate(self, system_prompt: str, user_prompt: str) -> str:
         target_answer = _extract_target_answer(user_prompt)
         if target_answer:
-            if "学力テスト" in system_prompt or "assessment" in system_prompt.lower():
+            if "学力テスト" in system_prompt:
                 return f"答え: {target_answer}"
-            return f"考えてみると、{target_answer} だと思います。答え: {target_answer}"
+            return _style_mock_answer(user_prompt, _answer_value(target_answer))
 
         problem = _extract_problem(user_prompt)
         answer = _solve_simple_linear_equation(problem)
@@ -145,6 +145,11 @@ class StudentAISimulator:
         updated_state["learning_history"].append(event)
         self.state_manager.save_student(updated_state)
         return event
+
+
+def _answer_value(target_answer: str) -> str:
+    match = re.search(r"x\s*=\s*([^\s。！？?]+)", target_answer)
+    return match.group(1) if match else target_answer
 
 
 def _extract_problem(prompt: str) -> str:

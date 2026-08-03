@@ -3,7 +3,12 @@ from __future__ import annotations
 import re
 from typing import Any, Protocol
 
-from src.prompts import ASSESSMENT_SYSTEM_PROMPT, SYSTEM_PROMPT, build_student_prompt
+from src.prompts import (
+    ASSESSMENT_SYSTEM_PROMPT,
+    CONTROLLED_LESSON_SYSTEM_PROMPT,
+    SYSTEM_PROMPT,
+    build_student_prompt,
+)
 
 
 class SpeechGenerator(Protocol):
@@ -28,11 +33,20 @@ class StudentAgent:
         assessment_directive: dict[str, Any] | None = None,
     ) -> str:
         prompt = build_student_prompt(student_state, problem, assessment_directive)
-        system_prompt = ASSESSMENT_SYSTEM_PROMPT if assessment_directive else SYSTEM_PROMPT
+        directive_mode = (assessment_directive or {}).get("mode")
+        if directive_mode == "lesson_probe":
+            system_prompt = CONTROLLED_LESSON_SYSTEM_PROMPT
+            is_assessment = False
+        elif assessment_directive:
+            system_prompt = ASSESSMENT_SYSTEM_PROMPT
+            is_assessment = True
+        else:
+            system_prompt = SYSTEM_PROMPT
+            is_assessment = False
         raw_answer = self.speech_generator.generate(system_prompt, prompt)
         return normalize_student_turn(
             raw_answer,
-            assessment=assessment_directive is not None,
+            assessment=is_assessment,
             teacher_message=problem,
         )
 
