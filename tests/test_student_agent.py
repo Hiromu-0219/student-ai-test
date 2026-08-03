@@ -1,4 +1,4 @@
-from src.student_agent import normalize_student_turn
+from src.student_agent import StudentAgent, normalize_student_turn
 
 
 def test_normalize_student_turn_removes_teacher_dialogue():
@@ -50,3 +50,41 @@ def test_normalize_student_turn_fills_linear_equation_answer_from_teacher_messag
 
 def test_normalize_student_turn_converts_empty_to_unknown_answer():
     assert normalize_student_turn("   ") == "答え: わかりません"
+
+
+class _FakeGenerator:
+    model_id = "fake"
+
+    def __init__(self, answer):
+        self.answer = answer
+
+    def generate(self, system_prompt, user_prompt):
+        return self.answer
+
+
+def test_lesson_probe_forces_controlled_answer_label():
+    agent = StudentAgent(
+        _FakeGenerator("まず3を引いて、2で割ります。答え: x = 4")
+    )
+
+    result = agent.answer(
+        {
+            "student_id": "S999",
+            "knowledge_state": {"linear_equation": {"score": 30}},
+            "misconceptions": [],
+            "self_efficacy": "medium",
+            "question_tendency": "medium",
+            "motivation": "medium",
+        },
+        "2x + 3 = 11 を解いてください。",
+        assessment_directive={
+            "mode": "lesson_probe",
+            "target_correct": False,
+            "correct_probability": 20,
+            "target_answer": "x = 5",
+            "rationale": "controlled wrong answer",
+        },
+    )
+
+    assert result.endswith("答え: x = 5")
+    assert "答え: x = 4" not in result

@@ -44,11 +44,17 @@ class StudentAgent:
             system_prompt = SYSTEM_PROMPT
             is_assessment = False
         raw_answer = self.speech_generator.generate(system_prompt, prompt)
-        return normalize_student_turn(
+        normalized_answer = normalize_student_turn(
             raw_answer,
             assessment=is_assessment,
             teacher_message=problem,
         )
+        if directive_mode == "lesson_probe":
+            return _force_controlled_answer_label(
+                normalized_answer,
+                (assessment_directive or {}).get("target_answer"),
+            )
+        return normalized_answer
 
 
 def normalize_student_turn(
@@ -70,6 +76,16 @@ def normalize_student_turn(
     text = _ensure_non_empty_answer(text)
     text = _ensure_answer_for_linear_problem(text, teacher_message)
     return _limit_sentences(text, max_sentences=4)
+
+
+def _force_controlled_answer_label(text: str, target_answer: str | None) -> str:
+    if not target_answer:
+        return text
+    answer_label = _normalize_answer_label(f"答え: {target_answer}")
+    text = _normalize_answer_label(text).strip()
+    text = re.sub(r"答え\s*[:：]\s*(?:x\s*=\s*)?[^\s。！？?]+", "", text).strip()
+    text = re.sub(r"\s+", " ", text).strip()
+    return f"{text} {answer_label}".strip() if text else answer_label
 
 
 def _ensure_non_empty_answer(text: str) -> str:
