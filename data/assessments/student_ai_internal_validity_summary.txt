@@ -1,0 +1,241 @@
+# Student AI Evaluation Summary
+
+## Summary
+{
+  "accuracy_gain_from_min_to_max": 0.85,
+  "probability_gain_from_min_to_max": 77.5,
+  "weakest_skill_condition": "can_handle_fractions",
+  "difficulty_rows": 3,
+  "easy_average_correct_probability": 65,
+  "hard_average_correct_probability": 51,
+  "difficulty_probability_gap": 14,
+  "misconception_rows": 3,
+  "internal_validity_score": 0.95,
+  "internal_validity_verdict": "internal_proxy_validity_supported",
+  "evidence_level": "internal_validity_only",
+  "human_replacement_validity_score": 0.95,
+  "human_replacement_verdict": "internal_proxy_validity_supported"
+}
+
+## Internal Validity Evaluation
+{
+  "overall_score": 0.95,
+  "raw_internal_score": 1.0,
+  "verdict": "internal_proxy_validity_supported",
+  "evidence_level": "internal_validity_only",
+  "criteria": [
+    {
+      "criterion": "cognitive_learning_curve",
+      "score": 1.0,
+      "passed": true,
+      "reason": "理解度上昇に対する平均正答確率の上昇量=77.5、単調性=1.0。"
+    },
+    {
+      "criterion": "misconception_sensitivity",
+      "score": 1.0,
+      "passed": true,
+      "reason": "関連問題での低中理解度ギャップ平均=18.6、高理解度ギャップ=2.0。"
+    },
+    {
+      "criterion": "skill_specific_weakness",
+      "score": 1.0,
+      "passed": true,
+      "reason": "弱点スキル化による平均正答確率低下=39.2。最弱条件=can_handle_fractions。"
+    },
+    {
+      "criterion": "personality_observable_separation",
+      "score": 1.0,
+      "passed": true,
+      "reason": "自信の低さ、質問傾向、丁寧さ、短さが発話特徴として分離しているかを判定。"
+    },
+    {
+      "criterion": "one_turn_student_response",
+      "score": 1.0,
+      "passed": true,
+      "reason": "教師発話や話者ラベルを混入させず、生徒1ターンとして観察可能かを判定。"
+    }
+  ],
+  "claim_scope": "この結果が支持するのは、人間全体の完全な代替ではなく、一次方程式学習における理解度・誤概念・個人特徴を制御した限定的な学習者代理である。",
+  "caution": "人間学習者との外的妥当性は、人間評価者または別LLM評価者による発話自然性評価で別途確認する必要がある。"
+}
+
+## Learning Curve
+{"understanding": 0, "correct_count": 1, "total_count": 20, "accuracy": 0.05, "average_correct_probability": 9.2}
+{"understanding": 10, "correct_count": 1, "total_count": 20, "accuracy": 0.05, "average_correct_probability": 12.2}
+{"understanding": 20, "correct_count": 1, "total_count": 20, "accuracy": 0.05, "average_correct_probability": 15.8}
+{"understanding": 30, "correct_count": 3, "total_count": 20, "accuracy": 0.15, "average_correct_probability": 23.1}
+{"understanding": 40, "correct_count": 6, "total_count": 20, "accuracy": 0.3, "average_correct_probability": 36.5}
+{"understanding": 50, "correct_count": 10, "total_count": 20, "accuracy": 0.5, "average_correct_probability": 47.4}
+{"understanding": 60, "correct_count": 12, "total_count": 20, "accuracy": 0.6, "average_correct_probability": 58.0}
+{"understanding": 70, "correct_count": 13, "total_count": 20, "accuracy": 0.65, "average_correct_probability": 68.7}
+{"understanding": 80, "correct_count": 14, "total_count": 20, "accuracy": 0.7, "average_correct_probability": 76}
+{"understanding": 90, "correct_count": 18, "total_count": 20, "accuracy": 0.9, "average_correct_probability": 81.9}
+{"understanding": 100, "correct_count": 18, "total_count": 20, "accuracy": 0.9, "average_correct_probability": 86.7}
+
+## Misconception Comparison
+{
+  "related_skills": [
+    "can_divide_by_coefficient",
+    "can_transpose_terms"
+  ],
+  "rows": [
+    {
+      "understanding": 20,
+      "all_accuracy_with_misconception": 0.05,
+      "all_accuracy_without_misconception": 0.15,
+      "all_probability_with_misconception": 15.8,
+      "all_probability_without_misconception": 23.4,
+      "all_probability_gap": 7.6,
+      "related_question_count": 6,
+      "related_accuracy_with_misconception": 0.0,
+      "related_accuracy_without_misconception": 0.333,
+      "related_probability_with_misconception": 5,
+      "related_probability_without_misconception": 30.3,
+      "related_probability_gap": 25.3
+    },
+    {
+      "understanding": 50,
+      "all_accuracy_with_misconception": 0.5,
+      "all_accuracy_without_misconception": 0.5,
+      "all_probability_with_misconception": 47.4,
+      "all_probability_without_misconception": 51,
+      "all_probability_gap": 3.6,
+      "related_question_count": 6,
+      "related_accuracy_with_misconception": 0.667,
+      "related_accuracy_without_misconception": 0.667,
+      "related_probability_with_misconception": 50,
+      "related_probability_without_misconception": 62,
+      "related_probability_gap": 12
+    },
+    {
+      "understanding": 80,
+      "all_accuracy_with_misconception": 0.7,
+      "all_accuracy_without_misconception": 0.7,
+      "all_probability_with_misconception": 76,
+      "all_probability_without_misconception": 76.6,
+      "all_probability_gap": 0.6,
+      "related_question_count": 6,
+      "related_accuracy_with_misconception": 0.833,
+      "related_accuracy_without_misconception": 0.833,
+      "related_probability_with_misconception": 78.7,
+      "related_probability_without_misconception": 80.7,
+      "related_probability_gap": 2.0
+    }
+  ]
+}
+
+## Skill Breakdown
+{"weak_skill": "can_divide_by_coefficient", "question_count": 3, "correct_count": 1, "accuracy": 0.333, "weak_skill_probability": 40.3, "baseline_probability": 75.3, "target_probability_drop": 35.0, "average_correct_probability": 40.3}
+{"weak_skill": "can_handle_fractions", "question_count": 3, "correct_count": 0, "accuracy": 0.0, "weak_skill_probability": 24, "baseline_probability": 68, "target_probability_drop": 44, "average_correct_probability": 24}
+{"weak_skill": "can_handle_negative_numbers", "question_count": 7, "correct_count": 3, "accuracy": 0.429, "weak_skill_probability": 26.9, "baseline_probability": 70, "target_probability_drop": 43.1, "average_correct_probability": 26.9}
+{"weak_skill": "can_solve_ax_plus_b_equals_c", "question_count": 4, "correct_count": 0, "accuracy": 0.0, "weak_skill_probability": 37.5, "baseline_probability": 76.2, "target_probability_drop": 38.8, "average_correct_probability": 37.5}
+{"weak_skill": "can_transpose_terms", "question_count": 3, "correct_count": 2, "accuracy": 0.667, "weak_skill_probability": 40.3, "baseline_probability": 75.3, "target_probability_drop": 35.0, "average_correct_probability": 40.3}
+
+## Difficulty Breakdown
+{"difficulty": 1, "label": "easy", "understanding": 60, "question_count": 5, "correct_count": 3, "accuracy": 0.6, "average_correct_probability": 65, "average_guess_probability": 17, "average_slip_probability": 9}
+{"difficulty": 2, "label": "medium", "understanding": 60, "question_count": 7, "correct_count": 4, "accuracy": 0.571, "average_correct_probability": 61.1, "average_guess_probability": 14, "average_slip_probability": 11}
+{"difficulty": 3, "label": "hard", "understanding": 60, "question_count": 8, "correct_count": 5, "accuracy": 0.625, "average_correct_probability": 51, "average_guess_probability": 11, "average_slip_probability": 12}
+
+## Parameter Guide
+{"parameter": "knowledge_state.linear_equation.score", "meaning": "単元全体の潜在的な理解度", "visible_effect": "高いほど全体の正答確率が上がる"}
+{"parameter": "knowledge_state.linear_equation.<skill>", "meaning": "スキル別の潜在的な習得度", "visible_effect": "該当スキルの問題だけ正答確率が変わる"}
+{"parameter": "question.difficulty", "meaning": "問題難易度", "visible_effect": "同じ理解度でも難しい問題ほど正答確率が下がる"}
+{"parameter": "misconceptions", "meaning": "誤概念", "visible_effect": "関連問題の正答確率が下がり、誤答傾向が出る"}
+{"parameter": "guess_probability", "meaning": "未習得でも正答する確率", "visible_effect": "低理解度でも正答率が0%に張り付かない"}
+{"parameter": "slip_probability", "meaning": "習得済みでも誤答する確率", "visible_effect": "高理解度でも正答率が100%に張り付かない"}
+{"parameter": "self_efficacy", "meaning": "自己効力感", "visible_effect": "発話の自信表現と正答確率の小補正に効く"}
+{"parameter": "question_tendency", "meaning": "質問傾向", "visible_effect": "質問や確認発話の出やすさに効く"}
+{"parameter": "motivation", "meaning": "モチベーション", "visible_effect": "粘り強さ、返答の短さ、正答確率の小補正に効く"}
+{"parameter": "big_five", "meaning": "性格特性", "visible_effect": "発話の丁寧さ、不安、外向性などの見え方に効く"}
+
+## Utterance Samples
+[
+  {
+    "profile_id": "low_confidence_questioner",
+    "personality_profile": {
+      "confidence_expression": "low",
+      "question_behavior": "asks_specific_questions",
+      "motivation_expression": "neutral",
+      "verbosity": "medium",
+      "step_detail": "medium",
+      "emotional_tone": "anxious",
+      "teacher_alignment": "cooperative",
+      "strategy_flexibility": "neutral",
+      "prompt_instructions": [
+        "自信なさげに、断定を避けて答える。",
+        "わからない点があれば具体的に質問する。",
+        "不安や確認したい気持ちを少し出す。",
+        "教師の説明を素直に受け止める。"
+      ]
+    },
+    "utterance": "自信はないけど、両辺を整理して、x は 4 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 4",
+    "utterance_features": {
+      "char_count": 75,
+      "line_count": 1,
+      "question_mark_count": 1,
+      "uncertainty_marker_count": 2,
+      "has_answer_label": true,
+      "has_teacher_label": false
+    }
+  },
+  {
+    "profile_id": "diligent_confident",
+    "personality_profile": {
+      "confidence_expression": "high",
+      "question_behavior": "asks_when_stuck",
+      "motivation_expression": "persists",
+      "verbosity": "medium",
+      "step_detail": "shows_steps",
+      "emotional_tone": "calm",
+      "teacher_alignment": "cooperative",
+      "strategy_flexibility": "neutral",
+      "prompt_instructions": [
+        "自信を持って、はっきり答える。",
+        "つまずいたときだけ短く質問する。",
+        "間違えてももう一度考えようとする。",
+        "途中式や手順を丁寧に出す。",
+        "落ち着いた口調にする。",
+        "教師の説明を素直に受け止める。"
+      ]
+    },
+    "utterance": "これは分かります。まず定数項を移して、そのあと係数で割ります。x = 4 です。間違っていたら、もう一度考えます。 答え: x = 4",
+    "utterance_features": {
+      "char_count": 67,
+      "line_count": 1,
+      "question_mark_count": 0,
+      "uncertainty_marker_count": 0,
+      "has_answer_label": true,
+      "has_teacher_label": false
+    }
+  },
+  {
+    "profile_id": "quiet_low_motivation",
+    "personality_profile": {
+      "confidence_expression": "medium",
+      "question_behavior": "rarely_asks",
+      "motivation_expression": "gives_up_easily",
+      "verbosity": "short",
+      "step_detail": "skips_steps",
+      "emotional_tone": "neutral",
+      "teacher_alignment": "cooperative",
+      "strategy_flexibility": "neutral",
+      "prompt_instructions": [
+        "自信は中程度で、必要に応じて確認する。",
+        "質問は少なめにする。",
+        "難しいと感じると粘りが弱くなる。",
+        "返答を短めにする。",
+        "途中式を省略しがちにする。",
+        "教師の説明を素直に受け止める。"
+      ]
+    },
+    "utterance": "x = 4 です。 答え: x = 4",
+    "utterance_features": {
+      "char_count": 19,
+      "line_count": 1,
+      "question_mark_count": 0,
+      "uncertainty_marker_count": 0,
+      "has_answer_label": true,
+      "has_teacher_label": false
+    }
+  }
+]

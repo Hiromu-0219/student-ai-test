@@ -1,0 +1,49 @@
+# Cognitive Model Comparison For Codex
+
+このファイルをCodex/ChatGPTに渡すときは、このtxtをそのまま添付してください。
+
+## Basic Info
+student_id: S002
+test_id: linear_equation_20q_001
+question_count: 20
+
+## Summary
+{
+  "model_pair": "legacy_vs_bkt_irt",
+  "row_count": 11,
+  "average_probability_delta": 2.9,
+  "average_accuracy_delta": 0.018,
+  "largest_probability_gap_understanding": 100,
+  "largest_probability_gap": -8.3,
+  "interpretation": "bkt_irt reflects item difficulty, guess, and slip; legacy mainly maps understanding and skill score directly to correctness probability."
+}
+
+## Learning Curve Comparison
+understanding	legacy_accuracy	bkt_irt_accuracy	accuracy_delta	legacy_probability	bkt_irt_probability	probability_delta
+0	0.05	0.05	0.0	5	9.2	4.2
+10	0.05	0.05	0.0	5	12.2	7.2
+20	0.05	0.05	0.0	12	15.8	3.8
+30	0.1	0.15	0.05	19	23.1	4.1
+40	0.25	0.3	0.05	30.5	36.5	6.0
+50	0.4	0.5	0.1	41.4	47.4	6.0
+60	0.55	0.6	0.05	52	58.0	6.0
+70	0.6	0.65	0.05	63.8	68.7	4.9
+80	0.75	0.7	-0.05	74.4	76	1.6
+90	0.9	0.9	0.0	85	81.9	-3.1
+100	0.95	0.9	-0.05	95	86.7	-8.3
+
+## Interpretation
+- legacy: previous understanding-centered model.
+- bkt_irt: BKT/IRT-inspired model using skill mastery, item difficulty, guess, and slip.
+- bkt_irt keeps non-zero correctness at low understanding through guess.
+- bkt_irt avoids 100% correctness at high understanding through slip.
+- bkt_irt lowers probability for harder items under the same understanding.
+
+## Difficulty Breakdown By Model
+model	difficulty	label	question_count	accuracy	average_correct_probability	average_guess_probability	average_slip_probability
+legacy	1	easy	5	0.6	47	None	None
+legacy	2	medium	7	0.429	52.1	None	None
+legacy	3	hard	8	0.625	55	None	None
+bkt_irt	1	easy	5	0.6	65	17	9
+bkt_irt	2	medium	7	0.571	61.1	14	11
+bkt_irt	3	hard	8	0.625	51	11	12

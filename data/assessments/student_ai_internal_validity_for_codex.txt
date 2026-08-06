@@ -1,0 +1,185 @@
+# Student AI Evaluation For Codex
+
+このファイルをCodex/ChatGPTに渡すときは、このtxtをそのまま添付してください。
+
+## Basic Info
+student_id: S002
+test_id: linear_equation_20q_001
+question_count: 20
+
+## Summary
+{
+  "accuracy_gain_from_min_to_max": 0.85,
+  "probability_gain_from_min_to_max": 77.5,
+  "weakest_skill_condition": "can_handle_fractions",
+  "difficulty_rows": 3,
+  "easy_average_correct_probability": 65,
+  "hard_average_correct_probability": 51,
+  "difficulty_probability_gap": 14,
+  "misconception_rows": 3,
+  "internal_validity_score": 0.95,
+  "internal_validity_verdict": "internal_proxy_validity_supported",
+  "evidence_level": "internal_validity_only",
+  "human_replacement_validity_score": 0.95,
+  "human_replacement_verdict": "internal_proxy_validity_supported"
+}
+
+## Internal Validity Evaluation
+- internal_validity_score: 0.95 / 1.0
+- raw_internal_score: 1.0 / 1.0
+- verdict: internal_proxy_validity_supported
+- evidence_level: internal_validity_only
+- cognitive_learning_curve: score=1.0, passed=True, reason=理解度上昇に対する平均正答確率の上昇量=77.5、単調性=1.0。
+- misconception_sensitivity: score=1.0, passed=True, reason=関連問題での低中理解度ギャップ平均=18.6、高理解度ギャップ=2.0。
+- skill_specific_weakness: score=1.0, passed=True, reason=弱点スキル化による平均正答確率低下=39.2。最弱条件=can_handle_fractions。
+- personality_observable_separation: score=1.0, passed=True, reason=自信の低さ、質問傾向、丁寧さ、短さが発話特徴として分離しているかを判定。
+- one_turn_student_response: score=1.0, passed=True, reason=教師発話や話者ラベルを混入させず、生徒1ターンとして観察可能かを判定。
+- claim_scope: この結果が支持するのは、人間全体の完全な代替ではなく、一次方程式学習における理解度・誤概念・個人特徴を制御した限定的な学習者代理である。
+
+## Auto Interpretation
+- 理解度の上昇により正答率は 0.85、平均正答確率は 77.5 ポイント上昇しています。
+- 学習曲線は 0 点で accuracy=0.05、100 点で accuracy=0.9 です。
+- 誤概念なしとの差は、全問平均で 3.9 ポイント、関連問題平均で 13.1 ポイントです。
+- 弱点スキル条件では、基準条件から平均 39.2 ポイント低下しています。
+- 難易度別では easy=65、hard=51 です。
+- スキル別弱点条件で最も低い条件は can_handle_fractions です。
+- 発話サンプルでは、教師発話を含まず、生徒1ターン分に収まっているかを確認してください。
+
+## Parameter Guide
+parameter	meaning	visible_effect
+knowledge_state.linear_equation.score	単元全体の潜在的な理解度	高いほど全体の正答確率が上がる
+knowledge_state.linear_equation.<skill>	スキル別の潜在的な習得度	該当スキルの問題だけ正答確率が変わる
+question.difficulty	問題難易度	同じ理解度でも難しい問題ほど正答確率が下がる
+misconceptions	誤概念	関連問題の正答確率が下がり、誤答傾向が出る
+guess_probability	未習得でも正答する確率	低理解度でも正答率が0%に張り付かない
+slip_probability	習得済みでも誤答する確率	高理解度でも正答率が100%に張り付かない
+self_efficacy	自己効力感	発話の自信表現と正答確率の小補正に効く
+question_tendency	質問傾向	質問や確認発話の出やすさに効く
+motivation	モチベーション	粘り強さ、返答の短さ、正答確率の小補正に効く
+big_five	性格特性	発話の丁寧さ、不安、外向性などの見え方に効く
+
+## Learning Curve
+understanding	correct_count	total_count	accuracy	average_correct_probability
+0	1	20	0.05	9.2
+10	1	20	0.05	12.2
+20	1	20	0.05	15.8
+30	3	20	0.15	23.1
+40	6	20	0.3	36.5
+50	10	20	0.5	47.4
+60	12	20	0.6	58.0
+70	13	20	0.65	68.7
+80	14	20	0.7	76
+90	18	20	0.9	81.9
+100	18	20	0.9	86.7
+
+## Misconception Comparison
+understanding	all_probability_gap	related_probability_gap	related_accuracy_with	related_accuracy_without
+20	7.6	25.3	0.0	0.333
+50	3.6	12	0.667	0.667
+80	0.6	2.0	0.833	0.833
+
+## Skill Breakdown
+weak_skill	question_count	weak_skill_probability	baseline_probability	target_probability_drop	accuracy
+can_divide_by_coefficient	3	40.3	75.3	35.0	0.333
+can_handle_fractions	3	24	68	44	0.0
+can_handle_negative_numbers	7	26.9	70	43.1	0.429
+can_solve_ax_plus_b_equals_c	4	37.5	76.2	38.8	0.0
+can_transpose_terms	3	40.3	75.3	35.0	0.667
+
+## Difficulty Breakdown
+difficulty	label	question_count	correct_count	accuracy	average_correct_probability	average_guess_probability	average_slip_probability
+1	easy	5	3	0.6	65	17	9
+2	medium	7	4	0.571	61.1	14	11
+3	hard	8	5	0.625	51	11	12
+
+## Utterance Samples
+profile_id: low_confidence_questioner
+utterance: 自信はないけど、両辺を整理して、x は 4 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 4
+utterance_features:
+{
+  "char_count": 75,
+  "line_count": 1,
+  "question_mark_count": 1,
+  "uncertainty_marker_count": 2,
+  "has_answer_label": true,
+  "has_teacher_label": false
+}
+personality_profile:
+{
+  "confidence_expression": "low",
+  "question_behavior": "asks_specific_questions",
+  "motivation_expression": "neutral",
+  "verbosity": "medium",
+  "step_detail": "medium",
+  "emotional_tone": "anxious",
+  "teacher_alignment": "cooperative",
+  "strategy_flexibility": "neutral",
+  "prompt_instructions": [
+    "自信なさげに、断定を避けて答える。",
+    "わからない点があれば具体的に質問する。",
+    "不安や確認したい気持ちを少し出す。",
+    "教師の説明を素直に受け止める。"
+  ]
+}
+
+profile_id: diligent_confident
+utterance: これは分かります。まず定数項を移して、そのあと係数で割ります。x = 4 です。間違っていたら、もう一度考えます。 答え: x = 4
+utterance_features:
+{
+  "char_count": 67,
+  "line_count": 1,
+  "question_mark_count": 0,
+  "uncertainty_marker_count": 0,
+  "has_answer_label": true,
+  "has_teacher_label": false
+}
+personality_profile:
+{
+  "confidence_expression": "high",
+  "question_behavior": "asks_when_stuck",
+  "motivation_expression": "persists",
+  "verbosity": "medium",
+  "step_detail": "shows_steps",
+  "emotional_tone": "calm",
+  "teacher_alignment": "cooperative",
+  "strategy_flexibility": "neutral",
+  "prompt_instructions": [
+    "自信を持って、はっきり答える。",
+    "つまずいたときだけ短く質問する。",
+    "間違えてももう一度考えようとする。",
+    "途中式や手順を丁寧に出す。",
+    "落ち着いた口調にする。",
+    "教師の説明を素直に受け止める。"
+  ]
+}
+
+profile_id: quiet_low_motivation
+utterance: x = 4 です。 答え: x = 4
+utterance_features:
+{
+  "char_count": 19,
+  "line_count": 1,
+  "question_mark_count": 0,
+  "uncertainty_marker_count": 0,
+  "has_answer_label": true,
+  "has_teacher_label": false
+}
+personality_profile:
+{
+  "confidence_expression": "medium",
+  "question_behavior": "rarely_asks",
+  "motivation_expression": "gives_up_easily",
+  "verbosity": "short",
+  "step_detail": "skips_steps",
+  "emotional_tone": "neutral",
+  "teacher_alignment": "cooperative",
+  "strategy_flexibility": "neutral",
+  "prompt_instructions": [
+    "自信は中程度で、必要に応じて確認する。",
+    "質問は少なめにする。",
+    "難しいと感じると粘りが弱くなる。",
+    "返答を短めにする。",
+    "途中式を省略しがちにする。",
+    "教師の説明を素直に受け止める。"
+  ]
+}
