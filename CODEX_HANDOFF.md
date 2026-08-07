@@ -1,6 +1,6 @@
 # Codex Handoff
 
-最終更新: 2026-08-07 15:51:27 JST
+最終更新: 2026-08-07 16:09:23 JST
 
 このファイルは、別PCや別Codexセッションへ研究開発を引き継ぐためのメモです。新しいCodexには、最初にこのファイルを読ませてください。
 
@@ -15,7 +15,7 @@
 
 目的は、個別の生徒AIを教育することではなく、複数の生徒AIからなるクラス全体を観察し、教師AIが授業構成・介入方針を変えられるかを検証すること。
 
-現在の設計では、生徒AIの正誤や理解度は認知モデルで制御し、LLMは発話生成器として使う。これにより、教育シミュレーション内で「正答率・誤概念・個人特徴」を制御しつつ、授業中に観察できる発話として外に出す。
+現在の設計では、生徒AIの正誤や理解度は認知モデルで制御し、生徒が授業中に何をするかは行動モデルで制御し、LLMは最後の自然言語発話生成器として使う。これにより、教育シミュレーション内で「正答率・誤概念・個人特徴・授業フェーズごとの反応」を制御しつつ、授業中に観察できる発話として外に出す。
 
 ## 現在の中心設計
 
@@ -35,7 +35,8 @@
   - `motivation`
   - `big_five`
 - 正誤は `src/cognitive_model.py` の BKT/IRT 寄りモデルで制御する。
-- LLMは、認知モデルが決めた `target_answer` に従って、生徒らしい発話を生成する。
+- 授業フェーズごとの行動は `src/student_behavior_model.py` で制御する。
+- LLMは、認知モデルが決めた `target_answer` と行動モデルが決めた `should_solve` などに従って、生徒らしい発話を生成する。
 
 ### 認知モデル
 
@@ -58,9 +59,38 @@ LLMは「正誤判定者」ではなく「発話生成器」。
 重要:
 
 - 認知モデルが `target_answer` を決める。
-- LLMはその答えを含む自然な生徒発話を作る。
+- 行動モデルが、授業フェーズに応じて「解く／聞く／質問する／答えを書くか」を決める。
+- LLMはその制御結果に従って自然な生徒発話を作る。
 - `lesson_probe` では、LLMが勝手に正答を書いても、最後の `答え: x = ...` は認知モデルの `target_answer` に強制される。
 - この修正は `src/student_agent.py` の `_force_controlled_answer_label` にある。
+
+### 行動モデル
+
+中心ファイル: `src/student_behavior_model.py`
+
+追加理由:
+
+- LLMに「何をするか」まで任せると、導入や説明フェーズでも勝手に問題を解くことがある。
+- 研究上は、LLMの自由生成ではなく、授業フェーズに応じた反応を制御できることが重要。
+- そこで、生徒AIを「認知モデル」「行動モデル」「性格モデル」「LLM発話生成」に分離した。
+
+主な出力:
+
+- `phase_type`: `listen` / `solve` / `practice` / `respond`
+- `action_type`: `acknowledge` / `solve` / `practice` など
+- `should_solve`
+- `should_include_answer`
+- `should_ask_question`
+- `should_show_work`
+- `should_express_uncertainty`
+- `target_answer`
+- `target_correct`
+
+現在の期待挙動:
+
+- 導入・全体説明では、勝手に `答え: x = ...` を出さない。
+- 例題・確認問題・問題文があるフェーズでは、認知モデルの正誤に沿って答える。
+- 性格モデルは、核心の正誤ではなく、自信のなさ、質問の多さ、説明量、不安表現などを変える。
 
 ## 教育シミュレーションの流れ
 
@@ -107,8 +137,39 @@ Colabでは上から順に実行する。Git更新セル、setupセル、preflig
 
 論文用のコア実験整理用。必要なら今後再整理。
 
+### `notebooks/simulation_timeline_experiment.ipynb`
+
+教育シミュレーションを時間経過で確認するNotebook。直近はこちらも重要。
+
+主な確認点:
+
+- 授業フェーズごとに教師発話・生徒発話・伝達AI要約・教師belief更新が流れるか。
+- 導入・全体説明では生徒が勝手に解答しないか。
+- 例題・確認問題では認知モデルの正誤に沿った発話になるか。
+- 会話ログが `data/assessments/simulation_timeline_for_codex.txt` に出るか。
+
+GPUなしの場合:
+
+- LLMセルは止まらず、`execution_mode: mock_fallback_no_gpu` でmock実験に切り替わる。
+- GPUありの場合は `execution_mode: llm` になり、LLMを使う。
+
 ## 直近の重要コミット
 
+- `18c4dcd Allow simulation notebook without GPU`
+  - `simulation_timeline_experiment.ipynb` のLLMセルを、GPUなしでもRuntimeErrorで止まらないように修正。
+  - GPUなしでは `mock_fallback_no_gpu` と表示して同じ流れをmockで実行する。
+- `e05ca56 Update notebook timestamps`
+  - 主要Notebookとdocsの最終更新日時を更新。
+- `bc7eb75 Add student behavior model`
+  - 生徒AIに行動モデルを追加。
+  - 導入・説明では解答せず、例題・確認問題では認知モデルの正誤に沿って解答するようにした。
+  - `py -m pytest` で `102 passed` 確認済み。
+- `36d4aef Add full simulation conversation log`
+  - シミュレーションの教師発話・生徒発話・伝達AI要約・教師beliefをtxtに出す会話ログを追加。
+- `a3ff187 Improve grading of LLM student answers`
+  - LLM生徒発話の採点ズレを軽減。
+- `99a51e1 Use cognitive correctness for lesson grading`
+  - 授業中の正誤判定はLLM採点ではなく、認知モデルの `target_correct` を使う方向に整理。
 - `800ffe4 Enforce controlled answers in LLM lesson probes`
   - LLMが勝手に正答へ戻しても、認知モデルの `target_answer` を最終回答に強制。
   - LLMロード時間を代表問題の応答時間に混ぜないよう、Notebook側で事前ロード。
@@ -200,7 +261,7 @@ git status
 現在のテスト期待値:
 
 ```text
-77 passed
+102 passed
 ```
 
 ## Git運用
@@ -218,14 +279,15 @@ git push origin main
 
 ## 次にやるとよさそうなこと
 
-1. Colabで `800ffe4` 以降をpullし、LLM実験を再実行する。
-2. `teaching_strategy_result_summary.txt` で `utterance` と `controlled_answer` が一致するか確認する。
-3. LLM生徒発話の品質を改善する。
+1. Colabで最新mainをpullし、`simulation_timeline_experiment.ipynb` を上から実行する。
+2. GPUなしなら `execution_mode: mock_fallback_no_gpu`、GPUありなら `execution_mode: llm` になっているか確認する。
+3. `simulation_timeline_for_codex.txt` の Full Conversation Log を見て、導入・全体説明で生徒が勝手に解答していないか確認する。
+4. `teaching_strategy_experiment.ipynb` の `llm_student_observer` モードで、授業設計AIまで含めた流れを確認する。
+5. `teaching_strategy_result_summary.txt` で `utterance` と `controlled_answer` が一致するか確認する。
+6. LLM生徒発話の品質を改善する。
    - 「生徒AIとして」などメタ発話が出ないようにする。
    - 「教師」「先生」ラベル混入をさらに除去する。
    - `答え: わかりません` が正答扱いになるケースを避ける。
-4. 伝達AIのLLM出力をJSON schema寄りに安定化する。
-5. 10人、20人クラスで講義設計がどう変わるか比較する。
-6. 発表・論文用には「認知モデルで制御された生徒AIが、クラス全体の授業設計入力として使えるか」を中心にまとめる。
-
-
+7. 伝達AIのLLM出力をJSON schema寄りに安定化する。
+8. 10人、20人クラスで講義設計がどう変わるか比較する。
+9. 発表・論文用には「認知モデルと行動モデルで制御された生徒AIが、クラス全体の授業設計入力として使えるか」を中心にまとめる。
