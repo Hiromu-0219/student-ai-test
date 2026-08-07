@@ -1,0 +1,39 @@
+{
+  "student_id": "S027",
+  "name": "Hina",
+  "understanding": {
+    "linear_equation": "86/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "very_high",
+      "score": 86,
+      "can_solve_ax_plus_b_equals_c": 90,
+      "can_transpose_terms": 83,
+      "can_divide_by_coefficient": 79,
+      "can_handle_negative_numbers": 74,
+      "can_handle_fractions": 68
+    }
+  },
+  "error_tendency": [
+    "answers confidently but rarely asks questions"
+  ],
+  "misconceptions": [],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "synthetic classroom profile",
+    "classroom_behavior": "used for class-level distribution evaluation"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "medium",
+    "extraversion": "medium",
+    "agreeableness": "medium",
+    "neuroticism": "low"
+  },
+  "self_efficacy": "high",
+  "question_tendency": "low",
+  "motivation": "high",
+  "learning_history": []
+}

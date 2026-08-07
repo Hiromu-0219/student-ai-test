@@ -1,0 +1,279 @@
+# Classroom Validity Evaluation For Codex
+
+このファイルをCodex/ChatGPTに渡すときは、このtxtをそのまま添付してください。
+
+## Summary
+{
+  "class_count": 4,
+  "student_count_range": [
+    3,
+    30
+  ],
+  "average_validity_score": 1.0,
+  "verdict": "classroom_proxy_structure_supported",
+  "passed_checks": 5,
+  "total_checks": 5,
+  "claim_scope": "複数生徒クラスの内部状態分布と代表問題への反応が制御可能であり、教師AIの授業設計入力として使えるクラス環境かを確認する。"
+}
+
+## Validity Checks
+- class_size_scalability: passed=True, score=1.0, reason=evaluated class sizes=[3, 10, 20, 30]
+- score_distribution_visibility: passed=True, score=1.0, reason=larger classes should contain low, middle, and high score groups
+- trait_distribution_visibility: passed=True, score=1.0, reason=larger classes should expose multiple observable trait levels
+- misconception_presence: passed=True, score=1.0, reason=larger classes should include students with misconceptions
+- probe_response_distribution_visibility: passed=True, score=1.0, reason=average within-class probe probability spread=90
+
+## Class Comparison
+class_id	student_count	average_score	score_std	low_count	medium_count	high_count	misconception_count	trait_variety	probe_accuracy	probe_probability	recommended_use
+class_3_basic	3	50	20.4	1	1	1	2	10	0.667	54.9	debug_small_flow
+class_10_mixed	10	54	22.9	4	2	4	6	14	0.7	56.3	classroom_summary_pilot
+class_20_mixed	20	55.3	22.7	7	5	8	10	17	0.717	57.2	standard_classroom_experiment
+class_30_mixed	30	55.6	23.2	11	7	12	15	17	0.711	57.0	large_classroom_scalability_check
+
+## Class Details
+### class_3_basic
+{
+  "class_features": {
+    "size": 3,
+    "understanding_profile": "small mixed baseline",
+    "question_tendency_profile": "two students are quiet, one asks often",
+    "motivation_profile": "balanced low-medium-high sample",
+    "misconception_profile": "limited visible misconceptions",
+    "teacher_note": "Use this class when checking the notebook quickly."
+  },
+  "score_buckets": {
+    "very_low": 1,
+    "low": 0,
+    "medium": 1,
+    "high": 1,
+    "very_high": 0
+  },
+  "trait_counts": {
+    "self_efficacy": {
+      "very_low": 0,
+      "low": 1,
+      "medium": 1,
+      "high": 1,
+      "very_high": 0
+    },
+    "question_tendency": {
+      "very_low": 0,
+      "low": 2,
+      "medium": 0,
+      "high": 1,
+      "very_high": 0
+    },
+    "motivation": {
+      "very_low": 0,
+      "low": 0,
+      "medium": 2,
+      "high": 1,
+      "very_high": 0
+    },
+    "neuroticism": {
+      "very_low": 0,
+      "low": 1,
+      "medium": 1,
+      "high": 1,
+      "very_high": 0
+    }
+  },
+  "probe_summary": {
+    "accuracy": 0.667,
+    "average_correct_probability": 54.9,
+    "hard_item_accuracy": 0.667,
+    "hard_item_probability": 58
+  },
+  "visible_class_risks": [
+    "低理解層が含まれる",
+    "理解度のばらつきが大きい",
+    "誤概念を持つ生徒が含まれる",
+    "質問しにくい生徒が多い"
+  ]
+}
+
+### class_10_mixed
+{
+  "class_features": {
+    "size": 10,
+    "understanding_profile": "wide spread from very low to very high",
+    "question_tendency_profile": "quiet students and high-question students coexist",
+    "motivation_profile": "mixed motivation with several high-motivation students",
+    "misconception_profile": "transposition and coefficient-division misconceptions are common",
+    "teacher_note": "Use this class to test whether the lecture plan changes when low-score risk is present."
+  },
+  "score_buckets": {
+    "very_low": 2,
+    "low": 2,
+    "medium": 2,
+    "high": 3,
+    "very_high": 1
+  },
+  "trait_counts": {
+    "self_efficacy": {
+      "very_low": 1,
+      "low": 3,
+      "medium": 2,
+      "high": 4,
+      "very_high": 0
+    },
+    "question_tendency": {
+      "very_low": 0,
+      "low": 5,
+      "medium": 2,
+      "high": 3,
+      "very_high": 0
+    },
+    "motivation": {
+      "very_low": 0,
+      "low": 1,
+      "medium": 5,
+      "high": 3,
+      "very_high": 1
+    },
+    "neuroticism": {
+      "very_low": 0,
+      "low": 4,
+      "medium": 2,
+      "high": 4,
+      "very_high": 0
+    }
+  },
+  "probe_summary": {
+    "accuracy": 0.7,
+    "average_correct_probability": 56.3,
+    "hard_item_accuracy": 0.5,
+    "hard_item_probability": 53.7
+  },
+  "visible_class_risks": [
+    "低理解層が含まれる",
+    "理解度のばらつきが大きい",
+    "誤概念を持つ生徒が含まれる",
+    "質問しにくい生徒が多い",
+    "自己効力感が低い生徒が複数いる"
+  ]
+}
+
+### class_20_mixed
+{
+  "class_features": {
+    "size": 20,
+    "understanding_profile": "full mixed classroom with multiple low, middle, and high learners",
+    "question_tendency_profile": "many quiet students, several confirmation seekers, and active questioners",
+    "motivation_profile": "varied motivation requiring whole-class pacing and individual prompts",
+    "misconception_profile": "sign-change, inverse-operation, coefficient-division, and negative-number risks",
+    "teacher_note": "Use this class when evaluating scalability and class-level summarization."
+  },
+  "score_buckets": {
+    "very_low": 4,
+    "low": 3,
+    "medium": 5,
+    "high": 6,
+    "very_high": 2
+  },
+  "trait_counts": {
+    "self_efficacy": {
+      "very_low": 1,
+      "low": 6,
+      "medium": 7,
+      "high": 5,
+      "very_high": 1
+    },
+    "question_tendency": {
+      "very_low": 0,
+      "low": 8,
+      "medium": 6,
+      "high": 6,
+      "very_high": 0
+    },
+    "motivation": {
+      "very_low": 1,
+      "low": 2,
+      "medium": 9,
+      "high": 7,
+      "very_high": 1
+    },
+    "neuroticism": {
+      "very_low": 1,
+      "low": 6,
+      "medium": 7,
+      "high": 6,
+      "very_high": 0
+    }
+  },
+  "probe_summary": {
+    "accuracy": 0.717,
+    "average_correct_probability": 57.2,
+    "hard_item_accuracy": 0.45,
+    "hard_item_probability": 53.2
+  },
+  "visible_class_risks": [
+    "低理解層が含まれる",
+    "理解度のばらつきが大きい",
+    "誤概念を持つ生徒が含まれる",
+    "質問しにくい生徒が多い",
+    "自己効力感が低い生徒が複数いる"
+  ]
+}
+
+### class_30_mixed
+{
+  "class_features": {
+    "size": 30,
+    "understanding_profile": "large mixed class with clear low, middle, and high achievement groups",
+    "question_tendency_profile": "quiet students, confirmation seekers, and active questioners coexist",
+    "motivation_profile": "broad motivation distribution with disengaged and highly motivated students",
+    "misconception_profile": "multiple misconception clusters across transposition, coefficient division, negatives, and fractions",
+    "teacher_note": "Use this class to test whether class-level summaries remain readable at 30 students."
+  },
+  "score_buckets": {
+    "very_low": 5,
+    "low": 6,
+    "medium": 7,
+    "high": 8,
+    "very_high": 4
+  },
+  "trait_counts": {
+    "self_efficacy": {
+      "very_low": 2,
+      "low": 9,
+      "medium": 10,
+      "high": 7,
+      "very_high": 2
+    },
+    "question_tendency": {
+      "very_low": 0,
+      "low": 12,
+      "medium": 9,
+      "high": 9,
+      "very_high": 0
+    },
+    "motivation": {
+      "very_low": 2,
+      "low": 3,
+      "medium": 13,
+      "high": 10,
+      "very_high": 2
+    },
+    "neuroticism": {
+      "very_low": 2,
+      "low": 9,
+      "medium": 10,
+      "high": 9,
+      "very_high": 0
+    }
+  },
+  "probe_summary": {
+    "accuracy": 0.711,
+    "average_correct_probability": 57.0,
+    "hard_item_accuracy": 0.433,
+    "hard_item_probability": 53.5
+  },
+  "visible_class_risks": [
+    "低理解層が含まれる",
+    "理解度のばらつきが大きい",
+    "誤概念を持つ生徒が含まれる",
+    "質問しにくい生徒が多い",
+    "自己効力感が低い生徒が複数いる"
+  ]
+}

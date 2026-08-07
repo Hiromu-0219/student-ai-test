@@ -1,0 +1,39 @@
+{
+  "student_id": "S024",
+  "name": "Sota",
+  "understanding": {
+    "linear_equation": "58/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "medium",
+      "score": 58,
+      "can_solve_ax_plus_b_equals_c": 62,
+      "can_transpose_terms": 55,
+      "can_divide_by_coefficient": 51,
+      "can_handle_negative_numbers": 46,
+      "can_handle_fractions": 40
+    }
+  },
+  "error_tendency": [
+    "works silently and skips intermediate explanations"
+  ],
+  "misconceptions": [],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "synthetic classroom profile",
+    "classroom_behavior": "used for class-level distribution evaluation"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "high",
+    "extraversion": "medium",
+    "agreeableness": "medium",
+    "neuroticism": "medium"
+  },
+  "self_efficacy": "medium",
+  "question_tendency": "low",
+  "motivation": "medium",
+  "learning_history": []
+}

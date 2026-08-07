@@ -1,0 +1,39 @@
+{
+  "student_id": "S028",
+  "name": "Kaito",
+  "understanding": {
+    "linear_equation": "95/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "very_high",
+      "score": 95,
+      "can_solve_ax_plus_b_equals_c": 99,
+      "can_transpose_terms": 92,
+      "can_divide_by_coefficient": 88,
+      "can_handle_negative_numbers": 83,
+      "can_handle_fractions": 77
+    }
+  },
+  "error_tendency": [
+    "can explain alternative solution paths"
+  ],
+  "misconceptions": [],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "synthetic classroom profile",
+    "classroom_behavior": "used for class-level distribution evaluation"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "high",
+    "extraversion": "high",
+    "agreeableness": "medium",
+    "neuroticism": "very_low"
+  },
+  "self_efficacy": "very_high",
+  "question_tendency": "medium",
+  "motivation": "very_high",
+  "learning_history": []
+}

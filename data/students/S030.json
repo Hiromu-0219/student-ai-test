@@ -1,0 +1,41 @@
+{
+  "student_id": "S030",
+  "name": "Toma",
+  "understanding": {
+    "linear_equation": "40/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "low",
+      "score": 40,
+      "can_solve_ax_plus_b_equals_c": 44,
+      "can_transpose_terms": 37,
+      "can_divide_by_coefficient": 33,
+      "can_handle_negative_numbers": 28,
+      "can_handle_fractions": 22
+    }
+  },
+  "error_tendency": [
+    "short answers and avoids asking for help"
+  ],
+  "misconceptions": [
+    "移項しても符号はそのままだと思っている"
+  ],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "synthetic classroom profile",
+    "classroom_behavior": "used for class-level distribution evaluation"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "low",
+    "extraversion": "low",
+    "agreeableness": "medium",
+    "neuroticism": "medium"
+  },
+  "self_efficacy": "low",
+  "question_tendency": "low",
+  "motivation": "low",
+  "learning_history": []
+}

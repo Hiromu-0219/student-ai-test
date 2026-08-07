@@ -1,0 +1,52 @@
+{
+  "class_id": "class_30_mixed",
+  "name": "30-student mixed class",
+  "description": "A larger classroom sample used to evaluate whether class-level summaries scale beyond the initial 3-20 student range.",
+  "student_ids": [
+    "S001",
+    "S002",
+    "S003",
+    "S004",
+    "S005",
+    "S006",
+    "S007",
+    "S008",
+    "S009",
+    "S010",
+    "S011",
+    "S012",
+    "S013",
+    "S014",
+    "S015",
+    "S016",
+    "S017",
+    "S018",
+    "S019",
+    "S020",
+    "S021",
+    "S022",
+    "S023",
+    "S024",
+    "S025",
+    "S026",
+    "S027",
+    "S028",
+    "S029",
+    "S030"
+  ],
+  "class_features": {
+    "size": 30,
+    "understanding_profile": "large mixed class with clear low, middle, and high achievement groups",
+    "question_tendency_profile": "quiet students, confirmation seekers, and active questioners coexist",
+    "motivation_profile": "broad motivation distribution with disengaged and highly motivated students",
+    "misconception_profile": "multiple misconception clusters across transposition, coefficient division, negatives, and fractions",
+    "teacher_note": "Use this class to test whether class-level summaries remain readable at 30 students."
+  },
+  "tags": [
+    "large_classroom",
+    "30_students",
+    "mixed_understanding",
+    "distribution_evaluation"
+  ],
+  "created_for": "class-level validity experiment"
+}

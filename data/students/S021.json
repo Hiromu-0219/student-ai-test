@@ -1,0 +1,42 @@
+{
+  "student_id": "S021",
+  "name": "Nana",
+  "understanding": {
+    "linear_equation": "12/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "very_low",
+      "score": 12,
+      "can_solve_ax_plus_b_equals_c": 16,
+      "can_transpose_terms": 9,
+      "can_divide_by_coefficient": 5,
+      "can_handle_negative_numbers": 0,
+      "can_handle_fractions": 0
+    }
+  },
+  "error_tendency": [
+    "gives up quickly on multi-step equations"
+  ],
+  "misconceptions": [
+    "移項するときに符号を変え忘れる",
+    "係数で割る代わりに係数を引くことがある"
+  ],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "synthetic classroom profile",
+    "classroom_behavior": "used for class-level distribution evaluation"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "low",
+    "extraversion": "very_low",
+    "agreeableness": "medium",
+    "neuroticism": "high"
+  },
+  "self_efficacy": "very_low",
+  "question_tendency": "low",
+  "motivation": "very_low",
+  "learning_history": []
+}

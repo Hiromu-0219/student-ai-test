@@ -1,0 +1,41 @@
+{
+  "student_id": "S023",
+  "name": "Mao",
+  "understanding": {
+    "linear_equation": "44/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "low",
+      "score": 44,
+      "can_solve_ax_plus_b_equals_c": 48,
+      "can_transpose_terms": 41,
+      "can_divide_by_coefficient": 37,
+      "can_handle_negative_numbers": 32,
+      "can_handle_fractions": 26
+    }
+  },
+  "error_tendency": [
+    "hesitates when negative numbers appear"
+  ],
+  "misconceptions": [
+    "負の数を含む式で符号を混同する"
+  ],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "synthetic classroom profile",
+    "classroom_behavior": "used for class-level distribution evaluation"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "medium",
+    "extraversion": "medium",
+    "agreeableness": "medium",
+    "neuroticism": "medium"
+  },
+  "self_efficacy": "low",
+  "question_tendency": "medium",
+  "motivation": "medium",
+  "learning_history": []
+}

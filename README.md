@@ -12,6 +12,7 @@
 | 進捗報告として共有する | [docs/student_ai_progress_report.md](docs/student_ai_progress_report.md) |
 | 論文用の実験コアを見る | [docs/paper_experiment_core.md](docs/paper_experiment_core.md) |
 | 内部妥当性の評価方法を見る | [docs/internal_validity_experiment.md](docs/internal_validity_experiment.md) |
+| 複数生徒クラスの妥当性を見る | [docs/classroom_validity_experiment.md](docs/classroom_validity_experiment.md) |
 | 参考文献との対応を見る | [docs/reference_mapping.md](docs/reference_mapping.md) |
 | Notebookの使い分けを見る | [notebooks/README.md](notebooks/README.md) |
 
@@ -122,6 +123,17 @@ Colab上のrepoを最新にする場合:
 - `google/gemma-3-4b-it`
 
 Gemma系の gated model を使う場合は、Colab上で Hugging Face login が必要になることがあります。
+
+## 研究用実験スクリプト
+
+Notebookに依存せず、研究用の基準結果を出す場合は次を使います。
+
+```bash
+python scripts/run_internal_validity_experiment.py
+python scripts/run_classroom_validity_experiment.py
+```
+
+出力は `data/assessments/` に保存されます。
 
 ## テスト
 

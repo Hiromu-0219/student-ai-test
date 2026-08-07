@@ -1,0 +1,41 @@
+{
+  "student_id": "S022",
+  "name": "Riku",
+  "understanding": {
+    "linear_equation": "31/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "low",
+      "score": 31,
+      "can_solve_ax_plus_b_equals_c": 35,
+      "can_transpose_terms": 28,
+      "can_divide_by_coefficient": 24,
+      "can_handle_negative_numbers": 19,
+      "can_handle_fractions": 13
+    }
+  },
+  "error_tendency": [
+    "asks for confirmation before dividing by coefficient"
+  ],
+  "misconceptions": [
+    "3x = 15 では3を引けばよいと考える"
+  ],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "synthetic classroom profile",
+    "classroom_behavior": "used for class-level distribution evaluation"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "medium",
+    "extraversion": "low",
+    "agreeableness": "medium",
+    "neuroticism": "high"
+  },
+  "self_efficacy": "low",
+  "question_tendency": "high",
+  "motivation": "medium",
+  "learning_history": []
+}

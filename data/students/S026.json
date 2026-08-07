@@ -1,0 +1,39 @@
+{
+  "student_id": "S026",
+  "name": "Ren",
+  "understanding": {
+    "linear_equation": "73/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "high",
+      "score": 73,
+      "can_solve_ax_plus_b_equals_c": 77,
+      "can_transpose_terms": 70,
+      "can_divide_by_coefficient": 66,
+      "can_handle_negative_numbers": 61,
+      "can_handle_fractions": 55
+    }
+  },
+  "error_tendency": [
+    "explains steps steadily"
+  ],
+  "misconceptions": [],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "synthetic classroom profile",
+    "classroom_behavior": "used for class-level distribution evaluation"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "high",
+    "extraversion": "medium",
+    "agreeableness": "medium",
+    "neuroticism": "low"
+  },
+  "self_efficacy": "high",
+  "question_tendency": "medium",
+  "motivation": "high",
+  "learning_history": []
+}

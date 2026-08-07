@@ -1,0 +1,41 @@
+{
+  "student_id": "S029",
+  "name": "Miu",
+  "understanding": {
+    "linear_equation": "53/100 control score for linear equations",
+    "note": "Synthetic student profile for classroom simulation."
+  },
+  "knowledge_state": {
+    "linear_equation": {
+      "level": "medium",
+      "score": 53,
+      "can_solve_ax_plus_b_equals_c": 57,
+      "can_transpose_terms": 50,
+      "can_divide_by_coefficient": 46,
+      "can_handle_negative_numbers": 41,
+      "can_handle_fractions": 35
+    }
+  },
+  "error_tendency": [
+    "asks questions when fractions appear"
+  ],
+  "misconceptions": [
+    "分数係数で両辺に同じ操作をする意識が弱い"
+  ],
+  "learning_speed": "medium",
+  "personality": {
+    "response_style": "synthetic classroom profile",
+    "classroom_behavior": "used for class-level distribution evaluation"
+  },
+  "big_five": {
+    "openness": "medium",
+    "conscientiousness": "medium",
+    "extraversion": "high",
+    "agreeableness": "medium",
+    "neuroticism": "high"
+  },
+  "self_efficacy": "medium",
+  "question_tendency": "high",
+  "motivation": "medium",
+  "learning_history": []
+}
