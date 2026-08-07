@@ -18,6 +18,10 @@ from src.experiment.rq1_communication_ai import (
     infer_teacher_beliefs_from_observations,
     run_rq1_communication_ai_experiment,
 )
+from src.experiment.simulation_timeline import (
+    export_simulation_timeline_results,
+    run_simulation_timeline,
+)
 from src.experiment.student_ai_evaluation import (
     compare_cognitive_models,
     export_cognitive_model_comparison_for_codex,
@@ -33,10 +37,12 @@ __all__ = [
     "export_communication_validity_for_codex",
     "export_lesson_design_validity_for_codex",
     "export_rq1_communication_ai_results",
+    "export_simulation_timeline_results",
     "run_classroom_validity_evaluation",
     "run_communication_validity_evaluation",
     "run_lesson_design_validity_evaluation",
     "run_rq1_communication_ai_experiment",
+    "run_simulation_timeline",
     "infer_teacher_beliefs_from_observations",
     "evaluate_teacher_beliefs",
     "compare_cognitive_models",

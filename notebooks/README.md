@@ -7,11 +7,12 @@ Colabで実行する実験Notebookの使い分けです。LLMロードは時間�
 | 順番 | Notebook | 目的 |
 | --- | --- | --- |
 | 1 | `communication_ai_rq1_experiment.ipynb` | 主研究用。伝達AIが観察ログからTeacher Beliefを推定できるかを評価する |
-| 2 | `student_ai_presentation_experiment.ipynb` | 生徒AI設計の発表用。認知モデル、テスト結果、性格別発話、複数生徒分布をまとめて見る |
-| 3 | `student_ai_colab.ipynb` | 生徒AI単体の詳細確認。理解度、誤概念、難易度、スキル弱点、発話サンプルを見る |
-| 4 | `personality_experiment.ipynb` | 個人特徴が発話に反映され、伝達AIが分類できるかを見る |
-| 5 | `teaching_strategy_experiment.ipynb` | 複数生徒クラスを観察し、伝達AI、講義設計AI、教師発話AIの流れを見る |
-| 6 | `paper_core_experiment.ipynb` | 論文に使う最小実験と出力結果をまとめて確認する |
+| 2 | `simulation_timeline_experiment.ipynb` | 実行環境用。LLMを任意で入れながら教育シミュレーションを時間経過で確認する |
+| 3 | `student_ai_presentation_experiment.ipynb` | 生徒AI設計の発表用。認知モデル、テスト結果、性格別発話、複数生徒分布をまとめて見る |
+| 4 | `student_ai_colab.ipynb` | 生徒AI単体の詳細確認。理解度、誤概念、難易度、スキル弱点、発話サンプルを見る |
+| 5 | `personality_experiment.ipynb` | 個人特徴が発話に反映され、伝達AIが分類できるかを見る |
+| 6 | `teaching_strategy_experiment.ipynb` | 複数生徒クラスを観察し、伝達AI、講義設計AI、教師発話AIの流れを見る |
+| 7 | `paper_core_experiment.ipynb` | 論文に使う最小実験と出力結果をまとめて確認する |
 
 ## 最初に実行するNotebook
 
@@ -68,6 +69,7 @@ Codex/ChatGPTに結果を渡すときは、Notebookの出力を大量に貼る�
 
 ```text
 data/assessments/rq1_communication_ai_for_codex.txt
+data/assessments/simulation_timeline_for_codex.txt
 data/assessments/student_ai_evaluation_for_codex.txt
 data/assessments/cognitive_model_comparison_for_codex.txt
 data/assessments/teaching_strategy_result_summary.txt
