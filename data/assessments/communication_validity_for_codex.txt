@@ -1,0 +1,109 @@
+# Communication AI Validity Evaluation For Codex
+
+このファイルをCodex/ChatGPTに渡すときは、このtxtをそのまま添付してください。
+
+## Purpose
+伝達AIが、生徒AIの内部パラメータを直接見ず、授業中に観察できる発話・正誤・反応だけから、教師AIに渡す生徒情報をどの程度推定できるかを検証します。
+
+## Summary
+{
+  "communication_validity_score": 1.0,
+  "passed_checks": 5,
+  "total_checks": 5,
+  "mean_trait_accuracy": 0.792,
+  "profile_accuracy": 0.567,
+  "mean_class_count_accuracy": 0.875,
+  "priority_recall": 0.8,
+  "verdict": "usable_as_observation_layer"
+}
+
+## Validity Checks
+- observable_input_only: passed=True, score=1.0, reason=leaked_row_keys=[], leaked_event_keys=[]
+- individual_trait_estimation: passed=True, score=0.792, reason=平均trait一致率が0.5以上なら、発話から粗い個人特徴を拾えているとみなす。
+- profile_estimation: passed=True, score=0.567, reason=A/B/C/Dの粗い生徒タイプが一定以上一致するかを見る。
+- class_level_count_agreement: passed=True, score=0.875, reason=クラス全体のlow/medium/high人数分布が大きく崩れていないかを見る。
+- priority_student_recall: passed=True, score=0.8, reason=教師が注意すべき生徒を伝達AIがどれだけ拾えるかを見る。
+
+## Trait Accuracy
+trait	exact_match	correct_count	total_count
+self_efficacy	0.933	28	30
+question_tendency	0.7	21	30
+motivation	0.767	23	30
+neuroticism	0.767	23	30
+
+## Profile Accuracy
+{
+  "exact_match": 0.567,
+  "correct_count": 17,
+  "total_count": 30
+}
+
+## Class-level Count Agreement
+trait	true_counts	estimated_counts	count_accuracy
+self_efficacy	{"low": 11, "medium": 10, "high": 9}	{"low": 13, "medium": 8, "high": 9}	0.933
+question_tendency	{"low": 12, "medium": 9, "high": 9}	{"low": 21, "medium": 0, "high": 9}	0.7
+motivation	{"low": 5, "medium": 13, "high": 12}	{"low": 6, "medium": 12, "high": 12}	0.967
+neuroticism	{"low": 11, "medium": 10, "high": 9}	{"low": 9, "medium": 9, "high": 12}	0.9
+
+## Priority Student Recall
+{
+  "true_priority_students": [
+    "S006",
+    "S011",
+    "S014",
+    "S021",
+    "S030"
+  ],
+  "estimated_priority_students": [
+    "S006",
+    "S011",
+    "S014",
+    "S018",
+    "S030"
+  ],
+  "hit_students": [
+    "S006",
+    "S011",
+    "S014",
+    "S030"
+  ],
+  "recall": 0.8,
+  "precision": 0.8,
+  "comparison": "top_5_hidden_priority_vs_estimated_priority"
+}
+
+## Per-student Comparison
+student_id	true_profile	estimated_profile	true_self_efficacy	est_self_efficacy	true_question_tendency	est_question_tendency	true_motivation	est_motivation	true_neuroticism	est_neuroticism	true_priority	estimated_priority	utterance
+S001	C	C	medium	medium	low	low	medium	low	medium	medium	True	False	x = 4 です。 答え: x = 4
+S002	A	A	low	low	high	high	medium	medium	high	high	True	False	自信はないけど、たぶん x = 4 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 4
+S003	C	B	high	high	low	low	high	high	low	low	True	False	これは分かります。まず定数項を移して、そのあと係数で割ります。x = 4 です。間違っていたら、もう一度考えます。 答え: x = 4
+S004	A	A	low	low	high	high	medium	medium	high	high	True	False	自信はないけど、両辺を整理して、x は 4 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 4
+S005	D	B	high	high	medium	low	high	high	low	low	False	False	これは分かります。まず定数項を移して、そのあと係数で割ります。x = 4 です。間違っていたら、もう一度考えます。 答え: x = 4
+S006	A	A	low	low	low	low	low	medium	high	high	True	True	自信はないけど、x = 5 です。符号が合っているか少し不安です。 答え: x = 5
+S007	D	B	high	high	medium	low	high	high	low	low	False	False	これは分かります。まず定数項を移して、そのあと係数で割ります。x = 4 です。間違っていたら、もう一度考えます。 答え: x = 4
+S008	A	A	low	low	high	high	medium	medium	high	high	True	False	自信はないけど、両辺を整理して、x は 4 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 4
+S009	C	C	medium	medium	low	low	medium	low	medium	medium	True	False	x = 4 です。 答え: x = 4
+S010	C	B	high	high	low	low	high	high	low	low	True	False	これは分かります。まず定数項を移して、そのあと係数で割ります。x = 4 です。間違っていたら、もう一度考えます。 答え: x = 4
+S011	A	A	low	low	medium	low	low	medium	high	high	True	True	自信はないけど、たぶん x = 4 です。符号が合っているか少し不安です。 答え: x = 4
+S012	B	B	medium	medium	medium	low	high	high	medium	medium	False	False	両辺を整理して、x は 4 だと思います。間違っていたら、もう一度考えます。 答え: x = 4
+S013	B	B	medium	medium	high	high	medium	medium	medium	medium	False	False	まず定数項を移して、そのあと係数で割ります。x = 4 です。移項の符号はこの考え方で合っていますか？ 答え: x = 4
+S014	A	C	low	low	low	low	low	low	medium	high	True	True	自信はないけど、x = 5 です。 答え: x = 5
+S015	B	D	medium	medium	high	high	high	high	medium	medium	False	False	まず定数項を移して、そのあと係数で割ります。x = 4 です。移項の符号はこの考え方で合っていますか？間違っていたら、もう一度考えます。 答え: x = 4
+S016	C	C	medium	low	low	low	medium	low	low	medium	True	False	たぶん x = 4 です。 答え: x = 4
+S017	D	B	high	high	medium	low	high	high	low	low	False	False	これは分かります。まず定数項を移して、そのあと係数で割ります。x = 4 です。間違っていたら、もう一度考えます。 答え: x = 4
+S018	A	A	low	low	medium	low	medium	medium	high	high	True	True	自信はないけど、x = 4 です。符号が合っているか少し不安です。 答え: x = 4
+S019	D	D	high	high	high	high	high	high	medium	low	False	False	これは分かります。両辺を整理して、x は 4 だと思います。移項の符号はこの考え方で合っていますか？間違っていたら、もう一度考えます。 答え: x = 4
+S020	C	C	medium	medium	low	low	medium	low	low	medium	True	False	x = 4 です。 答え: x = 4
+S021	A	A	low	low	low	low	low	medium	high	high	True	False	自信はないけど、x = 5 です。符号が合っているか少し不安です。 答え: x = 5
+S022	A	A	low	low	high	high	medium	medium	high	high	True	False	自信はないけど、x = 4 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 4
+S023	A	A	low	low	medium	low	medium	medium	medium	high	True	False	自信はないけど、両辺を整理して、x は 4 だと思います。 答え: x = 4
+S024	C	B	medium	medium	low	low	medium	medium	medium	medium	True	False	まず定数項を移して、そのあと係数で割ります。x = 4 です。 答え: x = 4
+S025	B	D	medium	medium	high	high	high	high	low	medium	False	False	まず定数項を移して、そのあと係数で割ります。x = 4 です。移項の符号はこの考え方で合っていますか？間違っていたら、もう一度考えます。 答え: x = 4
+S026	D	B	high	high	medium	low	high	high	low	low	False	False	これは分かります。まず定数項を移して、そのあと係数で割ります。x = 4 です。間違っていたら、もう一度考えます。 答え: x = 4
+S027	C	B	high	high	low	low	high	high	low	low	True	False	これは分かります。両辺を整理して、x は 4 だと思います。間違っていたら、もう一度考えます。 答え: x = 4
+S028	D	B	high	high	medium	low	high	high	low	low	False	False	これは分かります。まず定数項を移して、そのあと係数で割ります。x = 4 です。間違っていたら、もう一度考えます。 答え: x = 4
+S029	A	A	medium	low	high	high	medium	medium	high	high	True	False	両辺を整理して、x は 4 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 4
+S030	A	C	low	low	low	low	low	low	medium	high	True	True	自信はないけど、x = 4 です。 答え: x = 4
+
+## Claim Scope
+この実験で示すのは、伝達AIが観察可能な生徒発話から教育上使える粗い状態推定を行えるかであり、実際の人格や心理状態を正確に診断することではありません。
