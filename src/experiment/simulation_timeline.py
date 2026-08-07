@@ -188,6 +188,9 @@ def _cycle_metrics(*, cycle_index: int, lecture_design: dict[str, Any], session_
         "accuracy": summary.get("accuracy"),
         "correct_count": summary.get("correct_count"),
         "graded_event_count": summary.get("graded_event_count"),
+        "observed_accuracy": summary.get("observed_accuracy"),
+        "grading_agreement": summary.get("grading_agreement"),
+        "grading_mismatch_count": summary.get("grading_mismatch_count"),
         "average_estimated_score": class_profile.get("average_estimated_score"),
         "score_std": class_profile.get("score_std"),
         "low_score_count": len(class_profile.get("low_score_students", [])),
@@ -207,6 +210,22 @@ def _phase_rows(cycle_index: int, session_result: dict[str, Any]) -> list[dict[s
         events = turn.get("events", [])
         graded = [event for event in events if event.get("is_correct") is not None]
         correct = sum(1 for event in graded if event.get("is_correct") is True)
+        observed_graded = [
+            event
+            for event in graded
+            if event.get("observed_grade", {}).get("is_correct") is not None
+        ]
+        observed_correct = sum(
+            1
+            for event in observed_graded
+            if event.get("observed_grade", {}).get("is_correct") is True
+        )
+        agreement_values = [
+            event.get("grading_agreement")
+            for event in graded
+            if event.get("grading_agreement") is not None
+        ]
+        agreement_count = sum(1 for value in agreement_values if value is True)
         response_times = [event.get("response_time_sec") for event in events if event.get("response_time_sec") is not None]
         observation = turn.get("classroom_observation", {})
         priority_students = observation.get("priority_students", [])
@@ -221,6 +240,9 @@ def _phase_rows(cycle_index: int, session_result: dict[str, Any]) -> list[dict[s
                 "event_count": len(events),
                 "graded_event_count": len(graded),
                 "accuracy": round(correct / len(graded), 3) if graded else None,
+                "observed_accuracy": round(observed_correct / len(observed_graded), 3) if observed_graded else None,
+                "grading_agreement": round(agreement_count / len(agreement_values), 3) if agreement_values else None,
+                "grading_mismatch_count": len(agreement_values) - agreement_count,
                 "priority_student_count": len(priority_students),
                 "low_self_efficacy_count": trait_counts.get("self_efficacy", {}).get("low", 0),
                 "low_question_tendency_count": trait_counts.get("question_tendency", {}).get("low", 0),
@@ -236,11 +258,16 @@ def _phase_rows(cycle_index: int, session_result: dict[str, Any]) -> list[dict[s
 def _research_metrics(timeline_rows: list[dict[str, Any]], cycles_result: list[dict[str, Any]]) -> dict[str, Any]:
     cycle_rows = [item["cycle_metrics"] for item in cycles_result]
     accuracies = [row["accuracy"] for row in cycle_rows if row["accuracy"] is not None]
+    observed_accuracies = [row["observed_accuracy"] for row in cycle_rows if row.get("observed_accuracy") is not None]
+    grading_agreements = [row["grading_agreement"] for row in cycle_rows if row.get("grading_agreement") is not None]
     confidence_values = [row["average_belief_confidence"] for row in cycle_rows]
     return {
         "accuracy_first": accuracies[0] if accuracies else None,
         "accuracy_last": accuracies[-1] if accuracies else None,
         "accuracy_delta": round(accuracies[-1] - accuracies[0], 3) if len(accuracies) >= 2 else None,
+        "observed_accuracy_first": observed_accuracies[0] if observed_accuracies else None,
+        "observed_accuracy_last": observed_accuracies[-1] if observed_accuracies else None,
+        "grading_agreement_average": round(mean(grading_agreements), 3) if grading_agreements else None,
         "belief_confidence_first": confidence_values[0] if confidence_values else None,
         "belief_confidence_last": confidence_values[-1] if confidence_values else None,
         "belief_confidence_delta": round(confidence_values[-1] - confidence_values[0], 3) if len(confidence_values) >= 2 else None,
@@ -292,7 +319,7 @@ def _human_report(result: dict[str, Any]) -> str:
         json.dumps(result["research_metrics"], ensure_ascii=False, indent=2),
         "",
         "## Cycle Summary",
-        "cycle\ttarget_skill\tpace\taccuracy\tavg_estimated_score\tbelief_confidence\tavg_response_time\tmisconception_count",
+        "cycle\ttarget_skill\tpace\taccuracy\tobserved_accuracy\tgrading_agreement\tmismatch_count\tavg_estimated_score\tbelief_confidence\tavg_response_time\tmisconception_count",
     ]
     for row in result["cycle_summary_rows"]:
         lines.append("\t".join([
@@ -300,6 +327,9 @@ def _human_report(result: dict[str, Any]) -> str:
             str(row["target_skill"]),
             str(row["pace"]),
             str(row["accuracy"]),
+            str(row.get("observed_accuracy")),
+            str(row.get("grading_agreement")),
+            str(row.get("grading_mismatch_count")),
             str(row["average_estimated_score"]),
             str(row["average_belief_confidence"]),
             str(row["average_response_time_sec"]),
@@ -308,13 +338,16 @@ def _human_report(result: dict[str, Any]) -> str:
     lines.extend([
         "",
         "## Timeline Rows",
-        "cycle\tphase\taccuracy\tpriority_count\tlow_self\tlow_question\tlow_motivation\thigh_anxiety\tavg_response_time",
+        "cycle\tphase\taccuracy\tobserved_accuracy\tgrading_agreement\tmismatch_count\tpriority_count\tlow_self\tlow_question\tlow_motivation\thigh_anxiety\tavg_response_time",
     ])
     for row in result["timeline_rows"]:
         lines.append("\t".join([
             str(row["cycle_index"]),
             str(row["phase"]),
             str(row["accuracy"]),
+            str(row.get("observed_accuracy")),
+            str(row.get("grading_agreement")),
+            str(row.get("grading_mismatch_count")),
             str(row["priority_student_count"]),
             str(row["low_self_efficacy_count"]),
             str(row["low_question_tendency_count"]),

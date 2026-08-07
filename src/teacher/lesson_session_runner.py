@@ -167,7 +167,7 @@ class LessonSessionRunner:
             )
             response_time_sec = round(time.perf_counter() - started, 2)
             answer = record["answer"]
-            grade = (
+            observed_grade = (
                 self.grader.grade(expected_answer, answer)
                 if expected_answer
                 else {
@@ -176,6 +176,10 @@ class LessonSessionRunner:
                     "expected_value": None,
                     "student_value": None,
                 }
+            )
+            grade = self._authoritative_grade(
+                observed_grade=observed_grade,
+                assessment_directive=assessment_directive,
             )
             event = build_observable_event(
                 lesson_id=lesson_id,
@@ -188,11 +192,34 @@ class LessonSessionRunner:
                 response_time_sec=response_time_sec,
             ).to_dict()
             event["grade"] = grade
+            event["observed_grade"] = observed_grade
+            event["grading_agreement"] = _grading_agreement(grade, observed_grade)
             if assessment_directive:
                 event["cognitive_model"] = assessment_directive.get("cognitive_model")
                 event["controlled_skill"] = assessment_directive.get("skill")
             events.append(event)
         return events
+
+
+    def _authoritative_grade(
+        self,
+        *,
+        observed_grade: dict[str, Any],
+        assessment_directive: dict[str, Any] | None,
+    ) -> dict[str, Any]:
+        if not assessment_directive or "target_correct" not in assessment_directive:
+            return {**observed_grade, "source": "grader"}
+
+        is_correct = bool(assessment_directive["target_correct"])
+        return {
+            **observed_grade,
+            "is_correct": is_correct,
+            "score": 1 if is_correct else 0,
+            "source": "cognitive_model",
+            "target_answer": assessment_directive.get("target_answer"),
+            "correct_probability": assessment_directive.get("correct_probability"),
+            "rationale": assessment_directive.get("rationale"),
+        }
 
     def _assessment_directive_for_phase(
         self,
@@ -278,16 +305,47 @@ class LessonSessionRunner:
         ]
         correct_count = sum(1 for event in graded_events if event.get("is_correct") is True)
         total_count = len(graded_events)
+        observed_graded = [
+            event
+            for event in graded_events
+            if event.get("observed_grade", {}).get("is_correct") is not None
+        ]
+        observed_correct_count = sum(
+            1
+            for event in observed_graded
+            if event.get("observed_grade", {}).get("is_correct") is True
+        )
+        agreement_values = [
+            event.get("grading_agreement")
+            for event in graded_events
+            if event.get("grading_agreement") is not None
+        ]
+        agreement_count = sum(1 for value in agreement_values if value is True)
         return {
             "turn_count": len(turns),
             "graded_event_count": total_count,
             "correct_count": correct_count,
             "accuracy": round(correct_count / total_count, 3) if total_count else None,
+            "observed_correct_count": observed_correct_count,
+            "observed_accuracy": round(observed_correct_count / len(observed_graded), 3) if observed_graded else None,
+            "grading_agreement": round(agreement_count / len(agreement_values), 3) if agreement_values else None,
+            "grading_mismatch_count": len(agreement_values) - agreement_count,
             "final_average_estimated_score": final_class_profile.get(
                 "average_estimated_score"
             ),
             "final_common_risks": final_class_profile.get("common_risks", []),
         }
+
+
+def _grading_agreement(
+    authoritative_grade: dict[str, Any],
+    observed_grade: dict[str, Any],
+) -> bool | None:
+    authoritative = authoritative_grade.get("is_correct")
+    observed = observed_grade.get("is_correct")
+    if authoritative is None or observed is None:
+        return None
+    return authoritative is observed
 
 
 def _first_problem_for_goal(

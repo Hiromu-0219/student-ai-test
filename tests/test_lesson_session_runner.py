@@ -240,3 +240,74 @@ def test_lesson_session_runner_uses_cognitive_model_for_graded_phases(tmp_path):
     assert all(event.get("cognitive_model") == "bkt_irt" for event in graded_events)
     assert all(event.get("controlled_skill") == "can_divide_by_coefficient" for event in graded_events)
     assert any(event.get("is_correct") is False for event in graded_events)
+
+
+class _AlwaysCorrectCognitiveModel:
+    model_name = "always_correct_test"
+
+    def build_assessment_directive(self, *, student_state, question):
+        return {
+            "cognitive_model": self.model_name,
+            "skill": question["skill"],
+            "target_correct": True,
+            "correct_probability": 100,
+            "target_answer": question["answer"],
+            "rationale": "test forces internal correctness",
+        }
+
+
+class _UnparseableAnswerLLM:
+    model_id = "unparseable-answer-test"
+
+    def generate(self, system_prompt: str, user_prompt: str) -> str:
+        return "説明はしたつもりですが、最後の答え形式は書きません。"
+
+
+class _AlwaysWrongGrader:
+    def grade(self, expected_answer: str, student_answer: str):
+        return {
+            "is_correct": False,
+            "score": 0,
+            "expected_value": "forced",
+            "student_value": "forced_wrong",
+        }
+
+
+def test_lesson_session_runner_keeps_cognitive_correctness_when_observed_grading_differs(tmp_path):
+    students_dir = tmp_path / "students"
+    shutil.copytree(Path("data/students"), students_dir)
+    simulator = StudentAISimulator(
+        students_dir=str(students_dir),
+        logs_dir=str(tmp_path / "logs"),
+        speech_generator=_UnparseableAnswerLLM(),
+    )
+    belief_manager = TeacherBeliefManager(tmp_path / "teacher_beliefs")
+    runner = LessonSessionRunner(
+        student_simulator=simulator,
+        belief_manager=belief_manager,
+        teacher_id="T_TEST",
+        cognitive_model=_AlwaysCorrectCognitiveModel(),
+        grader=_AlwaysWrongGrader(),
+    )
+
+    result = runner.run_lesson(
+        lesson_id="LESSON_COGNITIVE_AUTHORITATIVE",
+        student_ids=["S001", "S002", "S003"],
+        lesson_plan=_lesson_plan(),
+        curriculum=_curriculum(),
+    )
+
+    graded_events = [
+        event
+        for turn in result["turns"]
+        for event in turn["events"]
+        if event.get("is_correct") is not None
+    ]
+    assert graded_events
+    assert all(event["is_correct"] is True for event in graded_events)
+    assert all(event["grade"]["source"] == "cognitive_model" for event in graded_events)
+    assert all(event["observed_grade"]["is_correct"] is False for event in graded_events)
+    assert all(event["grading_agreement"] is False for event in graded_events)
+    assert result["summary"]["accuracy"] == 1.0
+    assert result["summary"]["observed_accuracy"] == 0.0
+    assert result["summary"]["grading_agreement"] == 0.0
