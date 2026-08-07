@@ -15,7 +15,8 @@
   "load_in_4bit": true,
   "cognitive_model": "bkt_irt",
   "update_student_knowledge": false,
-  "reset_teacher_beliefs": true
+  "reset_teacher_beliefs": true,
+  "git_commit": "4e0bf5f"
 }
 
 ## Research Metrics

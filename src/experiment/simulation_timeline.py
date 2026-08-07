@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import shutil
+import subprocess
 from statistics import mean
 from typing import Any
 
@@ -145,6 +146,7 @@ def run_simulation_timeline(
             "cognitive_model": cognitive_model.model_name,
             "update_student_knowledge": update_student_knowledge,
             "reset_teacher_beliefs": reset_teacher_beliefs,
+            "git_commit": _git_commit(),
         },
         "student_ids": student_ids,
         "cycles": cycles_result,
@@ -322,6 +324,17 @@ def _human_report(result: dict[str, Any]) -> str:
         ]))
     lines.extend(["", "## Issue Candidates", json.dumps(result["issue_candidates"], ensure_ascii=False, indent=2)])
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _git_commit() -> str | None:
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"],
+            stderr=subprocess.DEVNULL,
+            text=True,
+        ).strip()
+    except Exception:
+        return None
 
 
 def _reset_generated_dir(path: Path) -> None:

@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 data/logs/simulation_timeline/
 data/teacher_beliefs/simulation_timeline/
+data/logs/simulation_timeline_llm/
+data/teacher_beliefs/simulation_timeline_llm/
