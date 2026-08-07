@@ -14,6 +14,7 @@
 | 内部妥当性の評価方法を見る | [docs/internal_validity_experiment.md](docs/internal_validity_experiment.md) |
 | 複数生徒クラスの妥当性を見る | [docs/classroom_validity_experiment.md](docs/classroom_validity_experiment.md) |
 | 伝達AIの推定妥当性を見る | [docs/communication_validity_experiment.md](docs/communication_validity_experiment.md) |
+| 授業設計AIの妥当性を見る | [docs/lesson_design_validity_experiment.md](docs/lesson_design_validity_experiment.md) |
 | 参考文献との対応を見る | [docs/reference_mapping.md](docs/reference_mapping.md) |
 | Notebookの使い分けを見る | [notebooks/README.md](notebooks/README.md) |
 
@@ -133,6 +134,7 @@ Notebookに依存せず、研究用の基準結果を出す場合は次を使い
 python scripts/run_internal_validity_experiment.py
 python scripts/run_classroom_validity_experiment.py
 python scripts/run_communication_validity_experiment.py
+python scripts/run_lesson_design_validity_experiment.py
 ```
 
 出力は `data/assessments/` に保存されます。

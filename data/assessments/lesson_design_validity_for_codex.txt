@@ -1,0 +1,408 @@
+# Lesson Design Validity Evaluation For Codex
+
+このファイルをCodex/ChatGPTに渡すときは、このtxtをそのまま添付してください。
+
+## Purpose
+授業設計AIが、伝達AIから教師側に渡された推定情報だけを入力として、クラス条件に応じた講義構成を提案できるかを検証します。
+
+## Summary
+{
+  "lesson_design_validity_score": 1.0,
+  "passed_checks": 5,
+  "total_checks": 5,
+  "scenario_count": 4,
+  "distinct_goals": [
+    "can_divide_by_coefficient",
+    "can_transpose_terms"
+  ],
+  "distinct_paces": [
+    "adaptive",
+    "slow",
+    "standard"
+  ],
+  "verdict": "usable_as_lesson_design_layer"
+}
+
+## Validity Checks
+- observable_input_policy: passed=True, score=1.0, reason=授業設計AIがtrue stateではなくteacher_beliefs由来の推定情報を使う設計になっている。
+- goal_adaptation: passed=True, score=1.0, reason=scenarioごとのgoal={"low_understanding_class": "can_transpose_terms", "wide_gap_class": "can_divide_by_coefficient", "high_understanding_class": "can_divide_by_coefficient", "common_misconception_class": "can_divide_by_coefficient"}
+- time_allocation_adaptation: passed=True, score=1.0, reason=低理解クラスは説明を厚く、学力差クラスは個別演習を厚く、高理解クラスは標準ペースにする。
+- whole_class_optimization_targets: passed=True, score=1.0, reason=クラス全体のリスクに応じたoptimization_targetsが出るかを見る。
+- individual_support_policy_presence: passed=True, score=1.0, reason=全体講義だけでなく、個別演習中の支援方針も併せて出す。
+
+## Scenario Comparison
+scenario	avg_score	score_std	low_count	high_count	goal	pace	whole_explanation_min	practice_min	check_min	optimization_targets	risk_count
+low_understanding_class	38.1	7.9	8	0	can_transpose_terms	slow	8	8	5	raise_class_level_understanding,support_low_estimated_understanding_students,increase_teacher_initiated_check_questions,protect_self_efficacy	4
+wide_gap_class	61.7	22.0	3	5	can_divide_by_coefficient	adaptive	6	12	5	raise_class_level_understanding,reduce_between_student_gap,support_low_estimated_understanding_students,increase_teacher_initiated_check_questions,protect_self_efficacy	4
+high_understanding_class	80	8.8	0	10	can_divide_by_coefficient	standard	5	11	6	raise_class_level_understanding	1
+common_misconception_class	61.1	7.8	0	3	can_divide_by_coefficient	standard	5	11	6	raise_class_level_understanding,address_common_misconceptions,increase_teacher_initiated_check_questions	2
+
+## Scenario Details
+### low_understanding_class
+input_summary:
+{
+  "student_count": 10,
+  "avg_score": 38.1,
+  "score_std": 7.9,
+  "low_count": 8,
+  "high_count": 0,
+  "trait_counts": {
+    "self_efficacy": {
+      "low": 4,
+      "medium": 6,
+      "high": 0
+    },
+    "question_tendency": {
+      "low": 5,
+      "medium": 5,
+      "high": 0
+    },
+    "motivation": {
+      "low": 0,
+      "medium": 10,
+      "high": 0
+    },
+    "neuroticism": {
+      "low": 0,
+      "medium": 7,
+      "high": 3
+    }
+  },
+  "misconception_student_count": 0
+}
+design_summary:
+{
+  "lesson_goal": {
+    "goal_id": "transpose_terms",
+    "target_skill": "can_transpose_terms",
+    "goal_text": "移項すると符号が変わることを理解する",
+    "success_criteria": [
+      "x + b = c 型で定数項を正しく移項できる",
+      "反対側へ移すと符号が変わる理由を短く説明できる"
+    ]
+  },
+  "whole_class_policy": {
+    "target_skill": "can_transpose_terms",
+    "pace": "slow",
+    "strategy": [
+      "short_review",
+      "worked_example",
+      "guided_practice"
+    ],
+    "reason": "selected from class-level observable estimates"
+  },
+  "optimization_targets": [
+    "raise_class_level_understanding",
+    "support_low_estimated_understanding_students",
+    "increase_teacher_initiated_check_questions",
+    "protect_self_efficacy"
+  ],
+  "minutes_by_phase": {
+    "導入": 3,
+    "全体説明": 8,
+    "例題": 6,
+    "個別演習": 8,
+    "確認": 5
+  },
+  "individual_support_policy_counts": {
+    "自信を下げない声かけを優先し、途中式を1行だけ確認する": 4,
+    "同じ型の小問を使い、操作を1つずつ確認する": 2,
+    "教師側から小さな確認質問を入れる": 3,
+    "全体演習中の反応を継続観察する": 1
+  },
+  "observable_input_policy": {
+    "uses": [
+      "teacher_beliefs.estimated_knowledge",
+      "teacher_beliefs.estimated_traits",
+      "teacher_beliefs.estimated_misconceptions",
+      "teacher_beliefs.evidence_history",
+      "curriculum",
+      "total_minutes"
+    ],
+    "does_not_use": [
+      "true_student_knowledge_state",
+      "true_student_misconceptions",
+      "true_student_personality",
+      "true_student_motivation",
+      "raw_hidden_student_parameters"
+    ]
+  }
+}
+reason:
+クラス平均推定理解度=38.1、低理解層=8人、主なリスク=['推定理解度が低い生徒がいる', '自己効力感が低い生徒が複数いる', '質問しにくい生徒が複数いる', '不安が高い生徒が複数いる']。そのため授業目標を「移項すると符号が変わることを理解する」に設定。
+
+### wide_gap_class
+input_summary:
+{
+  "student_count": 10,
+  "avg_score": 61.7,
+  "score_std": 22.0,
+  "low_count": 3,
+  "high_count": 5,
+  "trait_counts": {
+    "self_efficacy": {
+      "low": 3,
+      "medium": 4,
+      "high": 3
+    },
+    "question_tendency": {
+      "low": 4,
+      "medium": 6,
+      "high": 0
+    },
+    "motivation": {
+      "low": 1,
+      "medium": 6,
+      "high": 3
+    },
+    "neuroticism": {
+      "low": 3,
+      "medium": 4,
+      "high": 3
+    }
+  },
+  "misconception_student_count": 0
+}
+design_summary:
+{
+  "lesson_goal": {
+    "goal_id": "divide_by_coefficient",
+    "target_skill": "can_divide_by_coefficient",
+    "goal_text": "係数で両辺を割って x を求める",
+    "success_criteria": [
+      "ax = b 型で両辺を a で割れる",
+      "3x = 15 のような式で 3 を引く誤りを避けられる"
+    ]
+  },
+  "whole_class_policy": {
+    "target_skill": "can_divide_by_coefficient",
+    "pace": "adaptive",
+    "strategy": [
+      "brief_explanation",
+      "individual_practice",
+      "targeted_support"
+    ],
+    "reason": "selected from class-level observable estimates"
+  },
+  "optimization_targets": [
+    "raise_class_level_understanding",
+    "reduce_between_student_gap",
+    "support_low_estimated_understanding_students",
+    "increase_teacher_initiated_check_questions",
+    "protect_self_efficacy"
+  ],
+  "minutes_by_phase": {
+    "導入": 3,
+    "全体説明": 6,
+    "例題": 4,
+    "個別演習": 12,
+    "確認": 5
+  },
+  "individual_support_policy_counts": {
+    "自信を下げない声かけを優先し、途中式を1行だけ確認する": 3,
+    "全体演習中の反応を継続観察する": 2,
+    "発展問題や説明役を任せ、理解を言語化させる": 4,
+    "教師側から小さな確認質問を入れる": 1
+  },
+  "observable_input_policy": {
+    "uses": [
+      "teacher_beliefs.estimated_knowledge",
+      "teacher_beliefs.estimated_traits",
+      "teacher_beliefs.estimated_misconceptions",
+      "teacher_beliefs.evidence_history",
+      "curriculum",
+      "total_minutes"
+    ],
+    "does_not_use": [
+      "true_student_knowledge_state",
+      "true_student_misconceptions",
+      "true_student_personality",
+      "true_student_motivation",
+      "raw_hidden_student_parameters"
+    ]
+  }
+}
+reason:
+クラス平均推定理解度=61.7、低理解層=3人、主なリスク=['推定理解度が低い生徒がいる', '自己効力感が低い生徒が複数いる', '質問しにくい生徒が複数いる', '不安が高い生徒が複数いる']。そのため授業目標を「係数で両辺を割って x を求める」に設定。
+
+### high_understanding_class
+input_summary:
+{
+  "student_count": 10,
+  "avg_score": 80,
+  "score_std": 8.8,
+  "low_count": 0,
+  "high_count": 10,
+  "trait_counts": {
+    "self_efficacy": {
+      "low": 0,
+      "medium": 3,
+      "high": 7
+    },
+    "question_tendency": {
+      "low": 0,
+      "medium": 10,
+      "high": 0
+    },
+    "motivation": {
+      "low": 0,
+      "medium": 0,
+      "high": 10
+    },
+    "neuroticism": {
+      "low": 5,
+      "medium": 5,
+      "high": 0
+    }
+  },
+  "misconception_student_count": 0
+}
+design_summary:
+{
+  "lesson_goal": {
+    "goal_id": "divide_by_coefficient",
+    "target_skill": "can_divide_by_coefficient",
+    "goal_text": "係数で両辺を割って x を求める",
+    "success_criteria": [
+      "ax = b 型で両辺を a で割れる",
+      "3x = 15 のような式で 3 を引く誤りを避けられる"
+    ]
+  },
+  "whole_class_policy": {
+    "target_skill": "can_divide_by_coefficient",
+    "pace": "standard",
+    "strategy": [
+      "brief_explanation",
+      "worked_example",
+      "practice"
+    ],
+    "reason": "selected from class-level observable estimates"
+  },
+  "optimization_targets": [
+    "raise_class_level_understanding"
+  ],
+  "minutes_by_phase": {
+    "導入": 3,
+    "全体説明": 5,
+    "例題": 5,
+    "個別演習": 11,
+    "確認": 6
+  },
+  "individual_support_policy_counts": {
+    "発展問題や説明役を任せ、理解を言語化させる": 10
+  },
+  "observable_input_policy": {
+    "uses": [
+      "teacher_beliefs.estimated_knowledge",
+      "teacher_beliefs.estimated_traits",
+      "teacher_beliefs.estimated_misconceptions",
+      "teacher_beliefs.evidence_history",
+      "curriculum",
+      "total_minutes"
+    ],
+    "does_not_use": [
+      "true_student_knowledge_state",
+      "true_student_misconceptions",
+      "true_student_personality",
+      "true_student_motivation",
+      "raw_hidden_student_parameters"
+    ]
+  }
+}
+reason:
+クラス平均推定理解度=80、低理解層=0人、主なリスク=['大きな共通リスクはまだ観察されていない']。そのため授業目標を「係数で両辺を割って x を求める」に設定。
+
+### common_misconception_class
+input_summary:
+{
+  "student_count": 10,
+  "avg_score": 61.1,
+  "score_std": 7.8,
+  "low_count": 0,
+  "high_count": 3,
+  "trait_counts": {
+    "self_efficacy": {
+      "low": 0,
+      "medium": 10,
+      "high": 0
+    },
+    "question_tendency": {
+      "low": 3,
+      "medium": 7,
+      "high": 0
+    },
+    "motivation": {
+      "low": 0,
+      "medium": 10,
+      "high": 0
+    },
+    "neuroticism": {
+      "low": 0,
+      "medium": 10,
+      "high": 0
+    }
+  },
+  "misconception_student_count": 6
+}
+design_summary:
+{
+  "lesson_goal": {
+    "goal_id": "divide_by_coefficient",
+    "target_skill": "can_divide_by_coefficient",
+    "goal_text": "係数で両辺を割って x を求める",
+    "success_criteria": [
+      "ax = b 型で両辺を a で割れる",
+      "3x = 15 のような式で 3 を引く誤りを避けられる"
+    ]
+  },
+  "whole_class_policy": {
+    "target_skill": "can_divide_by_coefficient",
+    "pace": "standard",
+    "strategy": [
+      "brief_explanation",
+      "worked_example",
+      "practice",
+      "misconception_confrontation"
+    ],
+    "reason": "selected from class-level observable estimates"
+  },
+  "optimization_targets": [
+    "raise_class_level_understanding",
+    "address_common_misconceptions",
+    "increase_teacher_initiated_check_questions"
+  ],
+  "minutes_by_phase": {
+    "導入": 3,
+    "全体説明": 5,
+    "例題": 5,
+    "個別演習": 11,
+    "確認": 6
+  },
+  "individual_support_policy_counts": {
+    "全体演習中の反応を継続観察する": 5,
+    "教師側から小さな確認質問を入れる": 3,
+    "発展問題や説明役を任せ、理解を言語化させる": 2
+  },
+  "observable_input_policy": {
+    "uses": [
+      "teacher_beliefs.estimated_knowledge",
+      "teacher_beliefs.estimated_traits",
+      "teacher_beliefs.estimated_misconceptions",
+      "teacher_beliefs.evidence_history",
+      "curriculum",
+      "total_minutes"
+    ],
+    "does_not_use": [
+      "true_student_knowledge_state",
+      "true_student_misconceptions",
+      "true_student_personality",
+      "true_student_motivation",
+      "raw_hidden_student_parameters"
+    ]
+  }
+}
+reason:
+クラス平均推定理解度=61.1、低理解層=0人、主なリスク=['質問しにくい生徒が複数いる', '共通誤概念: 係数で割る操作に誤概念がある可能性']。そのため授業目標を「係数で両辺を割って x を求める」に設定。
+
+## Claim Scope
+この実験で主張できるのは、授業設計AIが観察由来のクラス要約に反応して講義構成を変えられることです。実際の授業効果や人間教師より優れていることは、この実験だけでは主張しません。

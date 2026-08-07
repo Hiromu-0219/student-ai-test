@@ -7,6 +7,10 @@ from src.experiment.communication_validity import (
     run_communication_validity_evaluation,
 )
 from src.experiment.experiment_config import TeachingStrategyExperimentConfig
+from src.experiment.lesson_design_validity import (
+    export_lesson_design_validity_for_codex,
+    run_lesson_design_validity_evaluation,
+)
 from src.experiment.result_exporter import export_teaching_strategy_summary
 from src.experiment.student_ai_evaluation import (
     compare_cognitive_models,
@@ -21,8 +25,10 @@ __all__ = [
     "TeachingStrategyExperimentConfig",
     "export_classroom_validity_for_codex",
     "export_communication_validity_for_codex",
+    "export_lesson_design_validity_for_codex",
     "run_classroom_validity_evaluation",
     "run_communication_validity_evaluation",
+    "run_lesson_design_validity_evaluation",
     "compare_cognitive_models",
     "export_cognitive_model_comparison_for_codex",
     "export_student_ai_evaluation",

@@ -124,7 +124,7 @@ class RuleBasedLessonPlanner:
         if low_ratio >= 0.5:
             allocation = [3, 8, 6, 8, 5]
         elif class_profile.get("score_std", 0) >= 12:
-            allocation = [3, 6, 5, 10, 6]
+            allocation = [3, 6, 4, 12, 5]
         else:
             allocation = [3, 5, 5, 11, 6]
         allocation = _scale_minutes(allocation, total_minutes)
