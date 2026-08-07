@@ -373,8 +373,81 @@ def _human_report(result: dict[str, Any]) -> str:
                 str(sample["grading_agreement"]),
                 _one_line(sample["utterance"]),
             ]))
+    lines.extend(_conversation_log_lines(result))
     lines.extend(["", "## Issue Candidates", json.dumps(result["issue_candidates"], ensure_ascii=False, indent=2)])
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _conversation_log_lines(result: dict[str, Any]) -> list[str]:
+    lines = ["", "## Full Conversation Log"]
+    for cycle in result.get("cycles", []):
+        cycle_index = cycle.get("cycle_index")
+        cycle_metrics = cycle.get("cycle_metrics", {})
+        lesson_goal = cycle.get("session_result", {}).get("lesson_goal", {})
+        lines.extend(
+            [
+                "",
+                f"### Cycle {cycle_index}",
+                f"lesson_goal: {lesson_goal.get('goal_text')}",
+                f"target_skill: {cycle_metrics.get('target_skill')}",
+                f"pace: {cycle_metrics.get('pace')}",
+                f"accuracy: {cycle_metrics.get('accuracy')} / observed_accuracy: {cycle_metrics.get('observed_accuracy')} / grading_agreement: {cycle_metrics.get('grading_agreement')}",
+            ]
+        )
+        for turn in cycle.get("session_result", {}).get("turns", []):
+            lines.extend(_turn_log_lines(turn))
+    return lines
+
+
+def _turn_log_lines(turn: dict[str, Any]) -> list[str]:
+    phase = turn.get("phase", {})
+    observation = turn.get("classroom_observation", {})
+    teacher_beliefs = turn.get("teacher_beliefs", {})
+    lines = [
+        "",
+        f"#### Phase {turn.get('phase_index')}: {phase.get('phase')}",
+        f"minutes: {phase.get('minutes')}",
+        f"problem: {phase.get('problem')}",
+        f"expected_answer: {turn.get('expected_answer')}",
+        f"Teacher: {_one_line(turn.get('teacher_message', ''), 500)}",
+        "Students:",
+    ]
+    for event in turn.get("events", []):
+        observed_grade = event.get("observed_grade", {})
+        lines.append(
+            "- "
+            f"{event.get('student_id')}: "
+            f"is_correct={event.get('is_correct')}, "
+            f"observed_is_correct={observed_grade.get('is_correct')}, "
+            f"grading_agreement={event.get('grading_agreement')}, "
+            f"response_time_sec={event.get('response_time_sec')}, "
+            f"utterance={_one_line(event.get('utterance', ''), 500)}"
+        )
+    lines.extend(
+        [
+            f"CommunicationAI classroom_summary: {_one_line(observation.get('classroom_summary', ''), 500)}",
+            f"CommunicationAI recommended_actions: {_one_line(json.dumps(observation.get('recommended_teacher_actions', []), ensure_ascii=False), 500)}",
+            f"CommunicationAI priority_students: {_one_line(json.dumps(observation.get('priority_students', []), ensure_ascii=False), 500)}",
+            f"TeacherBelief summary: {_one_line(json.dumps(_belief_summary(teacher_beliefs), ensure_ascii=False), 500)}",
+        ]
+    )
+    return lines
+
+
+def _belief_summary(teacher_beliefs: dict[str, Any]) -> dict[str, Any]:
+    summary = {}
+    for student_id, belief in teacher_beliefs.items():
+        linear = belief.get("estimated_knowledge", {}).get("linear_equation", {})
+        summary[student_id] = {
+            "score": linear.get("score"),
+            "confidence": linear.get("confidence"),
+            "traits": {
+                key: value.get("level")
+                for key, value in belief.get("estimated_traits", {}).items()
+            },
+            "misconception_count": len(belief.get("estimated_misconceptions", [])),
+        }
+    return summary
 
 
 def _utterance_samples(result: dict[str, Any], limit: int = 8) -> list[dict[str, Any]]:

@@ -16,7 +16,7 @@
   "cognitive_model": "bkt_irt",
   "update_student_knowledge": false,
   "reset_teacher_beliefs": true,
-  "git_commit": "99a51e1"
+  "git_commit": "a3ff187"
 }
 
 ## Research Metrics
@@ -78,6 +78,266 @@ cycle	phase	student_id	accuracy_source	is_correct	observed_is_correct	grading_ag
 1	確認	S001	cognitive_model	True	True	True	x = 4 です。 答え: x = 4
 1	確認	S002	cognitive_model	False	False	True	自信はないけど、たぶん x = 6 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 6
 1	確認	S003	cognitive_model	True	True	True	これは分かります。まず定数項を移して、そのあと係数で割ります。x = 4 です。間違っていたら、もう一度考えます。 答え: x = 4
+
+## Full Conversation Log
+
+### Cycle 1
+lesson_goal: 係数で両辺を割って x を求める
+target_skill: can_divide_by_coefficient
+pace: standard
+accuracy: 0.6 / observed_accuracy: 0.6 / grading_agreement: 1.0
+
+#### Phase 1: 導入
+minutes: 3
+problem: None
+expected_answer: None
+Teacher: 今日の目標は「係数で両辺を割って x を求める」です。まず前回の考え方を短く確認しましょう。
+Students:
+- S001: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、確認します。
+- S002: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、まず今日の目標を確認します。少し不安なので、途中で確認したいです。
+- S003: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、今日の目標を確認しました。次の問題で試してみます。
+- S004: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、まず今日の目標を確認します。少し不安なので、途中で確認したいです。
+- S005: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、今日の目標を確認しました。次の問題で試してみます。
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=0, C=3, D=0. Low self-efficacy=2, high anxiety=2, low motivation=0. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 6, "priority_reasons": ["low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "medium", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=low, neuroticism=high. Evidence: shows low confidence, shows anxiety or uncertainty, explains intermediate ste...
+TeacherBelief summary: {"S001": {"score": 50, "confidence": 0.0, "traits": {"self_efficacy": "medium", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 50, "confidence": 0.03, "traits": {"self_efficacy": "low", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 0}, "S003": {"score": 50, "confidence": 0.0, "traits": {"self_efficacy": ...
+
+#### Phase 2: 全体説明
+minutes: 5
+problem: None
+expected_answer: None
+Teacher: 全体説明です。係数で両辺を割って x を求めるために、式の左右で同じ操作をすることを確認します。
+Students:
+- S001: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、確認します。
+- S002: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、まず今日の目標を確認します。少し不安なので、途中で確認したいです。
+- S003: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、今日の目標を確認しました。次の問題で試してみます。
+- S004: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、まず今日の目標を確認します。少し不安なので、途中で確認したいです。
+- S005: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、今日の目標を確認しました。次の問題で試してみます。
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=0, C=3, D=0. Low self-efficacy=2, high anxiety=2, low motivation=0. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 6, "priority_reasons": ["low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "medium", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=low, neuroticism=high. Evidence: shows low confidence, shows anxiety or uncertainty, explains intermediate ste...
+TeacherBelief summary: {"S001": {"score": 50, "confidence": 0.0, "traits": {"self_efficacy": "medium", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 50, "confidence": 0.06, "traits": {"self_efficacy": "low", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 0}, "S003": {"score": 50, "confidence": 0.0, "traits": {"self_efficacy": ...
+
+#### Phase 3: 例題
+minutes: 5
+problem: 3x = 15
+expected_answer: x = 5
+Teacher: 例題です。3x = 15 を1手ずつ考えて、答えを書いてください。
+Students:
+- S001: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=x = 5 です。 答え: x = 5
+- S002: is_correct=False, observed_is_correct=False, grading_agreement=True, response_time_sec=0.0, utterance=自信はないけど、たぶん x = 7 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 7
+- S003: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 5 です。間違っていたら、もう一度考えます。 答え: x = 5
+- S004: is_correct=False, observed_is_correct=False, grading_agreement=True, response_time_sec=0.0, utterance=自信はないけど、両辺を整理して、x は 7 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 7
+- S005: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 5 です。間違っていたら、もう一度考えます。 答え: x = 5
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=2, C=1, D=0. Low self-efficacy=2, high anxiety=2, low motivation=1. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Use teacher-initiated checks because several students may not ask questions.", "Let confident or diligent students explain one step after individual thinking time.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 10, "priority_reasons": ["incorrect_answer", "low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=high, neuroticism=high. Evidence: shows low confidence, asks a question or requests confirm...
+TeacherBelief summary: {"S001": {"score": 56, "confidence": 0.11, "traits": {"self_efficacy": "medium", "question_tendency": "low", "motivation": "low", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 44, "confidence": 0.17, "traits": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 1}, "S003": {"score": 56, "confidence": 0.11, "traits": {"self_efficacy": "high"...
+
+#### Phase 4: 個別演習
+minutes: 11
+problem: None
+expected_answer: None
+Teacher: 個別演習です。3x = 15 を自分で解いて、途中で迷ったらその点も書いてください。
+Students:
+- S001: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=x = 5 です。 答え: x = 5
+- S002: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=自信はないけど、たぶん x = 5 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 5
+- S003: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 5 です。間違っていたら、もう一度考えます。 答え: x = 5
+- S004: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=自信はないけど、両辺を整理して、x は 5 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 5
+- S005: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 5 です。間違っていたら、もう一度考えます。 答え: x = 5
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=2, C=1, D=0. Low self-efficacy=2, high anxiety=2, low motivation=0. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Let confident or diligent students explain one step after individual thinking time.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 6, "priority_reasons": ["low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=high, neuroticism=high. Evidence: shows low confidence, asks a question or requests confirmation, shows anxiety ...
+TeacherBelief summary: {"S001": {"score": 56, "confidence": 0.14, "traits": {"self_efficacy": "medium", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 44, "confidence": 0.2, "traits": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 1}, "S003": {"score": 56, "confidence": 0.14, "traits": {"self_efficacy": "...
+
+#### Phase 5: 確認
+minutes: 6
+problem: 5x = 20
+expected_answer: x = 4
+Teacher: 確認問題です。5x = 20 を解いて、答えだけでなく確認した式も短く書いてください。
+Students:
+- S001: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=x = 4 です。 答え: x = 4
+- S002: is_correct=False, observed_is_correct=False, grading_agreement=True, response_time_sec=0.0, utterance=自信はないけど、たぶん x = 6 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 6
+- S003: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 4 です。間違っていたら、もう一度考えます。 答え: x = 4
+- S004: is_correct=False, observed_is_correct=False, grading_agreement=True, response_time_sec=0.0, utterance=自信はないけど、両辺を整理して、x は 6 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 6
+- S005: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 4 です。間違っていたら、もう一度考えます。 答え: x = 4
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=2, C=1, D=0. Low self-efficacy=2, high anxiety=2, low motivation=1. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Use teacher-initiated checks because several students may not ask questions.", "Let confident or diligent students explain one step after individual thinking time.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 10, "priority_reasons": ["incorrect_answer", "low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=high, neuroticism=high. Evidence: shows low confidence, asks a question or requests confirm...
+TeacherBelief summary: {"S001": {"score": 62, "confidence": 0.25, "traits": {"self_efficacy": "medium", "question_tendency": "low", "motivation": "low", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 38, "confidence": 0.31, "traits": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 1}, "S003": {"score": 62, "confidence": 0.25, "traits": {"self_efficacy": "high"...
+
+### Cycle 2
+lesson_goal: 移項すると符号が変わることを理解する
+target_skill: can_transpose_terms
+pace: standard
+accuracy: 0.6 / observed_accuracy: 0.6 / grading_agreement: 1.0
+
+#### Phase 1: 導入
+minutes: 3
+problem: None
+expected_answer: None
+Teacher: 今日の目標は「移項すると符号が変わることを理解する」です。まず前回の考え方を短く確認しましょう。
+Students:
+- S001: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、確認します。
+- S002: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、まず今日の目標を確認します。少し不安なので、途中で確認したいです。
+- S003: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、今日の目標を確認しました。次の問題で試してみます。
+- S004: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、まず今日の目標を確認します。少し不安なので、途中で確認したいです。
+- S005: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、今日の目標を確認しました。次の問題で試してみます。
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=0, C=3, D=0. Low self-efficacy=2, high anxiety=2, low motivation=0. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 6, "priority_reasons": ["low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "medium", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=low, neuroticism=high. Evidence: shows low confidence, shows anxiety or uncertainty, explains intermediate ste...
+TeacherBelief summary: {"S001": {"score": 62, "confidence": 0.25, "traits": {"self_efficacy": "medium", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 38, "confidence": 0.34, "traits": {"self_efficacy": "low", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 1}, "S003": {"score": 62, "confidence": 0.25, "traits": {"self_efficacy"...
+
+#### Phase 2: 全体説明
+minutes: 5
+problem: None
+expected_answer: None
+Teacher: 全体説明です。移項すると符号が変わることを理解するために、式の左右で同じ操作をすることを確認します。
+Students:
+- S001: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、確認します。
+- S002: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、まず今日の目標を確認します。少し不安なので、途中で確認したいです。
+- S003: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、今日の目標を確認しました。次の問題で試してみます。
+- S004: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、まず今日の目標を確認します。少し不安なので、途中で確認したいです。
+- S005: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、今日の目標を確認しました。次の問題で試してみます。
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=0, C=3, D=0. Low self-efficacy=2, high anxiety=2, low motivation=0. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 6, "priority_reasons": ["low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "medium", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=low, neuroticism=high. Evidence: shows low confidence, shows anxiety or uncertainty, explains intermediate ste...
+TeacherBelief summary: {"S001": {"score": 62, "confidence": 0.25, "traits": {"self_efficacy": "medium", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 38, "confidence": 0.37, "traits": {"self_efficacy": "low", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 1}, "S003": {"score": 62, "confidence": 0.25, "traits": {"self_efficacy"...
+
+#### Phase 3: 例題
+minutes: 5
+problem: x + 3 = 8
+expected_answer: x = 5
+Teacher: 例題です。x + 3 = 8 を1手ずつ考えて、答えを書いてください。
+Students:
+- S001: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=x = 5 です。 答え: x = 5
+- S002: is_correct=False, observed_is_correct=False, grading_agreement=True, response_time_sec=0.0, utterance=自信はないけど、たぶん x = 4 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 4
+- S003: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 5 です。間違っていたら、もう一度考えます。 答え: x = 5
+- S004: is_correct=False, observed_is_correct=False, grading_agreement=True, response_time_sec=0.0, utterance=自信はないけど、両辺を整理して、x は 4 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 4
+- S005: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 5 です。間違っていたら、もう一度考えます。 答え: x = 5
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=2, C=1, D=0. Low self-efficacy=2, high anxiety=2, low motivation=1. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Use teacher-initiated checks because several students may not ask questions.", "Let confident or diligent students explain one step after individual thinking time.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 10, "priority_reasons": ["incorrect_answer", "low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=high, neuroticism=high. Evidence: shows low confidence, asks a question or requests confirm...
+TeacherBelief summary: {"S001": {"score": 68, "confidence": 0.36, "traits": {"self_efficacy": "medium", "question_tendency": "low", "motivation": "low", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 32, "confidence": 0.48, "traits": {"self_efficacy": "low", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 1}, "S003": {"score": 68, "confidence": 0.36, "traits": {"self_efficacy": "hig...
+
+#### Phase 4: 個別演習
+minutes: 11
+problem: None
+expected_answer: None
+Teacher: 個別演習です。x + 3 = 8 を自分で解いて、途中で迷ったらその点も書いてください。
+Students:
+- S001: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=x = 5 です。 答え: x = 5
+- S002: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=自信はないけど、たぶん x = 5 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 5
+- S003: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 5 です。間違っていたら、もう一度考えます。 答え: x = 5
+- S004: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=自信はないけど、両辺を整理して、x は 5 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 5
+- S005: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 5 です。間違っていたら、もう一度考えます。 答え: x = 5
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=2, C=1, D=0. Low self-efficacy=2, high anxiety=2, low motivation=0. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Let confident or diligent students explain one step after individual thinking time.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 6, "priority_reasons": ["low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=high, neuroticism=high. Evidence: shows low confidence, asks a question or requests confirmation, shows anxiety ...
+TeacherBelief summary: {"S001": {"score": 68, "confidence": 0.39, "traits": {"self_efficacy": "medium", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 32, "confidence": 0.51, "traits": {"self_efficacy": "low", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 1}, "S003": {"score": 68, "confidence": 0.39, "traits": {"self_efficacy"...
+
+#### Phase 5: 確認
+minutes: 6
+problem: x - 4 = 9
+expected_answer: x = 13
+Teacher: 確認問題です。x - 4 = 9 を解いて、答えだけでなく確認した式も短く書いてください。
+Students:
+- S001: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=x = 13 です。 答え: x = 13
+- S002: is_correct=False, observed_is_correct=False, grading_agreement=True, response_time_sec=0.0, utterance=自信はないけど、たぶん x = 12 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 12
+- S003: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 13 です。間違っていたら、もう一度考えます。 答え: x = 13
+- S004: is_correct=False, observed_is_correct=False, grading_agreement=True, response_time_sec=0.0, utterance=自信はないけど、両辺を整理して、x は 12 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 12
+- S005: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 13 です。間違っていたら、もう一度考えます。 答え: x = 13
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=2, C=1, D=0. Low self-efficacy=2, high anxiety=2, low motivation=1. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Use teacher-initiated checks because several students may not ask questions.", "Let confident or diligent students explain one step after individual thinking time.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 10, "priority_reasons": ["incorrect_answer", "low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=high, neuroticism=high. Evidence: shows low confidence, asks a question or requests confirm...
+TeacherBelief summary: {"S001": {"score": 74, "confidence": 0.5, "traits": {"self_efficacy": "medium", "question_tendency": "low", "motivation": "low", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 26, "confidence": 0.62, "traits": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 1}, "S003": {"score": 74, "confidence": 0.5, "traits": {"self_efficacy": "high", ...
+
+### Cycle 3
+lesson_goal: 移項すると符号が変わることを理解する
+target_skill: can_transpose_terms
+pace: adaptive
+accuracy: 0.6 / observed_accuracy: 0.6 / grading_agreement: 1.0
+
+#### Phase 1: 導入
+minutes: 3
+problem: None
+expected_answer: None
+Teacher: 今日の目標は「移項すると符号が変わることを理解する」です。まず前回の考え方を短く確認しましょう。
+Students:
+- S001: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、確認します。
+- S002: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、まず今日の目標を確認します。少し不安なので、途中で確認したいです。
+- S003: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、今日の目標を確認しました。次の問題で試してみます。
+- S004: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、まず今日の目標を確認します。少し不安なので、途中で確認したいです。
+- S005: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、今日の目標を確認しました。次の問題で試してみます。
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=0, C=3, D=0. Low self-efficacy=2, high anxiety=2, low motivation=0. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 6, "priority_reasons": ["low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "medium", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=low, neuroticism=high. Evidence: shows low confidence, shows anxiety or uncertainty, explains intermediate ste...
+TeacherBelief summary: {"S001": {"score": 74, "confidence": 0.5, "traits": {"self_efficacy": "medium", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 26, "confidence": 0.65, "traits": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 1}, "S003": {"score": 74, "confidence": 0.5, "traits": {"self_efficacy": "h...
+
+#### Phase 2: 全体説明
+minutes: 6
+problem: None
+expected_answer: None
+Teacher: 全体説明です。移項すると符号が変わることを理解するために、式の左右で同じ操作をすることを確認します。
+Students:
+- S001: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、確認します。
+- S002: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、まず今日の目標を確認します。少し不安なので、途中で確認したいです。
+- S003: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、今日の目標を確認しました。次の問題で試してみます。
+- S004: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、まず今日の目標を確認します。少し不安なので、途中で確認したいです。
+- S005: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=はい、今日の目標を確認しました。次の問題で試してみます。
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=0, C=3, D=0. Low self-efficacy=2, high anxiety=2, low motivation=0. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 6, "priority_reasons": ["low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "medium", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=low, neuroticism=high. Evidence: shows low confidence, shows anxiety or uncertainty, explains intermediate ste...
+TeacherBelief summary: {"S001": {"score": 74, "confidence": 0.5, "traits": {"self_efficacy": "medium", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 26, "confidence": 0.68, "traits": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 1}, "S003": {"score": 74, "confidence": 0.5, "traits": {"self_efficacy": "h...
+
+#### Phase 3: 例題
+minutes: 4
+problem: x + 3 = 8
+expected_answer: x = 5
+Teacher: 例題です。x + 3 = 8 を1手ずつ考えて、答えを書いてください。
+Students:
+- S001: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=x = 5 です。 答え: x = 5
+- S002: is_correct=False, observed_is_correct=False, grading_agreement=True, response_time_sec=0.0, utterance=自信はないけど、たぶん x = 4 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 4
+- S003: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 5 です。間違っていたら、もう一度考えます。 答え: x = 5
+- S004: is_correct=False, observed_is_correct=False, grading_agreement=True, response_time_sec=0.0, utterance=自信はないけど、両辺を整理して、x は 4 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 4
+- S005: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 5 です。間違っていたら、もう一度考えます。 答え: x = 5
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=2, C=1, D=0. Low self-efficacy=2, high anxiety=2, low motivation=1. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Use teacher-initiated checks because several students may not ask questions.", "Let confident or diligent students explain one step after individual thinking time.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 10, "priority_reasons": ["incorrect_answer", "low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=high, neuroticism=high. Evidence: shows low confidence, asks a question or requests confirm...
+TeacherBelief summary: {"S001": {"score": 80, "confidence": 0.61, "traits": {"self_efficacy": "medium", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 20, "confidence": 0.79, "traits": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 1}, "S003": {"score": 80, "confidence": 0.61, "traits": {"self_efficacy": ...
+
+#### Phase 4: 個別演習
+minutes: 12
+problem: None
+expected_answer: None
+Teacher: 個別演習です。x + 3 = 8 を自分で解いて、途中で迷ったらその点も書いてください。
+Students:
+- S001: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=x = 5 です。 答え: x = 5
+- S002: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=自信はないけど、たぶん x = 5 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 5
+- S003: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 5 です。間違っていたら、もう一度考えます。 答え: x = 5
+- S004: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=自信はないけど、両辺を整理して、x は 5 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 5
+- S005: is_correct=None, observed_is_correct=None, grading_agreement=None, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 5 です。間違っていたら、もう一度考えます。 答え: x = 5
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=2, C=1, D=0. Low self-efficacy=2, high anxiety=2, low motivation=0. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Let confident or diligent students explain one step after individual thinking time.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 6, "priority_reasons": ["low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=high, neuroticism=high. Evidence: shows low confidence, asks a question or requests confirmation, shows anxiety ...
+TeacherBelief summary: {"S001": {"score": 80, "confidence": 0.64, "traits": {"self_efficacy": "medium", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 20, "confidence": 0.82, "traits": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 1}, "S003": {"score": 80, "confidence": 0.64, "traits": {"self_efficacy": ...
+
+#### Phase 5: 確認
+minutes: 5
+problem: x - 4 = 9
+expected_answer: x = 13
+Teacher: 確認問題です。x - 4 = 9 を解いて、答えだけでなく確認した式も短く書いてください。
+Students:
+- S001: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=x = 13 です。 答え: x = 13
+- S002: is_correct=False, observed_is_correct=False, grading_agreement=True, response_time_sec=0.0, utterance=自信はないけど、たぶん x = 12 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 12
+- S003: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 13 です。間違っていたら、もう一度考えます。 答え: x = 13
+- S004: is_correct=False, observed_is_correct=False, grading_agreement=True, response_time_sec=0.0, utterance=自信はないけど、両辺を整理して、x は 12 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 12
+- S005: is_correct=True, observed_is_correct=True, grading_agreement=True, response_time_sec=0.0, utterance=これは分かります。まず定数項を移して、そのあと係数で割ります。x = 13 です。間違っていたら、もう一度考えます。 答え: x = 13
+CommunicationAI classroom_summary: 5 students observed. Profiles: A=2, B=2, C=1, D=0. Low self-efficacy=2, high anxiety=2, low motivation=1. Priority students: S002, S004.
+CommunicationAI recommended_actions: ["Start with a short confidence-building recap before asking for answers.", "Use teacher-initiated checks because several students may not ask questions.", "Let confident or diligent students explain one step after individual thinking time.", "Check priority students individually before moving to a harder problem."]
+CommunicationAI priority_students: [{"student_id": "S002", "priority_score": 10, "priority_reasons": ["incorrect_answer", "low_self_efficacy", "high_anxiety"], "profile_prediction": "A", "trait_estimates": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "extraversion": "medium", "conscientiousness": "high", "neuroticism": "high"}, "teacher_summary": "S002 is estimated as self_efficacy=low, question_tendency=high, neuroticism=high. Evidence: shows low confidence, asks a question or requests confirm...
+TeacherBelief summary: {"S001": {"score": 86, "confidence": 0.75, "traits": {"self_efficacy": "medium", "question_tendency": "medium", "motivation": "medium", "conscientiousness": "low", "neuroticism": "medium"}, "misconception_count": 0}, "S002": {"score": 14, "confidence": 0.93, "traits": {"self_efficacy": "low", "question_tendency": "high", "motivation": "medium", "conscientiousness": "high", "neuroticism": "high"}, "misconception_count": 1}, "S003": {"score": 86, "confidence": 0.75, "traits": {"self_efficacy": ...
 
 ## Issue Candidates
 []
