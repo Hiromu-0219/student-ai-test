@@ -206,3 +206,37 @@ def test_lesson_session_runner_can_start_from_existing_teacher_beliefs(tmp_path)
     assert set(result["final_class_profile"]["high_score_students"]).issubset(
         {"S001", "S002", "S003"}
     )
+
+
+def test_lesson_session_runner_uses_cognitive_model_for_graded_phases(tmp_path):
+    students_dir = tmp_path / "students"
+    shutil.copytree(Path("data/students"), students_dir)
+    simulator = StudentAISimulator(
+        students_dir=str(students_dir),
+        logs_dir=str(tmp_path / "logs"),
+        use_mock_model=True,
+    )
+    belief_manager = TeacherBeliefManager(tmp_path / "teacher_beliefs")
+    runner = LessonSessionRunner(
+        student_simulator=simulator,
+        belief_manager=belief_manager,
+        teacher_id="T_TEST",
+    )
+
+    result = runner.run_lesson(
+        lesson_id="LESSON_COGNITIVE",
+        student_ids=["S001", "S002", "S003"],
+        lesson_plan=_lesson_plan(),
+        curriculum=_curriculum(),
+    )
+
+    graded_events = [
+        event
+        for turn in result["turns"]
+        for event in turn["events"]
+        if event.get("is_correct") is not None
+    ]
+    assert graded_events
+    assert all(event.get("cognitive_model") == "bkt_irt" for event in graded_events)
+    assert all(event.get("controlled_skill") == "can_divide_by_coefficient" for event in graded_events)
+    assert any(event.get("is_correct") is False for event in graded_events)

@@ -22,6 +22,7 @@ def main() -> None:
     parser.add_argument("--use-llm-communication", action="store_true")
     parser.add_argument("--model-id", default="Qwen/Qwen3-4B")
     parser.add_argument("--no-4bit", action="store_true")
+    parser.add_argument("--cognitive-model", choices=["legacy", "bkt_irt"], default="bkt_irt")
     parser.add_argument("--update-student-knowledge", action="store_true")
     parser.add_argument("--output-dir", default="data/assessments")
     args = parser.parse_args()
@@ -35,6 +36,7 @@ def main() -> None:
         use_llm_communication=args.use_llm_communication,
         model_id=args.model_id,
         load_in_4bit=not args.no_4bit,
+        cognitive_model_type=args.cognitive_model,
         update_student_knowledge=args.update_student_knowledge,
     )
     outputs = export_simulation_timeline_results(result, output_dir=args.output_dir)

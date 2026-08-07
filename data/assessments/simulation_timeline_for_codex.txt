@@ -13,27 +13,28 @@
   "use_llm_communication": false,
   "model_id": "rule-based/mock",
   "load_in_4bit": true,
+  "cognitive_model": "bkt_irt",
   "update_student_knowledge": false,
   "reset_teacher_beliefs": true
 }
 
 ## Research Metrics
 {
-  "accuracy_first": 1.0,
-  "accuracy_last": 1.0,
+  "accuracy_first": 0.6,
+  "accuracy_last": 0.6,
   "accuracy_delta": 0.0,
-  "belief_confidence_first": 0.254,
-  "belief_confidence_last": 0.673,
-  "belief_confidence_delta": 0.419,
+  "belief_confidence_first": 0.27,
+  "belief_confidence_last": 0.694,
+  "belief_confidence_delta": 0.424,
   "target_skill_sequence": [
     "can_divide_by_coefficient",
-    "can_divide_by_coefficient",
-    "can_divide_by_coefficient"
+    "can_transpose_terms",
+    "can_transpose_terms"
   ],
   "pace_sequence": [
     "standard",
     "standard",
-    "standard"
+    "adaptive"
   ],
   "phase_count": 15,
   "graded_phase_count": 6
@@ -41,27 +42,27 @@
 
 ## Cycle Summary
 cycle	target_skill	pace	accuracy	avg_estimated_score	belief_confidence	avg_response_time	misconception_count
-1	can_divide_by_coefficient	standard	1.0	62	0.254	0.0	0
-2	can_divide_by_coefficient	standard	1.0	74	0.476	0.0	0
-3	can_divide_by_coefficient	standard	1.0	86	0.673	0.0	0
+1	can_divide_by_coefficient	standard	0.6	52.4	0.27	0.0	2
+2	can_transpose_terms	standard	0.6	54.8	0.496	0.0	2
+3	can_transpose_terms	adaptive	0.6	57.2	0.694	0.0	2
 
 ## Timeline Rows
 cycle	phase	accuracy	priority_count	low_self	low_question	low_motivation	high_anxiety	avg_response_time
 1	導入	None	5	5	5	5	0	0.0
 1	全体説明	None	5	5	5	5	0	0.0
-1	例題	1.0	5	2	3	1	2	0.0
+1	例題	0.6	5	2	3	1	2	0.0
 1	個別演習	None	5	2	3	1	2	0.0
-1	確認	1.0	5	2	3	1	2	0.0
+1	確認	0.6	5	2	3	1	2	0.0
 2	導入	None	5	5	5	5	0	0.0
 2	全体説明	None	5	5	5	5	0	0.0
-2	例題	1.0	5	2	3	1	2	0.0
+2	例題	0.6	5	2	3	1	2	0.0
 2	個別演習	None	5	2	3	1	2	0.0
-2	確認	1.0	5	2	3	1	2	0.0
+2	確認	0.6	5	2	3	1	2	0.0
 3	導入	None	5	5	5	5	0	0.0
 3	全体説明	None	5	5	5	5	0	0.0
-3	例題	1.0	5	2	3	1	2	0.0
+3	例題	0.6	5	2	3	1	2	0.0
 3	個別演習	None	5	2	3	1	2	0.0
-3	確認	1.0	5	2	3	1	2	0.0
+3	確認	0.6	5	2	3	1	2	0.0
 
 ## Issue Candidates
 [
@@ -117,7 +118,7 @@ cycle	phase	accuracy	priority_count	low_self	low_question	low_motivation	high_an
       "expected_answer": "x = 5",
       "event_count": 5,
       "graded_event_count": 5,
-      "accuracy": 1.0,
+      "accuracy": 0.6,
       "priority_student_count": 5,
       "low_self_efficacy_count": 2,
       "low_question_tendency_count": 3,
@@ -159,7 +160,7 @@ cycle	phase	accuracy	priority_count	low_self	low_question	low_motivation	high_an
       "expected_answer": "x = 4",
       "event_count": 5,
       "graded_event_count": 5,
-      "accuracy": 1.0,
+      "accuracy": 0.6,
       "priority_student_count": 5,
       "low_self_efficacy_count": 2,
       "low_question_tendency_count": 3,
@@ -187,7 +188,7 @@ cycle	phase	accuracy	priority_count	low_self	low_question	low_motivation	high_an
       "low_motivation_count": 5,
       "high_neuroticism_count": 0,
       "average_response_time_sec": 0.0,
-      "teacher_message": "今日の目標は「係数で両辺を割って x を求める」です。まず前回の考え方を短く確認しましょう。"
+      "teacher_message": "今日の目標は「移項すると符号が変わることを理解する」です。まず前回の考え方を短く確認しましょう。"
     },
     "note": "要支援判定が多い。伝達AIの閾値または発話生成を確認する。"
   },
@@ -208,7 +209,7 @@ cycle	phase	accuracy	priority_count	low_self	low_question	low_motivation	high_an
       "low_motivation_count": 5,
       "high_neuroticism_count": 0,
       "average_response_time_sec": 0.0,
-      "teacher_message": "全体説明です。係数で両辺を割って x を求めるために、式の左右で同じ操作をすることを確認します。"
+      "teacher_message": "全体説明です。移項すると符号が変わることを理解するために、式の左右で同じ操作をすることを確認します。"
     },
     "note": "要支援判定が多い。伝達AIの閾値または発話生成を確認する。"
   },
@@ -222,14 +223,14 @@ cycle	phase	accuracy	priority_count	low_self	low_question	low_motivation	high_an
       "expected_answer": "x = 5",
       "event_count": 5,
       "graded_event_count": 5,
-      "accuracy": 1.0,
+      "accuracy": 0.6,
       "priority_student_count": 5,
       "low_self_efficacy_count": 2,
       "low_question_tendency_count": 3,
       "low_motivation_count": 1,
       "high_neuroticism_count": 2,
       "average_response_time_sec": 0.0,
-      "teacher_message": "例題です。3x = 15 を1手ずつ考えて、答えを書いてください。"
+      "teacher_message": "例題です。x + 3 = 8 を1手ずつ考えて、答えを書いてください。"
     },
     "note": "要支援判定が多い。伝達AIの閾値または発話生成を確認する。"
   },
@@ -250,7 +251,7 @@ cycle	phase	accuracy	priority_count	low_self	low_question	low_motivation	high_an
       "low_motivation_count": 1,
       "high_neuroticism_count": 2,
       "average_response_time_sec": 0.0,
-      "teacher_message": "個別演習です。3x = 15 を自分で解いて、途中で迷ったらその点も書いてください。"
+      "teacher_message": "個別演習です。x + 3 = 8 を自分で解いて、途中で迷ったらその点も書いてください。"
     },
     "note": "要支援判定が多い。伝達AIの閾値または発話生成を確認する。"
   },
@@ -261,17 +262,17 @@ cycle	phase	accuracy	priority_count	low_self	low_question	low_motivation	high_an
       "phase_index": 5,
       "phase": "確認",
       "minutes": 6,
-      "expected_answer": "x = 4",
+      "expected_answer": "x = 13",
       "event_count": 5,
       "graded_event_count": 5,
-      "accuracy": 1.0,
+      "accuracy": 0.6,
       "priority_student_count": 5,
       "low_self_efficacy_count": 2,
       "low_question_tendency_count": 3,
       "low_motivation_count": 1,
       "high_neuroticism_count": 2,
       "average_response_time_sec": 0.0,
-      "teacher_message": "確認問題です。5x = 20 を解いて、答えだけでなく確認した式も短く書いてください。"
+      "teacher_message": "確認問題です。x - 4 = 9 を解いて、答えだけでなく確認した式も短く書いてください。"
     },
     "note": "要支援判定が多い。伝達AIの閾値または発話生成を確認する。"
   }

@@ -3,6 +3,7 @@ from __future__ import annotations
 import time
 from typing import Any
 
+from src.cognitive_model import CognitiveModel, create_cognitive_model
 from src.grader import LinearEquationGrader
 from src.observer.observation_filter import (
     build_observable_event,
@@ -29,6 +30,7 @@ class LessonSessionRunner:
         communication_ai: CommunicationAI | None = None,
         belief_manager: TeacherBeliefManager | None = None,
         grader: LinearEquationGrader | None = None,
+        cognitive_model: CognitiveModel | None = None,
         teacher_id: str = "T001",
         update_student_knowledge: bool = False,
     ) -> None:
@@ -36,6 +38,7 @@ class LessonSessionRunner:
         self.communication_ai = communication_ai or CommunicationAI()
         self.belief_manager = belief_manager or TeacherBeliefManager()
         self.grader = grader or LinearEquationGrader()
+        self.cognitive_model = cognitive_model or create_cognitive_model("bkt_irt")
         self.teacher_id = teacher_id
         self.update_student_knowledge = update_student_knowledge
 
@@ -82,6 +85,8 @@ class LessonSessionRunner:
                 student_ids=student_ids,
                 student_teacher_messages=student_teacher_messages,
                 expected_answer=expected_answer,
+                phase=phase,
+                lesson_goal=lesson_goal,
             )
             classroom_observation = self.communication_ai.summarize_classroom(
                 events_to_communication_rows(events),
@@ -141,15 +146,24 @@ class LessonSessionRunner:
         student_ids: list[str],
         student_teacher_messages: dict[str, str],
         expected_answer: str | None,
+        phase: dict[str, Any],
+        lesson_goal: dict[str, Any],
     ) -> list[dict[str, Any]]:
         events = []
         for student_id in student_ids:
             teacher_message = student_teacher_messages[student_id]
             started = time.perf_counter()
+            assessment_directive = self._assessment_directive_for_phase(
+                student_id=student_id,
+                phase=phase,
+                lesson_goal=lesson_goal,
+                expected_answer=expected_answer,
+            )
             record = self.student_simulator.respond(
                 student_id,
                 teacher_message,
                 update_knowledge=self.update_student_knowledge,
+                assessment_directive=assessment_directive,
             )
             response_time_sec = round(time.perf_counter() - started, 2)
             answer = record["answer"]
@@ -174,8 +188,39 @@ class LessonSessionRunner:
                 response_time_sec=response_time_sec,
             ).to_dict()
             event["grade"] = grade
+            if assessment_directive:
+                event["cognitive_model"] = assessment_directive.get("cognitive_model")
+                event["controlled_skill"] = assessment_directive.get("skill")
             events.append(event)
         return events
+
+    def _assessment_directive_for_phase(
+        self,
+        *,
+        student_id: str,
+        phase: dict[str, Any],
+        lesson_goal: dict[str, Any],
+        expected_answer: str | None,
+    ) -> dict[str, Any] | None:
+        if not expected_answer:
+            return None
+        problem = phase.get("problem")
+        if not problem:
+            return None
+        student_state = self.student_simulator.state_manager.load_student(student_id)
+        question = {
+            "question_id": f"{student_id}_{phase.get('phase', 'phase')}_{problem}",
+            "problem": problem,
+            "answer": expected_answer,
+            "skill": lesson_goal.get("target_skill", "can_solve_ax_plus_b_equals_c"),
+            "difficulty": phase.get("difficulty", 1),
+        }
+        directive = self.cognitive_model.build_assessment_directive(
+            student_state=student_state,
+            question=question,
+        )
+        directive["mode"] = "lesson_probe"
+        return directive
 
     def _student_teacher_messages(
         self,

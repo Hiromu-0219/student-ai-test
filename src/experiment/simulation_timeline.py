@@ -8,6 +8,7 @@ from typing import Any
 
 from src.class_manager import ClassManager
 from src.config import GenerationConfig, ModelLoadConfig
+from src.cognitive_model import create_cognitive_model
 from src.experiment.experiment_config import TeachingStrategyExperimentConfig
 from src.model_loader import LocalLLM
 from src.observer import CommunicationAI, LLMCommunicationAI
@@ -35,6 +36,7 @@ def run_simulation_timeline(
     use_llm_communication: bool = False,
     model_id: str = "Qwen/Qwen3-4B",
     load_in_4bit: bool = True,
+    cognitive_model_type: str = "bkt_irt",
     generation_config: GenerationConfig | None = None,
     model_load_config: ModelLoadConfig | None = None,
     update_student_knowledge: bool = False,
@@ -76,6 +78,7 @@ def run_simulation_timeline(
     communication_ai = (
         LLMCommunicationAI(shared_llm) if use_llm_communication and shared_llm else CommunicationAI()
     )
+    cognitive_model = create_cognitive_model(cognitive_model_type)
     belief_manager = TeacherBeliefManager(teacher_beliefs_dir)
     lecture_designer = RuleBasedLectureDesignAI()
 
@@ -100,6 +103,7 @@ def run_simulation_timeline(
             belief_manager=belief_manager,
             teacher_id=teacher_id,
             update_student_knowledge=update_student_knowledge,
+            cognitive_model=cognitive_model,
         ).run_lesson(
             lesson_id=f"{class_id}_simulation_cycle_{cycle_index:02d}",
             student_ids=student_ids,
@@ -138,6 +142,7 @@ def run_simulation_timeline(
             "use_llm_communication": use_llm_communication,
             "model_id": model_id if (use_llm_student or use_llm_communication) else "rule-based/mock",
             "load_in_4bit": load_in_4bit,
+            "cognitive_model": cognitive_model.model_name,
             "update_student_knowledge": update_student_knowledge,
             "reset_teacher_beliefs": reset_teacher_beliefs,
         },
@@ -330,4 +335,3 @@ def _reset_generated_dir(path: Path) -> None:
 def _load_json(path: str | Path) -> dict[str, Any]:
     with Path(path).open("r", encoding="utf-8") as f:
         return json.load(f)
-
