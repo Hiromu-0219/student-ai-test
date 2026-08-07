@@ -16,7 +16,7 @@
   "cognitive_model": "bkt_irt",
   "update_student_knowledge": false,
   "reset_teacher_beliefs": true,
-  "git_commit": "172c05e"
+  "git_commit": "99a51e1"
 }
 
 ## Research Metrics
@@ -67,6 +67,17 @@ cycle	phase	accuracy	observed_accuracy	grading_agreement	mismatch_count	priority
 3	例題	0.6	0.6	1.0	0	2	2	3	1	2	0.0
 3	個別演習	None	None	None	0	2	2	0	0	2	0.0
 3	確認	0.6	0.6	1.0	0	2	2	3	1	2	0.0
+
+## Utterance Samples
+cycle	phase	student_id	accuracy_source	is_correct	observed_is_correct	grading_agreement	utterance
+1	例題	S001	cognitive_model	True	True	True	x = 5 です。 答え: x = 5
+1	例題	S002	cognitive_model	False	False	True	自信はないけど、たぶん x = 7 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 7
+1	例題	S003	cognitive_model	True	True	True	これは分かります。まず定数項を移して、そのあと係数で割ります。x = 5 です。間違っていたら、もう一度考えます。 答え: x = 5
+1	例題	S004	cognitive_model	False	False	True	自信はないけど、両辺を整理して、x は 7 だと思います。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 7
+1	例題	S005	cognitive_model	True	True	True	これは分かります。まず定数項を移して、そのあと係数で割ります。x = 5 です。間違っていたら、もう一度考えます。 答え: x = 5
+1	確認	S001	cognitive_model	True	True	True	x = 4 です。 答え: x = 4
+1	確認	S002	cognitive_model	False	False	True	自信はないけど、たぶん x = 6 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 6
+1	確認	S003	cognitive_model	True	True	True	これは分かります。まず定数項を移して、そのあと係数で割ります。x = 4 です。間違っていたら、もう一度考えます。 答え: x = 4
 
 ## Issue Candidates
 []

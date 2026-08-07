@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from fractions import Fraction
 from typing import Any
 
@@ -19,16 +20,54 @@ class LinearEquationGrader:
 
 
 def extract_x_value(text: str) -> Fraction | None:
-    normalized = text.replace(" ", "").replace("　", "")
-    patterns = [
-        r"x=([+-]?\d+(?:/\d+)?)",
-        r"答え[:：]?x=([+-]?\d+(?:/\d+)?)",
-    ]
-    for pattern in patterns:
-        match = re.search(pattern, normalized)
-        if match:
-            return _parse_number(match.group(1))
+    normalized = _normalize_text(text)
+    compact = re.sub(r"\s+", "", normalized)
+
+    answer_labeled = _last_number_from_patterns(
+        compact,
+        [
+            r"(?:答え|解答|答|answer)[:：は=]*x?=?([+-]?\d+(?:/\d+)?)",
+            r"(?:答え|解答|答|answer)[:：は=]*(?:xの値は|xは|xが)([+-]?\d+(?:/\d+)?)",
+        ],
+    )
+    if answer_labeled is not None:
+        return answer_labeled
+
+    explicit_x = _last_number_from_patterns(
+        compact,
+        [
+            r"(?<![0-9A-Za-z])x=([+-]?\d+(?:/\d+)?)",
+            r"(?<![0-9A-Za-z])x(?:は|が|の値は|になる)([+-]?\d+(?:/\d+)?)",
+        ],
+    )
+    if explicit_x is not None:
+        return explicit_x
+
+    english_x = _last_number_from_patterns(
+        normalized,
+        [
+            r"\bx\s*(?:=|equals|is)\s*([+-]?\d+(?:/\d+)?)",
+            r"\bthe\s+answer\s+is\s+([+-]?\d+(?:/\d+)?)",
+        ],
+    )
+    if english_x is not None:
+        return english_x
+
     return None
+
+
+def _normalize_text(text: str) -> str:
+    return unicodedata.normalize("NFKC", str(text)).lower()
+
+
+def _last_number_from_patterns(text: str, patterns: list[str]) -> Fraction | None:
+    matches: list[Fraction] = []
+    for pattern in patterns:
+        for match in re.finditer(pattern, text):
+            value = _parse_number(match.group(1))
+            if value is not None:
+                matches.append(value)
+    return matches[-1] if matches else None
 
 
 def _parse_number(value: str) -> Fraction | None:

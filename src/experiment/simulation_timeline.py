@@ -355,8 +355,59 @@ def _human_report(result: dict[str, Any]) -> str:
             str(row["high_neuroticism_count"]),
             str(row["average_response_time_sec"]),
         ]))
+    samples = _utterance_samples(result)
+    if samples:
+        lines.extend([
+            "",
+            "## Utterance Samples",
+            "cycle	phase	student_id	accuracy_source	is_correct	observed_is_correct	grading_agreement	utterance",
+        ])
+        for sample in samples:
+            lines.append("	".join([
+                str(sample["cycle_index"]),
+                str(sample["phase"]),
+                str(sample["student_id"]),
+                str(sample["accuracy_source"]),
+                str(sample["is_correct"]),
+                str(sample["observed_is_correct"]),
+                str(sample["grading_agreement"]),
+                _one_line(sample["utterance"]),
+            ]))
     lines.extend(["", "## Issue Candidates", json.dumps(result["issue_candidates"], ensure_ascii=False, indent=2)])
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _utterance_samples(result: dict[str, Any], limit: int = 8) -> list[dict[str, Any]]:
+    samples = []
+    for cycle in result.get("cycles", []):
+        cycle_index = cycle.get("cycle_index")
+        for turn in cycle.get("session_result", {}).get("turns", []):
+            phase = turn.get("phase", {}).get("phase")
+            for event in turn.get("events", []):
+                if event.get("is_correct") is None:
+                    continue
+                observed_grade = event.get("observed_grade", {})
+                grade = event.get("grade", {})
+                samples.append(
+                    {
+                        "cycle_index": cycle_index,
+                        "phase": phase,
+                        "student_id": event.get("student_id"),
+                        "accuracy_source": grade.get("source"),
+                        "is_correct": event.get("is_correct"),
+                        "observed_is_correct": observed_grade.get("is_correct"),
+                        "grading_agreement": event.get("grading_agreement"),
+                        "utterance": event.get("utterance", ""),
+                    }
+                )
+                if len(samples) >= limit:
+                    return samples
+    return samples
+
+
+def _one_line(text: str, max_chars: int = 240) -> str:
+    compact = " ".join(str(text).split())
+    return compact[: max_chars - 3] + "..." if len(compact) > max_chars else compact
 
 
 def _git_commit() -> str | None:
