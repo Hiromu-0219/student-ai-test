@@ -254,8 +254,8 @@ def _issue_candidates(timeline_rows: list[dict[str, Any]], cycles_result: list[d
     for row in timeline_rows:
         if row["accuracy"] is not None and row["accuracy"] < 0.5:
             issues.append({"type": "low_phase_accuracy", "row": row, "note": "このフェーズで正答率が低い。問題難易度、説明、誤概念推定を確認する。"})
-        if row["priority_student_count"] >= max(2, row["event_count"] // 2):
-            issues.append({"type": "many_priority_students", "row": row, "note": "要支援判定が多い。伝達AIの閾値または発話生成を確認する。"})
+        if row["priority_student_count"] > max(2, row["event_count"] // 2):
+            issues.append({"type": "many_priority_students", "row": row, "note": "要支援判定がクラスの半数を超えている。伝達AIの閾値または発話生成を確認する。"})
     cycle_rows = [item["cycle_metrics"] for item in cycles_result]
     accuracies = [row["accuracy"] for row in cycle_rows if row.get("accuracy") is not None]
     if len(accuracies) >= 2 and all(value >= 0.95 for value in accuracies):

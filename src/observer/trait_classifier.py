@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
+from math import ceil
 from typing import Any, Protocol
 
 
@@ -109,7 +110,12 @@ class CommunicationAI:
                 utterance=row["answer"],
                 student_id=row.get("student_id"),
             )
-            results.append({**row, **classification.to_dict()})
+            classified = classification.to_dict()
+            classified["trait_estimates"] = _calibrate_traits_with_event(
+                classified["trait_estimates"],
+                row.get("observable_event", {}),
+            )
+            results.append({**row, **classified})
         return results
 
     def summarize_classroom(
@@ -214,7 +220,12 @@ class LLMCommunicationAI:
                 utterance=row["answer"],
                 student_id=row.get("student_id"),
             )
-            results.append({**row, **classification.to_dict()})
+            classified = classification.to_dict()
+            classified["trait_estimates"] = _calibrate_traits_with_event(
+                classified["trait_estimates"],
+                row.get("observable_event", {}),
+            )
+            results.append({**row, **classified})
         return results
 
     def summarize_classroom(
@@ -490,6 +501,23 @@ def _validate_classroom_size(
         )
 
 
+def _calibrate_traits_with_event(
+    traits: dict[str, str],
+    event: dict[str, Any] | None,
+) -> dict[str, str]:
+    calibrated = dict(traits)
+    event = event or {}
+    is_graded = event.get("is_correct") is not None
+    if not is_graded and not event.get("asked_question"):
+        # In listening/explanation phases, no question or a short acknowledgment is weak evidence.
+        # Keep the teacher-facing estimate from over-labeling every student as low-risk.
+        if calibrated.get("question_tendency") == "low":
+            calibrated["question_tendency"] = "medium"
+        if calibrated.get("motivation") == "low" and not event.get("no_response"):
+            calibrated["motivation"] = "medium"
+    return calibrated
+
+
 def _count_profiles(results: list[dict[str, Any]]) -> dict[str, int]:
     counts = {"A": 0, "B": 0, "C": 0, "D": 0}
     for result in results:
@@ -522,23 +550,41 @@ def _select_priority_students(results: list[dict[str, Any]]) -> list[dict[str, A
     scored = []
     for result in results:
         traits = result.get("trait_estimates", {})
+        event = result.get("observable_event", {}) or {}
+        is_graded = event.get("is_correct") is not None
         score = 0
+        reasons = []
+
+        if event.get("no_response"):
+            score += 5
+            reasons.append("no_response")
+        if event.get("is_correct") is False:
+            score += 4
+            reasons.append("incorrect_answer")
         if traits.get("self_efficacy") == "low":
             score += 3
+            reasons.append("low_self_efficacy")
         if traits.get("neuroticism") == "high":
             score += 3
+            reasons.append("high_anxiety")
         if traits.get("motivation") == "low":
             score += 2
-        if traits.get("question_tendency") == "low":
+            reasons.append("low_motivation")
+        if is_graded and not event.get("showed_work"):
             score += 1
-        if result.get("profile_prediction") in {"A", "C"}:
+            reasons.append("no_visible_work")
+        if is_graded and traits.get("question_tendency") == "low":
             score += 1
-        if score <= 0:
+            reasons.append("does_not_ask")
+
+        threshold = 5
+        if score < threshold:
             continue
         scored.append(
             {
                 "student_id": result.get("student_id"),
                 "priority_score": score,
+                "priority_reasons": reasons,
                 "profile_prediction": result.get("profile_prediction"),
                 "trait_estimates": traits,
                 "teacher_summary": result.get("teacher_summary"),
@@ -548,7 +594,9 @@ def _select_priority_students(results: list[dict[str, Any]]) -> list[dict[str, A
                 ),
             }
         )
-    return sorted(scored, key=lambda row: row["priority_score"], reverse=True)[:5]
+
+    limit = max(1, min(5, ceil(len(results) * 0.4)))
+    return sorted(scored, key=lambda row: row["priority_score"], reverse=True)[:limit]
 
 
 def _classroom_actions(

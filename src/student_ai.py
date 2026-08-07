@@ -34,7 +34,7 @@ class RuleBasedMockLLM:
         problem = _extract_problem(user_prompt)
         answer = _solve_simple_linear_equation(problem)
         if answer is None:
-            return "まだ一次方程式として整理できていません。答え: わかりません"
+            return _style_mock_lesson_reaction(user_prompt)
         return _style_mock_answer(user_prompt, answer)
 
 
@@ -201,6 +201,14 @@ def _style_mock_answer(prompt: str, answer: str) -> str:
 
     return f"{base} 答え: x = {answer}"
 
+def _style_mock_lesson_reaction(prompt: str) -> str:
+    if "自信なさげに、断定を避けて答える" in prompt:
+        return "はい、まず今日の目標を確認します。少し不安なので、途中で確認したいです。"
+    if "自信を持って、はっきり答える" in prompt:
+        return "はい、今日の目標を確認しました。次の問題で試してみます。"
+    if "返答を短めにする" in prompt or "途中式を省略しがちにする" in prompt:
+        return "はい、確認します。"
+    return "はい、説明を聞いてから問題で確認します。"
 
 def _solve_simple_linear_equation(text: str) -> str | None:
     normalized = (

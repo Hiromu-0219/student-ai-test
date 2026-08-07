@@ -66,10 +66,46 @@ def test_communication_ai_summarizes_classroom():
     assert len(summary.individual_results) == 3
     assert sum(summary.profile_counts.values()) == 3
     assert "self_efficacy" in summary.trait_level_counts
-    assert summary.priority_students
+    assert summary.priority_students == []
     assert summary.recommended_teacher_actions
     assert summary.to_dict()["student_count"] == 3
 
+
+def test_communication_ai_prioritizes_observable_incorrect_answers():
+    rows = [
+        {
+            "student_id": "S001",
+            "answer": "x = 8",
+            "observable_event": {
+                "is_correct": False,
+                "showed_work": False,
+                "no_response": False,
+            },
+        },
+        {
+            "student_id": "S002",
+            "answer": "まず両辺を2で割ります。x = 4",
+            "observable_event": {
+                "is_correct": True,
+                "showed_work": True,
+                "no_response": False,
+            },
+        },
+        {
+            "student_id": "S003",
+            "answer": "x = 4",
+            "observable_event": {
+                "is_correct": True,
+                "showed_work": False,
+                "no_response": False,
+            },
+        },
+    ]
+
+    summary = CommunicationAI().summarize_classroom(rows)
+
+    assert [student["student_id"] for student in summary.priority_students] == ["S001"]
+    assert "incorrect_answer" in summary.priority_students[0]["priority_reasons"]
 
 def test_communication_ai_rejects_classroom_size_outside_expected_range():
     rows = [
