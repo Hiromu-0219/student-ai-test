@@ -11,6 +11,7 @@
 | 生徒AIの設計を把握する | [docs/student_ai_design.md](docs/student_ai_design.md) |
 | 進捗報告として共有する | [docs/student_ai_progress_report.md](docs/student_ai_progress_report.md) |
 | 論文用の実験コアを見る | [docs/paper_experiment_core.md](docs/paper_experiment_core.md) |
+| 伝達AIを主研究にする方針を見る | [docs/communication_ai_research_plan.md](docs/communication_ai_research_plan.md) |
 | 内部妥当性の評価方法を見る | [docs/internal_validity_experiment.md](docs/internal_validity_experiment.md) |
 | 複数生徒クラスの妥当性を見る | [docs/classroom_validity_experiment.md](docs/classroom_validity_experiment.md) |
 | 伝達AIの推定妥当性を見る | [docs/communication_validity_experiment.md](docs/communication_validity_experiment.md) |
@@ -134,6 +135,7 @@ Notebookに依存せず、研究用の基準結果を出す場合は次を使い
 python scripts/run_internal_validity_experiment.py
 python scripts/run_classroom_validity_experiment.py
 python scripts/run_communication_validity_experiment.py
+python scripts/run_rq1_communication_ai_experiment.py
 python scripts/run_lesson_design_validity_experiment.py
 ```
 

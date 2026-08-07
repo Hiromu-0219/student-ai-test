@@ -1,0 +1,619 @@
+# RQ1 Communication AI Experiment For Codex
+
+このファイルをCodex/ChatGPTに渡すときは、このtxtをそのまま添付してください。
+
+## Research Question
+RQ1: 観察可能な学習ログから、学習者の理解度、弱点スキル、誤概念、行動特徴をどの程度正確に推定できるか。
+
+## Conditions
+{
+  "class_id": "class_10_mixed",
+  "student_count": 5,
+  "question_count": 6,
+  "event_count": 30,
+  "seed": 20260807,
+  "cognitive_model": "bkt_irt",
+  "communication_methods": [
+    "stats_baseline",
+    "rule_based_communication_ai",
+    "enhanced_communication_ai"
+  ],
+  "ablation_conditions": [
+    "correctness_only",
+    "correctness_answer",
+    "correctness_answer_utterance",
+    "correctness_answer_response_time",
+    "all_observable"
+  ]
+}
+
+## Leakage Check
+{
+  "passed": true,
+  "leaked_keys": []
+}
+
+## Summary
+{
+  "evaluation_count": 15,
+  "best_skill_mastery_method": "stats_baseline",
+  "best_skill_mastery_ablation": "correctness_only",
+  "best_skill_mae": 0.198,
+  "best_trait_method": "rule_based_communication_ai",
+  "best_trait_ablation": "correctness_answer_utterance",
+  "best_trait_accuracy": 0.9,
+  "best_misconception_method": "rule_based_communication_ai",
+  "best_misconception_ablation": "correctness_only",
+  "best_misconception_f1": 0.286
+}
+
+## Method x Ablation Comparison
+method	ablation	skill_mae	skill_rmse	overall_mae	bucket_acc	mis_f1	trait_acc	brier	ece
+stats_baseline	correctness_only	0.198	0.254	0.114	0.6	0.0	0.3	0.345	0.352
+stats_baseline	correctness_answer	0.198	0.254	0.114	0.6	0.0	0.3	0.345	0.352
+stats_baseline	correctness_answer_utterance	0.198	0.254	0.114	0.6	0.0	0.3	0.345	0.352
+stats_baseline	correctness_answer_response_time	0.198	0.254	0.114	0.6	0.0	0.3	0.345	0.352
+stats_baseline	all_observable	0.198	0.254	0.114	0.6	0.0	0.3	0.345	0.352
+rule_based_communication_ai	correctness_only	0.198	0.254	0.114	0.6	0.286	0.2	0.327	0.289
+rule_based_communication_ai	correctness_answer	0.203	0.266	0.12	0.4	0.286	0.2	0.314	0.293
+rule_based_communication_ai	correctness_answer_utterance	0.203	0.266	0.12	0.4	0.25	0.9	0.301	0.335
+rule_based_communication_ai	correctness_answer_response_time	0.203	0.266	0.12	0.4	0.286	0.2	0.314	0.293
+rule_based_communication_ai	all_observable	0.203	0.266	0.12	0.4	0.25	0.9	0.301	0.335
+enhanced_communication_ai	correctness_only	0.198	0.254	0.114	0.6	0.286	0.2	0.351	0.381
+enhanced_communication_ai	correctness_answer	0.203	0.266	0.12	0.4	0.286	0.2	0.328	0.371
+enhanced_communication_ai	correctness_answer_utterance	0.203	0.266	0.12	0.4	0.25	0.9	0.281	0.277
+enhanced_communication_ai	correctness_answer_response_time	0.203	0.266	0.12	0.4	0.286	0.2	0.328	0.371
+enhanced_communication_ai	all_observable	0.203	0.266	0.12	0.4	0.25	0.9	0.281	0.277
+
+## Failure Examples
+### stats_baseline / correctness_only
+[
+  {
+    "student_id": "S001",
+    "true_state": {
+      "overall_bucket": "medium",
+      "misconception_ids": [
+        "transpose_sign"
+      ],
+      "traits": {
+        "self_efficacy": "medium",
+        "question_tendency": "low",
+        "motivation": "medium",
+        "neuroticism": "medium"
+      }
+    },
+    "estimated_state": {
+      "overall_bucket": "medium",
+      "misconception_ids": [],
+      "trait_misses": [
+        "question_tendency"
+      ]
+    },
+    "evidence_events": [
+      {
+        "event_id": "EV_S001_Q001",
+        "lesson_id": "rq1_lesson_01",
+        "teacher_id": "T_RQ1",
+        "student_id": "S001",
+        "teacher_prompt": "2x + 3 = 11 を解きなさい。",
+        "question_id": "Q001",
+        "skill": "can_solve_ax_plus_b_equals_c",
+        "difficulty": 1,
+        "is_correct": true,
+        "timestamp": "2026-08-07T00:00:00+00:00",
+        "seed": 20260807,
+        "utterance": "",
+        "answer": null,
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": false,
+        "revision_count": 0,
+        "no_response": true
+      },
+      {
+        "event_id": "EV_S001_Q002",
+        "lesson_id": "rq1_lesson_02",
+        "teacher_id": "T_RQ1",
+        "student_id": "S001",
+        "teacher_prompt": "3x - 5 = 10 を解きなさい。",
+        "question_id": "Q002",
+        "skill": "can_transpose_terms",
+        "difficulty": 2,
+        "is_correct": true,
+        "timestamp": "2026-08-07T00:01:00+00:00",
+        "seed": 20260807,
+        "utterance": "",
+        "answer": null,
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": false,
+        "revision_count": 0,
+        "no_response": true
+      },
+      {
+        "event_id": "EV_S001_Q003",
+        "lesson_id": "rq1_lesson_03",
+        "teacher_id": "T_RQ1",
+        "student_id": "S001",
+        "teacher_prompt": "-2x + 4 = 10 を解きなさい。",
+        "question_id": "Q003",
+        "skill": "can_handle_negative_numbers",
+        "difficulty": 3,
+        "is_correct": true,
+        "timestamp": "2026-08-07T00:02:00+00:00",
+        "seed": 20260807,
+        "utterance": "",
+        "answer": null,
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": false,
+        "revision_count": 0,
+        "no_response": true
+      }
+    ],
+    "possible_reason": "観察数が少ない、または発話に内部特徴が明示されていない可能性があります。",
+    "recommended_observations": [
+      "質問しやすさを見るため、確認質問を促す場面を作る",
+      "誤概念候補を確認する類題を追加する"
+    ]
+  },
+  {
+    "student_id": "S002",
+    "true_state": {
+      "overall_bucket": "low",
+      "misconception_ids": [
+        "divide_by_coefficient",
+        "transpose_sign"
+      ],
+      "traits": {
+        "self_efficacy": "low",
+        "question_tendency": "high",
+        "motivation": "medium",
+        "neuroticism": "high"
+      }
+    },
+    "estimated_state": {
+      "overall_bucket": "low",
+      "misconception_ids": [],
+      "trait_misses": [
+        "self_efficacy",
+        "question_tendency",
+        "neuroticism"
+      ]
+    },
+    "evidence_events": [
+      {
+        "event_id": "EV_S002_Q001",
+        "lesson_id": "rq1_lesson_01",
+        "teacher_id": "T_RQ1",
+        "student_id": "S002",
+        "teacher_prompt": "2x + 3 = 11 を解きなさい。",
+        "question_id": "Q001",
+        "skill": "can_solve_ax_plus_b_equals_c",
+        "difficulty": 1,
+        "is_correct": false,
+        "timestamp": "2026-08-07T00:00:01+00:00",
+        "seed": 20260807,
+        "utterance": "",
+        "answer": null,
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": false,
+        "revision_count": 0,
+        "no_response": true
+      },
+      {
+        "event_id": "EV_S002_Q002",
+        "lesson_id": "rq1_lesson_02",
+        "teacher_id": "T_RQ1",
+        "student_id": "S002",
+        "teacher_prompt": "3x - 5 = 10 を解きなさい。",
+        "question_id": "Q002",
+        "skill": "can_transpose_terms",
+        "difficulty": 2,
+        "is_correct": false,
+        "timestamp": "2026-08-07T00:01:01+00:00",
+        "seed": 20260807,
+        "utterance": "",
+        "answer": null,
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": false,
+        "revision_count": 0,
+        "no_response": true
+      },
+      {
+        "event_id": "EV_S002_Q003",
+        "lesson_id": "rq1_lesson_03",
+        "teacher_id": "T_RQ1",
+        "student_id": "S002",
+        "teacher_prompt": "-2x + 4 = 10 を解きなさい。",
+        "question_id": "Q003",
+        "skill": "can_handle_negative_numbers",
+        "difficulty": 3,
+        "is_correct": true,
+        "timestamp": "2026-08-07T00:02:01+00:00",
+        "seed": 20260807,
+        "utterance": "",
+        "answer": null,
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": false,
+        "revision_count": 0,
+        "no_response": true
+      }
+    ],
+    "possible_reason": "観察数が少ない、または発話に内部特徴が明示されていない可能性があります。",
+    "recommended_observations": [
+      "質問しやすさを見るため、確認質問を促す場面を作る",
+      "誤概念候補を確認する類題を追加する"
+    ]
+  }
+]
+### stats_baseline / correctness_answer
+[
+  {
+    "student_id": "S001",
+    "true_state": {
+      "overall_bucket": "medium",
+      "misconception_ids": [
+        "transpose_sign"
+      ],
+      "traits": {
+        "self_efficacy": "medium",
+        "question_tendency": "low",
+        "motivation": "medium",
+        "neuroticism": "medium"
+      }
+    },
+    "estimated_state": {
+      "overall_bucket": "medium",
+      "misconception_ids": [],
+      "trait_misses": [
+        "question_tendency"
+      ]
+    },
+    "evidence_events": [
+      {
+        "event_id": "EV_S001_Q001",
+        "lesson_id": "rq1_lesson_01",
+        "teacher_id": "T_RQ1",
+        "student_id": "S001",
+        "teacher_prompt": "2x + 3 = 11 を解きなさい。",
+        "question_id": "Q001",
+        "skill": "can_solve_ax_plus_b_equals_c",
+        "difficulty": 1,
+        "is_correct": true,
+        "timestamp": "2026-08-07T00:00:00+00:00",
+        "seed": 20260807,
+        "utterance": "x = 4",
+        "answer": "x = 4",
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": true,
+        "revision_count": 0,
+        "no_response": false
+      },
+      {
+        "event_id": "EV_S001_Q002",
+        "lesson_id": "rq1_lesson_02",
+        "teacher_id": "T_RQ1",
+        "student_id": "S001",
+        "teacher_prompt": "3x - 5 = 10 を解きなさい。",
+        "question_id": "Q002",
+        "skill": "can_transpose_terms",
+        "difficulty": 2,
+        "is_correct": true,
+        "timestamp": "2026-08-07T00:01:00+00:00",
+        "seed": 20260807,
+        "utterance": "x = 5",
+        "answer": "x = 5",
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": true,
+        "revision_count": 0,
+        "no_response": false
+      },
+      {
+        "event_id": "EV_S001_Q003",
+        "lesson_id": "rq1_lesson_03",
+        "teacher_id": "T_RQ1",
+        "student_id": "S001",
+        "teacher_prompt": "-2x + 4 = 10 を解きなさい。",
+        "question_id": "Q003",
+        "skill": "can_handle_negative_numbers",
+        "difficulty": 3,
+        "is_correct": true,
+        "timestamp": "2026-08-07T00:02:00+00:00",
+        "seed": 20260807,
+        "utterance": "x = -3",
+        "answer": "x = -3",
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": true,
+        "revision_count": 0,
+        "no_response": false
+      }
+    ],
+    "possible_reason": "観察数が少ない、または発話に内部特徴が明示されていない可能性があります。",
+    "recommended_observations": [
+      "質問しやすさを見るため、確認質問を促す場面を作る",
+      "誤概念候補を確認する類題を追加する"
+    ]
+  },
+  {
+    "student_id": "S002",
+    "true_state": {
+      "overall_bucket": "low",
+      "misconception_ids": [
+        "divide_by_coefficient",
+        "transpose_sign"
+      ],
+      "traits": {
+        "self_efficacy": "low",
+        "question_tendency": "high",
+        "motivation": "medium",
+        "neuroticism": "high"
+      }
+    },
+    "estimated_state": {
+      "overall_bucket": "low",
+      "misconception_ids": [],
+      "trait_misses": [
+        "self_efficacy",
+        "question_tendency",
+        "neuroticism"
+      ]
+    },
+    "evidence_events": [
+      {
+        "event_id": "EV_S002_Q001",
+        "lesson_id": "rq1_lesson_01",
+        "teacher_id": "T_RQ1",
+        "student_id": "S002",
+        "teacher_prompt": "2x + 3 = 11 を解きなさい。",
+        "question_id": "Q001",
+        "skill": "can_solve_ax_plus_b_equals_c",
+        "difficulty": 1,
+        "is_correct": false,
+        "timestamp": "2026-08-07T00:00:01+00:00",
+        "seed": 20260807,
+        "utterance": "x = 5",
+        "answer": "x = 5",
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": true,
+        "revision_count": 0,
+        "no_response": false
+      },
+      {
+        "event_id": "EV_S002_Q002",
+        "lesson_id": "rq1_lesson_02",
+        "teacher_id": "T_RQ1",
+        "student_id": "S002",
+        "teacher_prompt": "3x - 5 = 10 を解きなさい。",
+        "question_id": "Q002",
+        "skill": "can_transpose_terms",
+        "difficulty": 2,
+        "is_correct": false,
+        "timestamp": "2026-08-07T00:01:01+00:00",
+        "seed": 20260807,
+        "utterance": "x = 4",
+        "answer": "x = 4",
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": true,
+        "revision_count": 0,
+        "no_response": false
+      },
+      {
+        "event_id": "EV_S002_Q003",
+        "lesson_id": "rq1_lesson_03",
+        "teacher_id": "T_RQ1",
+        "student_id": "S002",
+        "teacher_prompt": "-2x + 4 = 10 を解きなさい。",
+        "question_id": "Q003",
+        "skill": "can_handle_negative_numbers",
+        "difficulty": 3,
+        "is_correct": true,
+        "timestamp": "2026-08-07T00:02:01+00:00",
+        "seed": 20260807,
+        "utterance": "x = -3",
+        "answer": "x = -3",
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": true,
+        "revision_count": 0,
+        "no_response": false
+      }
+    ],
+    "possible_reason": "観察数が少ない、または発話に内部特徴が明示されていない可能性があります。",
+    "recommended_observations": [
+      "質問しやすさを見るため、確認質問を促す場面を作る",
+      "誤概念候補を確認する類題を追加する"
+    ]
+  }
+]
+### stats_baseline / correctness_answer_utterance
+[
+  {
+    "student_id": "S001",
+    "true_state": {
+      "overall_bucket": "medium",
+      "misconception_ids": [
+        "transpose_sign"
+      ],
+      "traits": {
+        "self_efficacy": "medium",
+        "question_tendency": "low",
+        "motivation": "medium",
+        "neuroticism": "medium"
+      }
+    },
+    "estimated_state": {
+      "overall_bucket": "medium",
+      "misconception_ids": [],
+      "trait_misses": [
+        "question_tendency"
+      ]
+    },
+    "evidence_events": [
+      {
+        "event_id": "EV_S001_Q001",
+        "lesson_id": "rq1_lesson_01",
+        "teacher_id": "T_RQ1",
+        "student_id": "S001",
+        "teacher_prompt": "2x + 3 = 11 を解きなさい。",
+        "question_id": "Q001",
+        "skill": "can_solve_ax_plus_b_equals_c",
+        "difficulty": 1,
+        "is_correct": true,
+        "timestamp": "2026-08-07T00:00:00+00:00",
+        "seed": 20260807,
+        "utterance": "x = 4 です。 答え: x = 4",
+        "answer": "x = 4",
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": true,
+        "revision_count": 0,
+        "no_response": false
+      },
+      {
+        "event_id": "EV_S001_Q002",
+        "lesson_id": "rq1_lesson_02",
+        "teacher_id": "T_RQ1",
+        "student_id": "S001",
+        "teacher_prompt": "3x - 5 = 10 を解きなさい。",
+        "question_id": "Q002",
+        "skill": "can_transpose_terms",
+        "difficulty": 2,
+        "is_correct": true,
+        "timestamp": "2026-08-07T00:01:00+00:00",
+        "seed": 20260807,
+        "utterance": "x = 5 です。 答え: x = 5",
+        "answer": "x = 5",
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": true,
+        "revision_count": 0,
+        "no_response": false
+      },
+      {
+        "event_id": "EV_S001_Q003",
+        "lesson_id": "rq1_lesson_03",
+        "teacher_id": "T_RQ1",
+        "student_id": "S001",
+        "teacher_prompt": "-2x + 4 = 10 を解きなさい。",
+        "question_id": "Q003",
+        "skill": "can_handle_negative_numbers",
+        "difficulty": 3,
+        "is_correct": true,
+        "timestamp": "2026-08-07T00:02:00+00:00",
+        "seed": 20260807,
+        "utterance": "x = -3 です。 答え: x = -3",
+        "answer": "x = -3",
+        "response_time_sec": null,
+        "asked_question": false,
+        "showed_work": true,
+        "revision_count": 0,
+        "no_response": false
+      }
+    ],
+    "possible_reason": "観察数が少ない、または発話に内部特徴が明示されていない可能性があります。",
+    "recommended_observations": [
+      "質問しやすさを見るため、確認質問を促す場面を作る",
+      "誤概念候補を確認する類題を追加する"
+    ]
+  },
+  {
+    "student_id": "S002",
+    "true_state": {
+      "overall_bucket": "low",
+      "misconception_ids": [
+        "divide_by_coefficient",
+        "transpose_sign"
+      ],
+      "traits": {
+        "self_efficacy": "low",
+        "question_tendency": "high",
+        "motivation": "medium",
+        "neuroticism": "high"
+      }
+    },
+    "estimated_state": {
+      "overall_bucket": "low",
+      "misconception_ids": [],
+      "trait_misses": [
+        "self_efficacy",
+        "question_tendency",
+        "neuroticism"
+      ]
+    },
+    "evidence_events": [
+      {
+        "event_id": "EV_S002_Q001",
+        "lesson_id": "rq1_lesson_01",
+        "teacher_id": "T_RQ1",
+        "student_id": "S002",
+        "teacher_prompt": "2x + 3 = 11 を解きなさい。",
+        "question_id": "Q001",
+        "skill": "can_solve_ax_plus_b_equals_c",
+        "difficulty": 1,
+        "is_correct": false,
+        "timestamp": "2026-08-07T00:00:01+00:00",
+        "seed": 20260807,
+        "utterance": "自信はないけど、たぶん x = 5 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 5",
+        "answer": "x = 5",
+        "response_time_sec": null,
+        "asked_question": true,
+        "showed_work": true,
+        "revision_count": 0,
+        "no_response": false
+      },
+      {
+        "event_id": "EV_S002_Q002",
+        "lesson_id": "rq1_lesson_02",
+        "teacher_id": "T_RQ1",
+        "student_id": "S002",
+        "teacher_prompt": "3x - 5 = 10 を解きなさい。",
+        "question_id": "Q002",
+        "skill": "can_transpose_terms",
+        "difficulty": 2,
+        "is_correct": false,
+        "timestamp": "2026-08-07T00:01:01+00:00",
+        "seed": 20260807,
+        "utterance": "自信はないけど、たぶん x = 4 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = 4",
+        "answer": "x = 4",
+        "response_time_sec": null,
+        "asked_question": true,
+        "showed_work": true,
+        "revision_count": 0,
+        "no_response": false
+      },
+      {
+        "event_id": "EV_S002_Q003",
+        "lesson_id": "rq1_lesson_03",
+        "teacher_id": "T_RQ1",
+        "student_id": "S002",
+        "teacher_prompt": "-2x + 4 = 10 を解きなさい。",
+        "question_id": "Q003",
+        "skill": "can_handle_negative_numbers",
+        "difficulty": 3,
+        "is_correct": true,
+        "timestamp": "2026-08-07T00:02:01+00:00",
+        "seed": 20260807,
+        "utterance": "自信はないけど、たぶん x = -3 です。符号が合っているか少し不安です。移項の符号はこの考え方で合っていますか？ 答え: x = -3",
+        "answer": "x = -3",
+        "response_time_sec": null,
+        "asked_question": true,
+        "showed_work": true,
+        "revision_count": 0,
+        "no_response": false
+      }
+    ],
+    "possible_reason": "観察数が少ない、または発話に内部特徴が明示されていない可能性があります。",
+    "recommended_observations": [
+      "誤概念候補を確認する類題を追加する"
+    ]
+  }
+]

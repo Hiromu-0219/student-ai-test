@@ -12,6 +12,12 @@ from src.experiment.lesson_design_validity import (
     run_lesson_design_validity_evaluation,
 )
 from src.experiment.result_exporter import export_teaching_strategy_summary
+from src.experiment.rq1_communication_ai import (
+    evaluate_teacher_beliefs,
+    export_rq1_communication_ai_results,
+    infer_teacher_beliefs_from_observations,
+    run_rq1_communication_ai_experiment,
+)
 from src.experiment.student_ai_evaluation import (
     compare_cognitive_models,
     export_cognitive_model_comparison_for_codex,
@@ -26,9 +32,13 @@ __all__ = [
     "export_classroom_validity_for_codex",
     "export_communication_validity_for_codex",
     "export_lesson_design_validity_for_codex",
+    "export_rq1_communication_ai_results",
     "run_classroom_validity_evaluation",
     "run_communication_validity_evaluation",
     "run_lesson_design_validity_evaluation",
+    "run_rq1_communication_ai_experiment",
+    "infer_teacher_beliefs_from_observations",
+    "evaluate_teacher_beliefs",
     "compare_cognitive_models",
     "export_cognitive_model_comparison_for_codex",
     "export_student_ai_evaluation",
