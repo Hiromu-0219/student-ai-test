@@ -1,20 +1,33 @@
 # Notebook Guide
 
-Colabで実行する実験Notebookの使い分けです。LLMロードは時間がかかるため、まずは `use_mock_model=True` のセルで表や評価指標を確認し、必要なときだけLLMセルを実行します。
+Colabで実行する実験Notebookの使い分けです。LLMロードは時間がかかるため、まずはmock modelやルールベースのセルで表や評価指標を確認し、必要なときだけLLMセルを実行します。
 
 ## 推奨順
 
 | 順番 | Notebook | 目的 |
 | --- | --- | --- |
-| 1 | `student_ai_presentation_experiment.ipynb` | 生徒AI設計の発表用。認知モデル、テスト結果、性格別発話、複数生徒分布をまとめて見る |
-| 2 | `student_ai_colab.ipynb` | 生徒AI単体の詳細確認。理解度、誤概念、難易度、スキル弱点、発話サンプルを見る |
-| 3 | `personality_experiment.ipynb` | 個人特徴が発話に反映され、伝達AIが分類できるかを見る |
-| 4 | `teaching_strategy_experiment.ipynb` | 複数生徒クラスを観察し、伝達AI、講義設計AI、教師発話AIの流れを見る |
-| 5 | `paper_core_experiment.ipynb` | 論文に使う最小実験と出力結果をまとめて確認する |
+| 1 | `communication_ai_rq1_experiment.ipynb` | 主研究用。伝達AIが観察ログからTeacher Beliefを推定できるかを評価する |
+| 2 | `student_ai_presentation_experiment.ipynb` | 生徒AI設計の発表用。認知モデル、テスト結果、性格別発話、複数生徒分布をまとめて見る |
+| 3 | `student_ai_colab.ipynb` | 生徒AI単体の詳細確認。理解度、誤概念、難易度、スキル弱点、発話サンプルを見る |
+| 4 | `personality_experiment.ipynb` | 個人特徴が発話に反映され、伝達AIが分類できるかを見る |
+| 5 | `teaching_strategy_experiment.ipynb` | 複数生徒クラスを観察し、伝達AI、講義設計AI、教師発話AIの流れを見る |
+| 6 | `paper_core_experiment.ipynb` | 論文に使う最小実験と出力結果をまとめて確認する |
 
 ## 最初に実行するNotebook
 
-進捗報告や発表では、まず `student_ai_presentation_experiment.ipynb` から始めます。
+伝達AIを主研究として確認する場合は、まず `communication_ai_rq1_experiment.ipynb` から始めます。
+
+このNotebookで確認するもの:
+
+- Ground Truth StateとObservable Eventの分離
+- Observable EventだけからTeacher Belief Stateを推定する流れ
+- `stats_baseline`, `rule_based_communication_ai`, `enhanced_communication_ai` の比較
+- 観察情報アブレーションによる性能変化
+- スキル習熟度、全体理解度、誤概念、個人特徴、確信度の評価
+- 失敗例と追加観察候補
+- Codex/ChatGPT共有用txtの出力
+
+生徒AI設計の進捗報告や発表では、`student_ai_presentation_experiment.ipynb` を使います。
 
 発表用Notebookで確認するもの:
 
@@ -27,20 +40,7 @@ Colabで実行する実験Notebookの使い分けです。LLMロードは時間�
 - 30人分のパラメータ設計と予測正答率分布
 - 従来モデルとBKT/IRT寄りモデルの補助比較
 
-LLM発話確認はロード時間が長いため、`7.1 実際のLLMで性格別発話を見る` のセルだけ任意で実行します。実行する場合はセル内の `RUN_LLM_PERSONALITY_UTTERANCE_CHECK = True` に変更してください。
-
-詳細に掘り下げたい場合は `student_ai_colab.ipynb` を使います。
-
-主に確認するもの:
-
-- 理解度と正答率の関係
-- 問題難易度別の正答率
-- 誤概念あり/なしの差
-- 弱点スキルごとの差
-- 個人特徴による発話の違い
-- BKT/IRT寄りモデルと従来モデルの比較
-- スライド用の認知モデル式
-- 複数生徒AIにしたときのクラス分布グラフ
+## スライド用の材料
 
 スライドに貼る材料を作る場合は、`student_ai_colab.ipynb` の後半にある次のセルを使います。
 
@@ -52,7 +52,7 @@ LLM発話確認はロード時間が長いため、`7.1 実際のLLMで性格別
 
 ## LLMセルの扱い
 
-LLM発話の自然性を確認するセルは、ロード時間が長いため標準では実行しない構成にしています。必要なときだけ `use_mock_model=False` にして実行してください。
+LLM発話の自然性を確認するセルは、ロード時間が長いため標準では実行しない構成にしています。必要なときだけ `use_mock_model=False` や実行フラグを有効にしてください。
 
 ColabでLLMを使う場合:
 
@@ -67,6 +67,7 @@ ColabでLLMを使う場合:
 Codex/ChatGPTに結果を渡すときは、Notebookの出力を大量に貼るのではなく、共有用txtを作成して添付します。
 
 ```text
+data/assessments/rq1_communication_ai_for_codex.txt
 data/assessments/student_ai_evaluation_for_codex.txt
 data/assessments/cognitive_model_comparison_for_codex.txt
 data/assessments/teaching_strategy_result_summary.txt

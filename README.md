@@ -37,6 +37,7 @@ student-ai/
   docs/
     daily/             # 日付ごとの作業メモ
   notebooks/
+    communication_ai_rq1_experiment.ipynb
     student_ai_presentation_experiment.ipynb
     student_ai_colab.ipynb
     personality_experiment.ipynb
@@ -70,6 +71,7 @@ student-ai/
 
 | Notebook | 役割 |
 | --- | --- |
+| `notebooks/communication_ai_rq1_experiment.ipynb` | 主研究用。伝達AIが観察ログからTeacher Beliefを推定できるかを評価 |
 | `notebooks/student_ai_presentation_experiment.ipynb` | 生徒AI設計の発表用。認知モデル、テスト結果、性格別発話、複数生徒分布を確認 |
 | `notebooks/student_ai_colab.ipynb` | 生徒AI単体の詳細確認、学習曲線、誤概念、難易度別正答率、発話サンプル |
 | `notebooks/personality_experiment.ipynb` | 個人特徴が発話に出るか、伝達AIが分類できるかを確認 |
