@@ -25,6 +25,8 @@ class RuleBasedMockLLM:
     model_id = "rule-based-mock"
 
     def generate(self, system_prompt: str, user_prompt: str) -> str:
+        if not _extract_should_solve(user_prompt):
+            return _style_mock_lesson_reaction(user_prompt)
         target_answer = _extract_target_answer(user_prompt)
         if target_answer:
             if "学力テスト" in system_prompt:
@@ -145,6 +147,11 @@ class StudentAISimulator:
         updated_state["learning_history"].append(event)
         self.state_manager.save_student(updated_state)
         return event
+
+
+def _extract_should_solve(prompt: str) -> bool:
+    match = re.search(r"should_solve:\s*(True|False)", prompt)
+    return match is None or match.group(1) == "True"
 
 
 def _answer_value(target_answer: str) -> str:

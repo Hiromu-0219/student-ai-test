@@ -88,3 +88,26 @@ def test_lesson_probe_forces_controlled_answer_label():
 
     assert result.endswith("答え: x = 5")
     assert "答え: x = 4" not in result
+
+
+
+def test_student_agent_removes_solution_when_behavior_says_listen():
+    agent = StudentAgent(
+        _FakeGenerator("3x = 15 なので、両辺を3で割ります。答え: x = 5")
+    )
+
+    result = agent.answer(
+        {
+            "student_id": "S999",
+            "knowledge_state": {"linear_equation": {"score": 80}},
+            "misconceptions": [],
+            "self_efficacy": "medium",
+            "question_tendency": "medium",
+            "motivation": "medium",
+        },
+        "今日の目標は係数で両辺を割ることです。まず確認しましょう。",
+    )
+
+    assert "答え" not in result
+    assert "x =" not in result
+    assert result

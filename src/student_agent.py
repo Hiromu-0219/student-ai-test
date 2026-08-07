@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any, Protocol
 
+from src.student_behavior_model import build_student_behavior, fallback_utterance_for_behavior
 from src.prompts import (
     ASSESSMENT_SYSTEM_PROMPT,
     CONTROLLED_LESSON_SYSTEM_PROMPT,
@@ -32,7 +33,17 @@ class StudentAgent:
         problem: str,
         assessment_directive: dict[str, Any] | None = None,
     ) -> str:
-        prompt = build_student_prompt(student_state, problem, assessment_directive)
+        behavior_directive = build_student_behavior(
+            student_state,
+            problem,
+            assessment_directive,
+        )
+        prompt = build_student_prompt(
+            student_state,
+            problem,
+            assessment_directive,
+            behavior_directive=behavior_directive,
+        )
         directive_mode = (assessment_directive or {}).get("mode")
         if directive_mode == "lesson_probe":
             system_prompt = CONTROLLED_LESSON_SYSTEM_PROMPT
@@ -48,12 +59,15 @@ class StudentAgent:
             raw_answer,
             assessment=is_assessment,
             teacher_message=problem,
+            behavior_directive=behavior_directive,
         )
         if directive_mode == "lesson_probe":
             return _force_controlled_answer_label(
                 normalized_answer,
                 (assessment_directive or {}).get("target_answer"),
             )
+        if not normalized_answer.strip():
+            return fallback_utterance_for_behavior(behavior_directive)
         return normalized_answer
 
 
@@ -62,6 +76,7 @@ def normalize_student_turn(
     *,
     assessment: bool = False,
     teacher_message: str | None = None,
+    behavior_directive: dict[str, Any] | None = None,
 ) -> str:
     """Keep only one student turn and remove accidental teacher dialogue."""
 
@@ -73,9 +88,42 @@ def normalize_student_turn(
         return _keep_assessment_answer(text)
     text = _keep_only_student_speaker_turn(text)
     text = _remove_empty_lines(text)
+    if behavior_directive and not behavior_directive.get("should_solve", False):
+        text = _remove_solution_like_sentences(text)
+        text = _remove_answer_label(text)
+        text = text or fallback_utterance_for_behavior(behavior_directive)
+        return _limit_sentences(text, max_sentences=2)
     text = _ensure_non_empty_answer(text)
     text = _ensure_answer_for_linear_problem(text, teacher_message)
     return _limit_sentences(text, max_sentences=4)
+
+
+def _remove_solution_like_sentences(text: str) -> str:
+    parts = re.split(r"(?<=[。！？?])\s*|\n+", text)
+    kept = []
+    for part in parts:
+        candidate = part.strip()
+        if not candidate:
+            continue
+        if _looks_like_solution(candidate):
+            continue
+        kept.append(candidate)
+    return " ".join(kept).strip()
+
+
+def _looks_like_solution(text: str) -> bool:
+    return bool(
+        re.search(r"答え\s*[:：]", text)
+        or re.search(r"\d*\s*x\s*=", text)
+        or re.search(r"x\s*(?:は|が|の値)", text)
+        or "両辺" in text
+        or "割" in text
+        or "移項" in text
+    )
+
+
+def _remove_answer_label(text: str) -> str:
+    return re.sub(r"答え\s*[:：][^。！？?]*", "", text).strip()
 
 
 def _force_controlled_answer_label(text: str, target_answer: str | None) -> str:

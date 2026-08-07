@@ -63,6 +63,8 @@ def build_student_prompt(
     student_state: dict[str, Any],
     teacher_message: str,
     assessment_directive: dict[str, Any] | None = None,
+    *,
+    behavior_directive: dict[str, Any] | None = None,
 ) -> str:
     if assessment_directive:
         if assessment_directive.get("mode") == "lesson_probe":
@@ -70,6 +72,7 @@ def build_student_prompt(
                 student_state,
                 teacher_message,
                 assessment_directive,
+                behavior_directive=behavior_directive,
             )
         return build_assessment_prompt(student_state, teacher_message, assessment_directive)
 
@@ -108,6 +111,9 @@ def build_student_prompt(
 - personality_profile: {personality_profile}
 {personality_instructions}
 
+行動仕様:
+{_format_behavior_directive(behavior_directive)}
+
 出力ルール:
 - 生徒の1ターン分だけを書く。
 - 教師や先生の発話を書かない。
@@ -115,14 +121,15 @@ def build_student_prompt(
 - 1-4文に収める。
 - 数式は英語化せず、記号のまま書く。
 - personality_profile と矛盾する口調にしない。
-- 解答する場合は最後に必ず「答え: x = ...」を書く。
-- 答えが分からない場合でも、空欄にせず「答え: わかりません」と書く。
-- 教師に説明する口調ではなく、自分が解いた結果を返す。
+- 行動仕様の should_solve が False の場合は、問題を解かず、途中式も答えも書かない。
+- 行動仕様の should_include_answer が False の場合は、「答え: ...」を書かない。
+- 行動仕様の should_solve が True の場合だけ、最後に「答え: x = ...」を書く。
+- 教師に説明する口調ではなく、自分が授業中に返す自然な反応を書く。
 
 教師の発話:
 {teacher_message}
 
-生徒AIとして、授業中の自然な返答をしてください。問題を出されている場合は、最後に必ず答えを書いてください。
+生徒AIとして、行動仕様に従って授業中の自然な返答をしてください。
 """
 
 
@@ -160,6 +167,8 @@ def build_controlled_lesson_prompt(
     student_state: dict[str, Any],
     teacher_message: str,
     assessment_directive: dict[str, Any],
+    *,
+    behavior_directive: dict[str, Any] | None = None,
 ) -> str:
     knowledge_state = student_state.get("knowledge_state", {})
     misconceptions = student_state.get("misconceptions", [])
@@ -179,6 +188,9 @@ def build_controlled_lesson_prompt(
 発話スタイル:
 - personality_profile: {personality_profile}
 {personality_instructions}
+
+行動仕様:
+{_format_behavior_directive(behavior_directive)}
 
 assessment_directive:
 - mode: lesson_probe
@@ -202,3 +214,26 @@ assessment_directive:
 
 生徒AIとして、授業中に観察できる自然な返答をしてください。
 """
+
+
+
+def _format_behavior_directive(behavior_directive: dict[str, Any] | None) -> str:
+    if not behavior_directive:
+        return "- behavior_directive: None"
+    lines = []
+    for key in [
+        "phase_type",
+        "action_type",
+        "should_solve",
+        "should_include_answer",
+        "should_ask_question",
+        "should_show_work",
+        "should_express_uncertainty",
+        "target_answer",
+        "target_correct",
+    ]:
+        lines.append(f"- {key}: {behavior_directive.get(key)}")
+    constraints = behavior_directive.get("constraints", [])
+    if constraints:
+        lines.append("- constraints: " + ", ".join(str(item) for item in constraints))
+    return "\n".join(lines)

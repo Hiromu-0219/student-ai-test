@@ -16,7 +16,7 @@
   "cognitive_model": "bkt_irt",
   "update_student_knowledge": false,
   "reset_teacher_beliefs": true,
-  "git_commit": "a3ff187"
+  "git_commit": "36d4aef"
 }
 
 ## Research Metrics
