@@ -1,51 +1,10 @@
-# docs
+# 研究資料
 
-研究設計、進捗共有、実験方針を置く場所です。日付ごとの作業メモは `daily/` に分けています。
+入口は [research_overview.md](research_overview.md) です。
 
-## 研究設計
+- `design/`: 生徒AI仕様、教室全体を扱う設計理由、参考文献対応。
+- `evaluation/`: 生徒AI、クラス、伝達AI、授業設計の詳細評価手順。
+- `archive/`: 過去の研究計画・成果案・共有資料。現在の方針は全体像を参照。
+- `daily/`: 日付ごとの作業記録。
 
-| ファイル | 役割 |
-| --- | --- |
-| `student_ai_design.md` | 生徒AIの設計仕様書。状態、認知モデル、発話生成、評価範囲を説明 |
-| `classroom_level_cognitive_model_rationale.md` | 認知モデル制御を、教室全体を見る研究目的から説明する資料 |
-| `internal_validity_experiment.md` | 生徒AIを内部妥当性から検証するための評価手順 |
-| `paper_experiment_core.md` | 論文に使う実験のコア、必要な出力、Notebookで確認する内容 |
-| `reference_mapping.md` | BKT/IRTなど、設計要素と参考文献の対応表 |
-
-## 共有・進捗
-
-| ファイル | 役割 |
-| --- | --- |
-| `student_ai_progress_report.md` | 生徒AI設計に絞った進捗報告 |
-| `share_summary.md` | 先輩共有用の全体進捗、方向性、Todo |
-| `research_paper_plan.md` | 論文用の研究計画、問い、実験設計 |
-| `research_outcomes.md` | 出せそうな研究成果の一覧 |
-
-## 日付メモ
-
-日付ごとの作業ログは `docs/daily/` に置きます。
-
-```text
-docs/daily/
-  2026-07-28.md
-  2026-07-26.md
-  2026-07-13.md
-  2026-07-14.md
-  2026-07-16.md
-  2026-07-16-class-management.md
-  2026-07-17.md
-  2026-07-20.md
-  2026-07-21.md
-  2026-07-23.md
-```
-
-## 共有用出力
-
-Codex/ChatGPTに実験結果を渡すときは、次のtxtをそのまま添付します。
-
-```text
-data/assessments/student_ai_evaluation_for_codex.txt
-data/assessments/cognitive_model_comparison_for_codex.txt
-data/assessments/teaching_strategy_result_summary.txt
-```
-
+実行方法はリポジトリのREADME、Notebookの選択は `notebooks/README.md` を参照してください。

@@ -1,155 +1,51 @@
-# Student AI Education Simulation
+# 教育シミュレーション研究
 
-一次方程式を題材に、生徒AI・伝達AI・講義設計AI・教師発話AIを組み合わせて授業シミュレーションを行う研究用リポジトリです。
+最終更新: 2026-10-01 JST
 
-現在の主張範囲は、人間生徒の完全な代替ではありません。理解度、誤概念、個人特徴を外部状態として制御した生徒AIが、教育シミュレーション内の「限定的な学習者代理」として使えるかを内部妥当性から検証します。
+複数の生徒AIを観察し、伝達AIの要約を使って教師がクラス全体の授業を調整する研究です。生徒の認知・行動・性格を外部状態で制御し、LLMで発話を生成します。対象単元は一次方程式です。
 
-## まず読むもの
+## 最初に読む
 
-| 目的 | ファイル |
+- [研究の目的・評価・次にやること](docs/research_overview.md)
+- [生徒AIの設計仕様](docs/design/student_ai_design.md)
+- [参考文献と設計の対応](docs/design/reference_mapping.md)
+- 別端末への引継ぎ: [CODEX_HANDOFF.md](CODEX_HANDOFF.md)
+
+## 実行するNotebookは3つ
+
+| Notebook | 用途 |
 | --- | --- |
-| 生徒AIの設計を把握する | [docs/student_ai_design.md](docs/student_ai_design.md) |
-| 進捗報告として共有する | [docs/student_ai_progress_report.md](docs/student_ai_progress_report.md) |
-| 論文用の実験コアを見る | [docs/paper_experiment_core.md](docs/paper_experiment_core.md) |
-| 伝達AIを主研究にする方針を見る | [docs/communication_ai_research_plan.md](docs/communication_ai_research_plan.md) |
-| 内部妥当性の評価方法を見る | [docs/internal_validity_experiment.md](docs/internal_validity_experiment.md) |
-| 複数生徒クラスの妥当性を見る | [docs/classroom_validity_experiment.md](docs/classroom_validity_experiment.md) |
-| 伝達AIの推定妥当性を見る | [docs/communication_validity_experiment.md](docs/communication_validity_experiment.md) |
-| 授業設計AIの妥当性を見る | [docs/lesson_design_validity_experiment.md](docs/lesson_design_validity_experiment.md) |
-| 参考文献との対応を見る | [docs/reference_mapping.md](docs/reference_mapping.md) |
-| Notebookの使い分けを見る | [notebooks/README.md](notebooks/README.md) |
+| [授業シミュレーション](notebooks/simulation_timeline_experiment.ipynb) | 最初に実行。時間経過、会話、授業設計を確認 |
+| [伝達AIの評価](notebooks/communication_ai_rq1_experiment.ipynb) | 観察からの生徒状態推定を比較 |
+| [生徒AIの発表実験](notebooks/student_ai_presentation_experiment.ipynb) | 認知モデルの式、正答率、性格別発話、複数生徒の分布 |
 
-## 全体構成
+詳細な旧実験は `notebooks/supplementary/` に保存しています。
 
-```text
-student-ai/
-  README.md
-  AGENTS.md
-  requirements.txt
-  data/
-    students/          # 生徒ごとの内部状態
-    classes/           # クラス構成とクラス特徴
-    teacher_beliefs/   # 教師側が観察から持つ生徒理解
-    tests/             # 一次方程式テスト
-    curriculum/        # 単元・スキル定義
-    logs/              # 対話ログ
-    assessments/       # 実験結果・共有用txt
-  docs/
-    daily/             # 日付ごとの作業メモ
-  notebooks/
-    communication_ai_rq1_experiment.ipynb
-    simulation_timeline_experiment.ipynb
-    student_ai_presentation_experiment.ipynb
-    student_ai_colab.ipynb
-    personality_experiment.ipynb
-    teaching_strategy_experiment.ipynb
-    paper_core_experiment.ipynb
-  src/
-    experiment/        # 論文・検証用実験ランナー
-    observer/          # 伝達AI、観察情報フィルタ
-    teacher/           # 講義設計AI、教師AI関連
-  tests/
-```
+## Colabで実行
 
-## シミュレーションの流れ
+1. GitHub上の対象NotebookをColabで開く。
+2. LLMを使用する場合は「ランタイム → ランタイムのタイプを変更」でGPUを選ぶ。
+3. 上からセットアップ・設定・実験セルを実行する。最初はmockで確認する。
+4. LLMを使う設定を有効にして再実行する。GPUなしの代替実行はLLM評価には含めない。
+5. `data/assessments/` に出る共有用 `.txt` と会話ログを確認する。
 
-```text
-生徒AI
-  -> 授業中に観察できる発話・正誤・反応を出す
-伝達AI
-  -> 観察可能情報だけから、生徒個人とクラス全体を要約する
-講義設計AI
-  -> クラス全体に対して次の授業構成を考える
-教師発話AI
-  -> 授業構成に沿って全体・個別の発話を作る
-生徒AI
-  -> 教師発話を受けて反応する
-```
+セットアップセルがGitHubから取得するリポジトリ:
+`https://github.com/Hiromu-0219/student-ai-test.git`
 
-生徒AIの内部状態は `data/students/*.json` で管理し、LLMは主に発話生成器として使います。理解度と正答は `src/cognitive_model.py` の認知モデルで制御します。
+コード更新はNotebookの更新セルを使います。開いているセル内容は自動更新されないため、Notebook自体の変更はGitHubの最新版をColabで開き直してください。
 
-## Notebookの役割
+## ファイルの場所
 
-| Notebook | 役割 |
+| フォルダ | 内容 |
 | --- | --- |
-| `notebooks/communication_ai_rq1_experiment.ipynb` | 主研究用。伝達AIが観察ログからTeacher Beliefを推定できるかを評価 |
-| `notebooks/simulation_timeline_experiment.ipynb` | 実行環境用。LLMを任意で入れながら教育シミュレーションを時間経過で確認 |
-| `notebooks/student_ai_presentation_experiment.ipynb` | 生徒AI設計の発表用。認知モデル、テスト結果、性格別発話、複数生徒分布を確認 |
-| `notebooks/student_ai_colab.ipynb` | 生徒AI単体の詳細確認、学習曲線、誤概念、難易度別正答率、発話サンプル |
-| `notebooks/personality_experiment.ipynb` | 個人特徴が発話に出るか、伝達AIが分類できるかを確認 |
-| `notebooks/teaching_strategy_experiment.ipynb` | 複数生徒クラス、伝達AI要約、講義設計AI、教師発話AIの流れを確認 |
-| `notebooks/paper_core_experiment.ipynb` | 論文用に使う最小実験と出力確認 |
+| `src/` | 生徒AI、認知・行動モデル、伝達AI、教師AI、実験ランナー |
+| `data/students/`, `data/classes/` | 生徒の内部状態とクラス構成 |
+| `data/teacher_beliefs/` | 観察から得た教師側の推定 |
+| `data/assessments/`, `data/logs/` | 実験結果と会話ログ |
+| `docs/design/`, `docs/evaluation/` | 設計仕様と詳細評価手順 |
+| `docs/archive/`, `docs/daily/` | 過去の計画・報告と作業履歴 |
+| `scripts/`, `tests/` | Notebook外の実験実行と自動テスト |
 
-## Colabでの実行手順
+標準テスト: `python -m pytest`。モデルのダウンロードは行いません。
 
-1. ColabでGPUランタイムを選びます。
-
-```text
-ランタイム > ランタイムのタイプを変更 > GPU
-```
-
-2. GitHubからcloneします。
-
-```python
-REPO_URL = "https://github.com/Hiromu-0219/student-ai-test.git"
-
-!git clone {REPO_URL} /content/student-ai
-%cd /content/student-ai
-```
-
-3. 依存関係を入れます。
-
-```python
-!pip install -q -r requirements.txt
-```
-
-4. Notebookを開きます。
-
-進捗報告では、まず `notebooks/student_ai_presentation_experiment.ipynb` を開いてください。詳細確認をしたい場合は `notebooks/student_ai_colab.ipynb` を使います。LLMロードは時間がかかるため、最初は `use_mock_model=True` のセルだけで動作確認するのがおすすめです。
-
-## ColabでGitHub更新を反映する
-
-Colab上のrepoを最新にする場合:
-
-```python
-%cd /content/student-ai
-!git fetch origin main
-!git reset --hard origin/main
-!git log -1 --oneline
-```
-
-すでに開いているNotebook画面のセル内容は自動更新されないことがあります。Notebook自体を更新した場合は、GitHub上の最新版Notebookを開き直してください。
-
-## LLM設定
-
-ローカルLLMは `transformers` で読み込みます。4bit量子化は `bitsandbytes` の `BitsAndBytesConfig` を使います。
-
-想定モデル:
-
-- `Qwen/Qwen3-4B`
-- `google/gemma-3-4b-it`
-
-Gemma系の gated model を使う場合は、Colab上で Hugging Face login が必要になることがあります。
-
-## 研究用実験スクリプト
-
-Notebookに依存せず、研究用の基準結果を出す場合は次を使います。
-
-```bash
-python scripts/run_internal_validity_experiment.py
-python scripts/run_classroom_validity_experiment.py
-python scripts/run_communication_validity_experiment.py
-python scripts/run_rq1_communication_ai_experiment.py
-python scripts/run_simulation_timeline.py
-python scripts/run_lesson_design_validity_experiment.py
-```
-
-出力は `data/assessments/` に保存されます。
-
-## テスト
-
-標準テストではモデルダウンロードを行いません。mock modelで状態管理、ログ保存、実験ランナーの経路を確認します。
-
-```bash
-python -m pytest
-```
+実生徒との一致を証明した段階ではありません。現在は制御可能性と内部整合性を検証します。

@@ -150,7 +150,7 @@ LLM出力が教師発話や会話台本を混ぜず、生徒1ターンの観察�
 
 ## 実験実行方法
 
-Colabでは `notebooks/student_ai_colab.ipynb` の生徒AI評価セルを実行する。
+Colabでは `notebooks/supplementary/student_ai_colab.ipynb` の生徒AI評価セルを実行する。
 
 主な呼び出し:
 

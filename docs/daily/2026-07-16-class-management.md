@@ -34,7 +34,7 @@
 
 ## Colabでの使い方
 
-`notebooks/teaching_strategy_experiment.ipynb` の実験設定セルで変更する。
+`notebooks/supplementary/teaching_strategy_experiment.ipynb` の実験設定セルで変更する。
 
 ```python
 CLASS_ID = "class_20_mixed"

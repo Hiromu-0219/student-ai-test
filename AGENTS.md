@@ -10,7 +10,7 @@
 
 - Google Colab で動くことを優先する。
 - ColabではGitHubから `student-ai` をcloneし、repo rootで実行する前提にする。
-- Colab実行例は `notebooks/student_ai_colab.ipynb` に置く。
+- Colab実行例は `notebooks/supplementary/student_ai_colab.ipynb` に置く。
 - ローカルLLMは `transformers` で読み込む。
 - 4bit量子化は `bitsandbytes` の `BitsAndBytesConfig` を使う。
 - 最初はファインチューニングしない。
@@ -70,3 +70,6 @@ Gemma系の gated model を使う場合は、Colab上で Hugging Face login が�
 ```bash
 python -m pytest
 ```
+
+## Current entry points (2026-10-01)
+主実行: notebooks/simulation_timeline_experiment.ipynb。伝達AI評価と生徒AI発表Notebookが現役。詳細な旧実験は notebooks/supplementary/。研究方針は docs/research_overview.md。

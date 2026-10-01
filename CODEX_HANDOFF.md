@@ -106,7 +106,7 @@ LLMは「正誤判定者」ではなく「発話生成器」。
 
 ## 重要Notebook
 
-### `notebooks/teaching_strategy_experiment.ipynb`
+### `notebooks/supplementary/teaching_strategy_experiment.ipynb`
 
 現在の最重要Notebook。教育シミュレーションの流れを確認する。
 
@@ -129,11 +129,11 @@ Colabでは上から順に実行する。Git更新セル、setupセル、preflig
 
 生徒AIそのものの設計説明・発表用Notebook。認知モデル、理解度と正答率、性格別発話などを見せる用途。
 
-### `notebooks/student_ai_colab.ipynb`
+### `notebooks/supplementary/student_ai_colab.ipynb`
 
 初期からある生徒AI検証Notebook。現在は補助的位置づけ。
 
-### `notebooks/paper_core_experiment.ipynb`
+### `notebooks/supplementary/paper_core_experiment.ipynb`
 
 論文用のコア実験整理用。必要なら今後再整理。
 
@@ -291,3 +291,6 @@ git push origin main
 7. 伝達AIのLLM出力をJSON schema寄りに安定化する。
 8. 10人、20人クラスで講義設計がどう変わるか比較する。
 9. 発表・論文用には「認知モデルと行動モデルで制御された生徒AIが、クラス全体の授業設計入力として使えるか」を中心にまとめる。
+
+## 2026-10-01 構成整理
+普段使うNotebookは授業シミュレーション・伝達AI評価・生徒AI発表の3つ。旧Notebookは notebooks/supplementary/。資料は docs/design/、docs/evaluation/、docs/archive/ に分類。現在の研究方針は docs/research_overview.md を参照。実装モジュールは移動していない。

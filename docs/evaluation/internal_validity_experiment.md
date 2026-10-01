@@ -131,7 +131,7 @@ python scripts/run_internal_validity_experiment.py --use-llm
 既存Notebookを使う場合は、次を実行する。
 
 ```text
-notebooks/student_ai_colab.ipynb
+notebooks/supplementary/student_ai_colab.ipynb
 notebooks/student_ai_presentation_experiment.ipynb
 ```
 

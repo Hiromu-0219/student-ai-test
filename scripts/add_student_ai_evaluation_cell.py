@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 MARKER = "<!-- student-ai-expanded-evaluation -->"
-NOTEBOOK_PATH = Path("notebooks/student_ai_colab.ipynb")
+NOTEBOOK_PATH = Path("notebooks/supplementary/student_ai_colab.ipynb")
 
 
 def markdown_cell(source: str) -> dict:
